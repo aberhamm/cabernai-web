@@ -1,0 +1,40 @@
+{
+  "collectionName": "components_sections_cta_banner_centered",
+  "info": {
+    "displayName": "CTABannerCentered",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subText": {
+      "type": "string",
+      "required": false
+    },
+    "image": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.basic-image"
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "isVisible": {
+      "type": "boolean",
+      "default": true,
+      "required": false
+    },
+    "bgColor": {
+      "type": "string",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+    },
+    "footnote": {
+      "type": "string"
+    }
+  }
+}

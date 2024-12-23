@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_sections_feature_cta_grids",
+  "info": {
+    "displayName": "FeatureCTAGrid"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "subTitle": {
+      "type": "string"
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.card-item"
+    },
+    "isVisible": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

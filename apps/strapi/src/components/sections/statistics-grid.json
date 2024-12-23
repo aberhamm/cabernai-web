@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_sections_statistics_grids",
+  "info": {
+    "displayName": "StatisticsGrid",
+    "description": "A grid layout for displaying statistics"
+  },
+  "options": {},
+  "attributes": {
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.card-item"
+    },
+    "isVisible": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

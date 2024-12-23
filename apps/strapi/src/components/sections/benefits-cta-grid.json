@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_sections_benefits_cta_grids",
+  "info": {
+    "displayName": "BenefitsCTAGrid",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "subTitle": {
+      "type": "string"
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
+    },
+    "benefits": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.card-item"
+    },
+    "isVisible": {
+      "type": "boolean",
+      "default": true
+    },
+    "bgImage": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ],
+      "type": "media",
+      "multiple": false
+    }
+  }
+}

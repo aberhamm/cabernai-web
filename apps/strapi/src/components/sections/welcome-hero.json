@@ -1,0 +1,50 @@
+{
+  "collectionName": "components_sections_welcome_heroes",
+  "info": {
+    "displayName": "WelcomeHero",
+    "icon": "chartBubble",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "subTitle": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.button",
+      "max": 4
+    },
+    "isVisible": {
+      "type": "boolean",
+      "default": true
+    },
+    "bgImage": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.basic-image"
+    },
+    "bgColor": {
+      "type": "enumeration",
+      "enum": [
+        "none",
+        "primary",
+        "secondary",
+        "foreground",
+        "background"
+      ]
+    }
+  }
+}

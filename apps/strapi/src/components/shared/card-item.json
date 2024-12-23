@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_shared_card_items",
+  "info": {
+    "displayName": "CardItem",
+    "description": "A single card with optional link"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subTitle": {
+      "type": "string",
+      "required": true
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "image": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.basic-image"
+    }
+  }
+}

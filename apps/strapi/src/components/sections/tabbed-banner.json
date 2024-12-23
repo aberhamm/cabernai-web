@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_sections_tabbed_banners",
+  "info": {
+    "displayName": "TabbedBanner",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subTitle": {
+      "type": "string"
+    },
+    "tabs": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.card-item",
+      "required": true
+    }
+  }
+}
