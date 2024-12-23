@@ -16,16 +16,6 @@
     }
   },
   "attributes": {
-    "gridCols": {
-      "type": "component",
-      "repeatable": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "component": "shared.grid-column"
-    },
     "sections": {
       "type": "component",
       "repeatable": true,

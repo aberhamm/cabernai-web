@@ -1,20 +1,20 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import { StrapiImageMedia } from "@/types/api"
-import { ImageExtendedProps } from "@/types/next"
+import { StrapiImageMedia } from '@/types/api'
+import { ImageExtendedProps } from '@/types/next'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { ImageWithFallback } from "@/components/elementary/ImageWithFallback"
-import { ImageWithPlaiceholder } from "@/components/elementary/ImageWithPlaiceholder"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { ImageWithFallback } from '@/components/elementary/ImageWithFallback'
+import { ImageWithPlaiceholder } from '@/components/elementary/ImageWithPlaiceholder'
 
 export interface BasicImageProps
-  extends Omit<ImageExtendedProps, "src" | "alt"> {
+  extends Omit<ImageExtendedProps, 'src' | 'alt'> {
   readonly component:
-    | Schema.Attribute.ComponentValue<"shared.basic-image", false>
+    | Schema.Attribute.ComponentValue<'shared.basic-image', false>
     | undefined
     | null
   readonly useClient?: boolean
-  readonly className?: ImageExtendedProps["className"]
+  readonly className?: ImageExtendedProps['className']
   readonly hideWhenMissing?: boolean
   readonly fallbackSizes?: { width?: number | null; height?: number | null }
   readonly forcedSizes?: { width?: number | null; height?: number | null }
@@ -29,7 +29,7 @@ export function BasicImage({
   forcedSizes,
   ...imgProps
 }: BasicImageProps) {
-  removeThisWhenYouNeedMe("BasicImage")
+  removeThisWhenYouNeedMe('BasicImage')
 
   const media: StrapiImageMedia = component?.media
 
@@ -62,7 +62,7 @@ export function BasicImage({
       // @ts-expect-error - src needs to be typed in better way
       src={media?.url}
       fallbackSrc={component?.fallbackSrc ?? undefined}
-      alt={component?.alt ?? media?.caption ?? media?.alternativeText ?? ""}
+      alt={component?.alt ?? media?.caption ?? media?.alternativeText ?? ''}
       {...sizes}
       {...imgProps}
     />

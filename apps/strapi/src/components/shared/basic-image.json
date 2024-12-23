@@ -10,11 +10,14 @@
       "type": "media",
       "multiple": false,
       "required": true,
-      "allowedTypes": ["images", "videos"]
+      "allowedTypes": [
+        "images",
+        "videos"
+      ]
     },
     "alt": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "width": {
       "type": "integer",
@@ -26,6 +29,10 @@
     },
     "fallbackSrc": {
       "type": "string"
+    },
+    "opacity": {
+      "type": "decimal",
+      "max": 1
     }
   }
 }

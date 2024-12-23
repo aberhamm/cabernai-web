@@ -1,16 +1,16 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
-import * as Sentry from "@sentry/nextjs"
-import { XIcon } from "lucide-react"
-import { useTranslations } from "next-intl"
-import { ErrorBoundary as ErrorBoundaryComp } from "react-error-boundary"
+import { useState } from 'react'
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import * as Sentry from '@sentry/nextjs'
+import { XIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { ErrorBoundary as ErrorBoundaryComp } from 'react-error-boundary'
 
-import { isDevelopment } from "@/lib/general-helpers"
+import { isDevelopment } from '@/lib/general-helpers'
 
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
-import { Button } from "../ui/button"
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
+import { Button } from '../ui/button'
 
 function ErrorBoundaryFallback({
   error,
@@ -26,7 +26,7 @@ function ErrorBoundaryFallback({
   showErrorMessage?: boolean
 }) {
   const [hidden, setHidden] = useState(false)
-  const t = useTranslations("errors.global")
+  const t = useTranslations('errors.global')
 
   if (hidden) {
     return null
@@ -42,7 +42,7 @@ function ErrorBoundaryFallback({
   return (
     <Alert variant="destructive" className="relative">
       <ExclamationTriangleIcon className="s-4" />
-      <AlertTitle>{customErrorTitle ?? t("invalidContent")}</AlertTitle>
+      <AlertTitle>{customErrorTitle ?? t('invalidContent')}</AlertTitle>
       <AlertDescription>
         {(showErrorMessage || isDev) && (
           <p className="mt-1 text-sm text-black">{error.message}</p>
@@ -50,7 +50,7 @@ function ErrorBoundaryFallback({
 
         {isDev && (
           <div className="mt-2 w-full overflow-x-auto bg-gray-100 p-3 text-xs">
-            <pre>{error.stack?.split("\n").slice(0, 5).join("\n")}</pre>
+            <pre>{error.stack?.split('\n').slice(0, 5).join('\n')}</pre>
           </div>
         )}
 
@@ -62,7 +62,7 @@ function ErrorBoundaryFallback({
             onClick={handleTryAgain}
             className="mt-2"
           >
-            {t("tryAgain")}
+            {t('tryAgain')}
           </Button>
         )}
       </AlertDescription>

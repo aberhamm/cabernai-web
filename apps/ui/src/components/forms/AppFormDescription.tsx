@@ -1,14 +1,14 @@
-import React from "react"
+import React from 'react'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { FormDescription } from "@/components/ui/form"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { FormDescription } from '@/components/ui/form'
 
 type Props = {
   readonly description?: React.ReactNode
 }
 
 export function AppFormDescription({ description }: Props) {
-  removeThisWhenYouNeedMe("AppFormDescription")
+  removeThisWhenYouNeedMe('AppFormDescription')
 
   if (description == null) {
     return null

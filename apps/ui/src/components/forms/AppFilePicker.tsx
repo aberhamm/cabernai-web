@@ -1,17 +1,17 @@
-"use client"
+'use client'
 
-import { useRef, useState } from "react"
-import { Cross1Icon } from "@radix-ui/react-icons"
-import { PaperclipIcon } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { useRef, useState } from 'react'
+import { Cross1Icon } from '@radix-ui/react-icons'
+import { PaperclipIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
 
-import { Tooltip } from "../elementary/Tooltip"
-import { FormItem } from "../ui/form"
-import { useToast } from "../ui/use-toast"
-import { AppFormLabel } from "./AppFormLabel"
+import { Tooltip } from '../elementary/Tooltip'
+import { FormItem } from '../ui/form'
+import { useToast } from '../ui/use-toast'
+import { AppFormLabel } from './AppFormLabel'
 
 interface Props {
   readonly selectedFile: File | null
@@ -38,13 +38,13 @@ export function AppFilePicker({
   label,
   required,
 }: Props) {
-  removeThisWhenYouNeedMe("AppFilePicker")
+  removeThisWhenYouNeedMe('AppFilePicker')
 
   const [isDraggingOver, setIsDraggingOver] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  const t = useTranslations("comps.fileInput")
+  const t = useTranslations('comps.fileInput')
   const { toast } = useToast()
 
   const setFile = (file: File | null) => {
@@ -52,12 +52,12 @@ export function AppFilePicker({
       setSelectedFile(file)
     } else {
       toast({
-        variant: "destructive",
-        title: t("wrongFileType"),
-        description: t("validFileTypes", {
+        variant: 'destructive',
+        title: t('wrongFileType'),
+        description: t('validFileTypes', {
           validFileTypes: validTypes
-            .map((type) => (type.includes("/") ? type.split("/").pop() : type))
-            .join(", "),
+            .map((type) => (type.includes('/') ? type.split('/').pop() : type))
+            .join(', '),
         }),
       })
     }
@@ -97,7 +97,7 @@ export function AppFilePicker({
   const removeSelectedFile = () => {
     setFile(null)
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = ''
     }
   }
 
@@ -106,9 +106,9 @@ export function AppFilePicker({
       <AppFormLabel label={label} required={required} />
 
       <div
-        className={cn(fieldClassName, "w-full rounded-lg border-2", {
-          "bg-gray-100": isDraggingOver,
-          "cursor-pointer": !selectedFile,
+        className={cn(fieldClassName, 'w-full rounded-lg border-2', {
+          'bg-gray-100': isDraggingOver,
+          'cursor-pointer': !selectedFile,
         })}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -129,8 +129,8 @@ export function AppFilePicker({
                   <PaperclipIcon size={16} /> {selectedFile.name}
                 </span>
                 <Tooltip
-                  contentProps={{ side: "left" }}
-                  content={t("removeFile")}
+                  contentProps={{ side: 'left' }}
+                  content={t('removeFile')}
                 >
                   <button
                     type="button"
@@ -155,7 +155,7 @@ export function AppFilePicker({
               }}
               className="size-full text-sm text-gray-500"
             >
-              {t("dragAndDrop")}
+              {t('dragAndDrop')}
             </button>
           )}
         </div>

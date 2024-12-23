@@ -1,27 +1,27 @@
-"use client"
+'use client'
 
-import React, { useTransition } from "react"
-import { useSearchParams } from "next/navigation"
+import React, { useTransition } from 'react'
+import { useSearchParams } from 'next/navigation'
 
-import { AppLocale } from "@/types/general"
+import { AppLocale } from '@/types/general'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { routing, usePathname, useRouter } from "@/lib/navigation"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { routing, usePathname, useRouter } from '@/lib/navigation'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectSeparator,
   SelectTrigger,
-} from "@/components/ui/select"
+} from '@/components/ui/select'
 
 const localeTranslation = {
-  cs: "Czech",
-  en: "English",
+  cs: 'Czech',
+  en: 'English',
 }
 
 const LocaleSwitcher = ({ locale }: { locale: AppLocale }) => {
-  removeThisWhenYouNeedMe("LocaleSwitcher")
+  removeThisWhenYouNeedMe('LocaleSwitcher')
 
   // prevent the locale switch from blocking the UI thread
   const [, startTransition] = useTransition()

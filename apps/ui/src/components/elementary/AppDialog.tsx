@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { createContext, useContext, useMemo, useState } from "react"
-import { useTranslations } from "next-intl"
+import { createContext, useContext, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 
 interface Props {
   readonly Props: React.ReactNode
@@ -48,9 +48,9 @@ export function AppDialog({
   confirmDialogClose,
   dialogCloseCallback,
 }: Props) {
-  removeThisWhenYouNeedMe("AppDialog")
+  removeThisWhenYouNeedMe('AppDialog')
 
-  const t = useTranslations("comps.dialog")
+  const t = useTranslations('comps.dialog')
   const [open, setOpen] = useState<boolean>(false)
   const [confirmClose, setConfirmClose] = useState<boolean>(
     confirmDialogClose ?? false
@@ -68,7 +68,7 @@ export function AppDialog({
   )
 
   const handleOpenChange = (open: boolean) => {
-    if (!!confirmClose && open === false && !confirm(t("confirmClose"))) {
+    if (!!confirmClose && open === false && !confirm(t('confirmClose'))) {
       return
     }
     if (open === false && !!dialogCloseCallback) {
@@ -82,7 +82,7 @@ export function AppDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{triggerButton}</DialogTrigger>
       <DialogContent
-        className={cn("max-h-screen overflow-auto", dialogContentClassName)}
+        className={cn('max-h-screen overflow-auto', dialogContentClassName)}
       >
         <DialogHeader className="mb-4">
           <DialogTitle className="text-2xl font-semibold">

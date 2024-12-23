@@ -1,10 +1,10 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
-import { Container } from "@/components/elementary/Container"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
+import { Container } from '@/components/elementary/Container'
 
-import { BasicImage } from "./BasicImage"
+import { BasicImage } from './BasicImage'
 
 const DEFAULT_IMG_SIZE = 50
 
@@ -12,11 +12,11 @@ export function FeatureGrid({
   component,
 }: {
   readonly component: Schema.Attribute.ComponentValue<
-    "sections.feature-grid",
+    'sections.feature-grid',
     false
   >
 }) {
-  removeThisWhenYouNeedMe("FeatureGrid")
+  removeThisWhenYouNeedMe('FeatureGrid')
 
   const [desktop, tablet, mobile] = [
     component.gridCol?.desktop ?? 4,
@@ -29,7 +29,7 @@ export function FeatureGrid({
       <Container className="grid px-4 py-8 lg:grid-cols-12 lg:gap-8 lg:py-16 xl:gap-0">
         <div
           className={cn(
-            "grid gap-8",
+            'grid gap-8',
             `grid-cols-${mobile}`,
             `sm:grid-cols-${mobile}`,
             `md:grid-cols-${tablet}`,
@@ -41,7 +41,7 @@ export function FeatureGrid({
               <BasicImage
                 component={item.image}
                 className={cn(
-                  "mb-2 object-cover",
+                  'mb-2 object-cover',
                   component.imageRadius && `rounded-${component.imageRadius}`
                 )}
                 fallbackSizes={{

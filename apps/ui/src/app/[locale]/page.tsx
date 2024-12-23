@@ -1,65 +1,85 @@
-import { setRequestLocale } from "next-intl/server"
+import { notFound } from 'next/navigation'
+import { setRequestLocale } from 'next-intl/server'
 
-import { PageProps } from "@/types/next"
+import { PageProps } from '@/types/next'
 
-import { getAuth } from "@/lib/auth"
-import { Link } from "@/lib/navigation"
-import { ErrorBoundary } from "@/components/elementary/ErrorBoundary"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { routing } from '@/lib/navigation'
+import { getMetadataFromStrapi } from '@/lib/next-helpers'
+import Strapi from '@/lib/strapi'
+import { ComponentsRenderer } from '@/components/page-builder/ComponentsRenderer'
+import { Footer } from '@/components/page-builder/single-types/Footer'
 
-import { ConfigurationExample } from "./_components/Configuration"
+export async function generateStaticParams() {
+  const promises = routing.locales.map((locale) =>
+    Strapi.fetchAll('api::page.page', { locale }, undefined, {
+      omitAuthorization: true,
+    })
+  )
 
-// export async function generateMetadata({ params }: PageProps) {
-//   return getMetadataFromStrapi({ pageUrl, locale: params.locale })
-// }
+  const results = await Promise.allSettled(promises)
 
-export default async function RootPage({ params }: PageProps) {
-  const session = await getAuth()
+  const params = results
+    .filter((result) => result.status === 'fulfilled')
+    .map((result) => result.value.data)
+    .flat()
+    .map((page) => ({
+      locale: page.locale,
+      rest: [page.slug],
+    }))
 
-  // Enable static rendering
+  return params
+}
+
+async function fetchData(pageUrl: string, locale: string) {
+  try {
+    return Strapi.fetchOneBySlug(
+      'api::page.page',
+      pageUrl,
+      {
+        populate: ['content'],
+        pLevel: 10,
+        locale,
+      },
+      undefined,
+      { omitAuthorization: true }
+    )
+  } catch (e: any) {
+    console.error(`"api::page.page" wasn't fetched: `, e?.message)
+    return undefined
+  }
+}
+
+type Props = PageProps<{
+  rest: string[]
+}>
+
+export async function generateMetadata({ params }: Props) {
+  return getMetadataFromStrapi({ pageUrl: '/', locale: params.locale })
+}
+
+export default async function StrapiPage({ params }: Props) {
   setRequestLocale(params.locale)
 
-  return (
-    <div className="space-y-10">
-      <ErrorBoundary
-        customErrorTitle="Configuration wasn't fetched from Strapi."
-        showErrorMessage
-      >
-        <ConfigurationExample />
-      </ErrorBoundary>
+  const response = await fetchData('/', params.locale)
 
-      {session && (
-        <Card className="m-auto w-[800px]">
-          <CardHeader>
-            <CardTitle>Authenticated content</CardTitle>
-            <CardDescription>
-              This is available only for authenticated users.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <strong>Session: </strong> {JSON.stringify(session.user)}
-          </CardContent>
-          <CardFooter className="flex w-full items-center justify-end gap-3">
-            <Button asChild>
-              <Link href="/profile">Profile page</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth/change-password">Change password</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth/signout">Logout</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
-    </div>
+  const page = response?.data
+
+  if (page?.content == null) {
+    notFound()
+  }
+
+  const pageComponents = page.content.filter((x) => {
+    return (
+      x.__component !== 'layout.navbar' &&
+      ('isVisible' in x ? x.isVisible : true)
+    )
+  })
+
+  return (
+    <>
+      <main className="w-full overflow-x-hidden">
+        <ComponentsRenderer pageComponents={pageComponents} />
+      </main>
+    </>
   )
 }

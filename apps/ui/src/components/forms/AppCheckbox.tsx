@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import React from "react"
-import { useFormContext } from "react-hook-form"
+import React from 'react'
+import { useFormContext } from 'react-hook-form'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
-import { Checkbox as CheckboxComponent } from "@/components/ui/checkbox"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
+import { Checkbox as CheckboxComponent } from '@/components/ui/checkbox'
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form"
+} from '@/components/ui/form'
 
-import { AppFormDescription } from "./AppFormDescription"
-import { AppFormLabel } from "./AppFormLabel"
+import { AppFormDescription } from './AppFormDescription'
+import { AppFormLabel } from './AppFormLabel'
 
 type Props = {
   readonly name: string
@@ -22,7 +22,7 @@ type Props = {
   readonly containerClassName?: string
   readonly fieldClassName?: string
   readonly description?: React.ReactNode
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'>
 
 export function AppCheckbox({
   name,
@@ -32,7 +32,7 @@ export function AppCheckbox({
   description,
   ...nativeProps
 }: Props) {
-  removeThisWhenYouNeedMe("AppCheckbox")
+  removeThisWhenYouNeedMe('AppCheckbox')
 
   const { control } = useFormContext()
 
@@ -44,7 +44,7 @@ export function AppCheckbox({
         <FormItem
           className={cn(
             containerClassName,
-            "flex flex-col justify-center justify-items-center"
+            'flex flex-col justify-center justify-items-center'
           )}
         >
           <div className="flex flex-row items-start space-x-3 space-y-0">

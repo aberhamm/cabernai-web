@@ -1,7 +1,7 @@
 {
   "collectionName": "components_sections_feature_grids",
   "info": {
-    "displayName": "FeatureGrid",
+    "displayName": "LegacyFeatureGrid",
     "description": ""
   },
   "options": {},
@@ -31,7 +31,13 @@
     },
     "imageRadius": {
       "type": "enumeration",
-      "enum": ["sm", "md", "lg", "xl", "full"]
+      "enum": [
+        "sm",
+        "md",
+        "lg",
+        "xl",
+        "full"
+      ]
     }
   }
 }

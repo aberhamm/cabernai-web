@@ -1,12 +1,12 @@
-import React from "react"
-import { Schema } from "@repo/strapi"
+import React from 'react'
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { Link } from "@/lib/navigation"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { Link } from '@/lib/navigation'
 
 export interface LinkStrapiProps {
   readonly component:
-    | Schema.Attribute.ComponentValue<"shared.link", false>
+    | Schema.Attribute.ComponentValue<'shared.link', false>
     | undefined
     | null
 
@@ -21,8 +21,6 @@ export function LinkStrapi({
   className,
   hideWhenMissing,
 }: LinkStrapiProps) {
-  removeThisWhenYouNeedMe("LinkStrapi")
-
   if (component == null && hideWhenMissing) {
     return null
   }
@@ -34,7 +32,7 @@ export function LinkStrapi({
   return (
     <Link
       href={component.href}
-      target={component.newTab ? "_blank" : undefined}
+      target={component.newTab ? '_blank' : undefined}
       className={className}
     >
       {children ?? component.label}

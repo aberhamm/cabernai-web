@@ -1,9 +1,9 @@
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 
-import { ForgotPasswordForm } from "./_components/ForgotPasswordForm"
+import { ForgotPasswordForm } from './_components/ForgotPasswordForm'
 
 export default function ForgotPasswordPage() {
-  removeThisWhenYouNeedMe("ForgotPasswordPage")
+  removeThisWhenYouNeedMe('ForgotPasswordPage')
 
   return <ForgotPasswordForm />
 }

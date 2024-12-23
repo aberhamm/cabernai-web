@@ -1,20 +1,20 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { Container } from "@/components/elementary/Container"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { Container } from '@/components/elementary/Container'
 
-import { BasicImage } from "./BasicImage"
-import { LinkStrapi } from "./LinkStrapi"
+import { BasicImage } from './BasicImage'
+import { LinkStrapi } from './LinkStrapi'
 
 export const ImageWithCTAButton = ({
   component,
 }: {
   readonly component: Schema.Attribute.ComponentValue<
-    "sections.image-with-cta-button",
+    'sections.image-with-cta-button',
     false
   >
 }) => {
-  removeThisWhenYouNeedMe("ImageWithCTAButton")
+  removeThisWhenYouNeedMe('ImageWithCTAButton')
 
   return (
     <section className="">

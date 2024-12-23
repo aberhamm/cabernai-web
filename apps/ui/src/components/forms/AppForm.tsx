@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import { BaseSyntheticEvent } from "react"
+import { BaseSyntheticEvent } from 'react'
 import {
   FieldValues,
   FormProvider,
   SubmitErrorHandler,
   UseFormReturn,
-} from "react-hook-form"
+} from 'react-hook-form'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 
 interface Props<T extends FieldValues = FieldValues> {
   readonly form: UseFormReturn<T>
@@ -34,7 +34,7 @@ export function AppForm<T extends FieldValues = FieldValues>({
   form,
   disabled,
 }: Props<T>) {
-  removeThisWhenYouNeedMe("AppForm")
+  removeThisWhenYouNeedMe('AppForm')
 
   const { handleSubmit } = form
 

@@ -1,9 +1,9 @@
-import React from "react"
-import { ControllerFieldState } from "react-hook-form"
+import React from 'react'
+import { ControllerFieldState } from 'react-hook-form'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
-import { FormLabel } from "@/components/ui/form"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
+import { FormLabel } from '@/components/ui/form'
 
 type Props = {
   readonly label?: React.ReactNode
@@ -18,7 +18,7 @@ export function AppFormLabel({
   required,
   className,
 }: Props) {
-  removeThisWhenYouNeedMe("AppFormLabel")
+  removeThisWhenYouNeedMe('AppFormLabel')
 
   if (label == null) {
     return null
@@ -28,8 +28,8 @@ export function AppFormLabel({
     <FormLabel
       className={cn(
         {
-          "font-normal": !fieldState?.invalid,
-          "font-medium": fieldState?.invalid,
+          'font-normal': !fieldState?.invalid,
+          'font-medium': fieldState?.invalid,
         },
         className
       )}

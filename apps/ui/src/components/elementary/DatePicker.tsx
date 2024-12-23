@@ -1,29 +1,29 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import dayjs from "dayjs"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { useState } from 'react'
+import dayjs from 'dayjs'
+import { Calendar as CalendarIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from '@/components/ui/popover'
 
 export function DatePicker({
-  defaultDate = dayjs(new Date()).subtract(2, "D").toDate(),
+  defaultDate = dayjs(new Date()).subtract(2, 'D').toDate(),
 }: {
   readonly defaultDate?: Date
 }) {
-  removeThisWhenYouNeedMe("DatePicker")
+  removeThisWhenYouNeedMe('DatePicker')
 
   const [date, setDate] = useState<Date | undefined>(defaultDate)
-  const t = useTranslations("comps.datePicker")
+  const t = useTranslations('comps.datePicker')
 
   return (
     <Popover>
@@ -31,12 +31,12 @@ export function DatePicker({
         <Button
           variant="outline"
           className={cn(
-            "w-[280px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            'w-[280px] justify-start text-left font-normal',
+            !date && 'text-muted-foreground'
           )}
         >
           <CalendarIcon className="mr-2 size-4" />
-          {date ? dayjs(date).format("LL") : <span>{t("label")}</span>}
+          {date ? dayjs(date).format('LL') : <span>{t('label')}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

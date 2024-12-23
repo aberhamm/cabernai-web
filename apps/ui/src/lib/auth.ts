@@ -38,7 +38,6 @@ export const authOptions: NextAuthOptions = {
                 password: credentials.password,
               }),
               method: "POST",
-              next: { revalidate: 0 },
             },
             { omitAuthorization: true }
           )
@@ -85,9 +84,7 @@ export const authOptions: NextAuthOptions = {
           // OAuth login - connect the account
           try {
             const data = await Strapi.fetchAPI(
-              `/auth/${account.provider}/callback?access_token=${account.access_token}`,
-              undefined,
-              { next: { revalidate: 0 } }
+              `/auth/${account.provider}/callback?access_token=${account.access_token}`
             )
             const { jwt, user } = data
 
@@ -133,12 +130,9 @@ export const authOptions: NextAuthOptions = {
         // (user is logged in within NextAuth and UI but not in Strapi API)
         try {
           const fetchedUser: Result<"plugin::users-permissions.user"> =
-            await Strapi.fetchAPI(
-              "/users/me",
-              undefined,
-              { next: { revalidate: 0 } },
-              { strapiJWT: token.strapiJWT }
-            )
+            await Strapi.fetchAPI("/users/me", undefined, undefined, {
+              strapiJWT: token.strapiJWT,
+            })
 
           // API token is valid - update/reload user data or add more data
           token.name = fetchedUser.username

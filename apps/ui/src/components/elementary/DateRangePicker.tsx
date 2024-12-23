@@ -1,22 +1,22 @@
-"use client"
+'use client'
 
-import { useMemo } from "react"
-import dayjs from "dayjs"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { useTranslations } from "next-intl"
-import { DateRange } from "react-day-picker"
+import { useMemo } from 'react'
+import dayjs from 'dayjs'
+import { Calendar as CalendarIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { DateRange } from 'react-day-picker'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from '@/components/ui/popover'
 
-const DATE_FORMAT = "LLL dd, y"
+const DATE_FORMAT = 'LLL dd, y'
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   readonly date: DateRange | undefined
@@ -24,9 +24,9 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
 }
 
 export function DateRangePicker({ className, date, setDate }: Props) {
-  removeThisWhenYouNeedMe("DateRangePicker")
+  removeThisWhenYouNeedMe('DateRangePicker')
 
-  const t = useTranslations("comps.dateRangePicker")
+  const t = useTranslations('comps.dateRangePicker')
 
   const selectedDate = useMemo(() => {
     if (date?.from != null) {
@@ -41,19 +41,19 @@ export function DateRangePicker({ className, date, setDate }: Props) {
       }
       return dayjs(date.from).format(DATE_FORMAT)
     }
-    return <span>{t("label")}</span>
+    return <span>{t('label')}</span>
   }, [date, t])
 
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div className={cn('grid gap-2', className)}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             id="date"
             variant="outline"
             className={cn(
-              "w-[300px] justify-center font-normal",
-              !date && "text-muted-foreground"
+              'w-[300px] justify-center font-normal',
+              !date && 'text-muted-foreground'
             )}
           >
             <CalendarIcon className="mr-2 size-4" />

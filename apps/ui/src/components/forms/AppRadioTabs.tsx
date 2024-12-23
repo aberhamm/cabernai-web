@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import React from "react"
-import { useFormContext } from "react-hook-form"
+import React from 'react'
+import { useFormContext } from 'react-hook-form'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form"
+} from '@/components/ui/form'
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import { AppFormDescription } from "./AppFormDescription"
-import { AppFormLabel } from "./AppFormLabel"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { AppFormDescription } from './AppFormDescription'
+import { AppFormLabel } from './AppFormLabel'
 
 type Props = {
   readonly name: string
@@ -41,7 +41,7 @@ export function AppRadioTabs({
   tabListProps,
   required,
 }: Props) {
-  removeThisWhenYouNeedMe("AppRadioTabs")
+  removeThisWhenYouNeedMe('AppRadioTabs')
 
   const { control } = useFormContext()
 
@@ -63,7 +63,7 @@ export function AppRadioTabs({
 
                 <TabsList
                   {...tabListProps}
-                  className={cn("bg-primary", tabListProps?.className)}
+                  className={cn('bg-primary', tabListProps?.className)}
                 >
                   {tabTriggers.map((tabTrigger) => (
                     <TabsTrigger

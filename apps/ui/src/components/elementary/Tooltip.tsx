@@ -1,10 +1,10 @@
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import {
   Tooltip as RadixTooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from '@/components/ui/tooltip'
 
 interface Props {
   readonly children: React.ReactNode
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export function Tooltip({ children, content, contentProps }: Props) {
-  removeThisWhenYouNeedMe("Tooltip")
+  removeThisWhenYouNeedMe('Tooltip')
 
   return (
     <TooltipProvider>

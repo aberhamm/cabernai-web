@@ -1,17 +1,17 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
-import { Container } from "@/components/elementary/Container"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
+import { Container } from '@/components/elementary/Container'
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
+} from '@/components/ui/carousel'
 
-import { ImageWithLink } from "./ImageWithLink"
+import { ImageWithLink } from './ImageWithLink'
 
 const DEFAULT_IMG_SIZE = 110
 
@@ -19,11 +19,11 @@ export function CarouselGrid({
   component,
 }: {
   readonly component: Schema.Attribute.ComponentValue<
-    "sections.carousel",
+    'sections.carousel',
     false
   >
 }) {
-  removeThisWhenYouNeedMe("CarouselGrid")
+  removeThisWhenYouNeedMe('CarouselGrid')
 
   return (
     <section>
@@ -39,7 +39,7 @@ export function CarouselGrid({
                   component={item}
                   imageProps={{
                     className: cn(
-                      "mb-2 object-cover",
+                      'mb-2 object-cover',
                       component?.radius && `rounded-${component.radius}`
                     ),
                     fallbackSizes: {

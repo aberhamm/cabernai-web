@@ -1,9 +1,9 @@
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 
-import { SignInForm } from "./_components/SignInForm"
+import { SignInForm } from './_components/SignInForm'
 
 export default function SignInPage() {
-  removeThisWhenYouNeedMe("SignInPage")
+  removeThisWhenYouNeedMe('SignInPage')
 
   return <SignInForm />
 }

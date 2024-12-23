@@ -1,20 +1,20 @@
-import React from "react"
-import { Schema } from "@repo/strapi"
+import React from 'react'
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { Container } from "@/components/elementary/Container"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { Container } from '@/components/elementary/Container'
 
-import { LinkStrapi } from "./LinkStrapi"
+import { LinkStrapi } from './LinkStrapi'
 
 export const HeadingWithCTAButton = ({
   component,
 }: {
   readonly component: Schema.Attribute.ComponentValue<
-    "sections.heading-with-cta-button",
+    'sections.heading-with-cta-button',
     false
   >
 }) => {
-  removeThisWhenYouNeedMe("HeadingWithCTAButton")
+  removeThisWhenYouNeedMe('HeadingWithCTAButton')
 
   return (
     <section className="px-4 py-8 sm:py-16 lg:px-6">

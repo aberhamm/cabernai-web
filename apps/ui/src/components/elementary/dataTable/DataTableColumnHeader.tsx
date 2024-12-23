@@ -1,25 +1,25 @@
 /* eslint-disable tailwindcss/classnames-order */
 
-"use client"
+'use client'
 
 import {
   ArrowDownIcon,
   ArrowUpIcon,
   CaretSortIcon,
-} from "@radix-ui/react-icons"
-import { Column } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
-import { useTranslations } from "next-intl"
+} from '@radix-ui/react-icons'
+import { Column } from '@tanstack/react-table'
+import { ArrowUpDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
-import { Button } from "@/components/ui/button"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 
 interface Props<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
   readonly column: Column<TData, TValue>
@@ -33,9 +33,9 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
   withDropdown,
 }: Props<TData, TValue>) {
-  removeThisWhenYouNeedMe("DataTableColumnHeader")
+  removeThisWhenYouNeedMe('DataTableColumnHeader')
 
-  const t = useTranslations("tables")
+  const t = useTranslations('tables')
 
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>
@@ -47,7 +47,7 @@ export function DataTableColumnHeader<TData, TValue>({
         variant="ghost"
         size="sm"
         className="-ml-3 h-8 data-[state=open]:bg-accent"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
         <span>{title}</span>
         <ArrowUpDown className="ml-2 size-4" />
@@ -56,7 +56,7 @@ export function DataTableColumnHeader<TData, TValue>({
   }
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
+    <div className={cn('flex items-center space-x-2', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -65,9 +65,9 @@ export function DataTableColumnHeader<TData, TValue>({
             className="-ml-3 h-8 data-[state=open]:bg-accent"
           >
             <span>{title}</span>
-            {column.getIsSorted() === "desc" ? (
+            {column.getIsSorted() === 'desc' ? (
               <ArrowDownIcon className="ml-2 size-4" />
-            ) : column.getIsSorted() === "asc" ? (
+            ) : column.getIsSorted() === 'asc' ? (
               <ArrowUpIcon className="ml-2 size-4" />
             ) : (
               <CaretSortIcon className="ml-2 size-4" />
@@ -78,11 +78,11 @@ export function DataTableColumnHeader<TData, TValue>({
         <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
             <ArrowUpIcon className="mr-2 size-3.5 text-muted-foreground/70" />
-            {t("ascending")}
+            {t('ascending')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
             <ArrowDownIcon className="mr-2 size-3.5 text-muted-foreground/70" />
-            {t("descending")}
+            {t('descending')}
           </DropdownMenuItem>
           {/* <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>

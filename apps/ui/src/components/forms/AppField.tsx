@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import React from "react"
-import { useFormContext } from "react-hook-form"
+import React from 'react'
+import { useFormContext } from 'react-hook-form'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 
-import { AppFormDescription } from "./AppFormDescription"
-import { AppFormLabel } from "./AppFormLabel"
+import { AppFormDescription } from './AppFormDescription'
+import { AppFormLabel } from './AppFormLabel'
 
 type Props = {
   readonly name: string
@@ -23,7 +23,7 @@ type Props = {
   readonly containerClassName?: string
   readonly fieldClassName?: string
   readonly description?: React.ReactNode
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'>
 
 export function AppField({
   name,
@@ -34,7 +34,7 @@ export function AppField({
   description,
   ...nativeProps
 }: Props) {
-  removeThisWhenYouNeedMe("AppField")
+  removeThisWhenYouNeedMe('AppField')
 
   const { control } = useFormContext()
 
@@ -55,21 +55,21 @@ export function AppField({
               <Input
                 {...field}
                 {...nativeProps}
-                value={field.value ?? ""}
+                value={field.value ?? ''}
                 onChange={(event) => {
                   const value = event.target.value
-                  if (nativeProps.type === "number") {
+                  if (nativeProps.type === 'number') {
                     field.onChange(parseFloat(value))
                   } else {
                     field.onChange(value)
                   }
                 }}
                 className={cn(
-                  "w-full",
+                  'w-full',
                   {
-                    "border-red-600": fieldState.invalid,
-                    "rounded-md border": !endAdornment,
-                    "rounded-l-md border-y border-l": !!endAdornment,
+                    'border-red-600': fieldState.invalid,
+                    'rounded-md border': !endAdornment,
+                    'rounded-l-md border-y border-l': !!endAdornment,
                   },
                   fieldClassName
                 )}
@@ -77,11 +77,11 @@ export function AppField({
               {endAdornment && (
                 <div
                   className={cn(
-                    "flex items-center rounded-r-md border bg-gray-100 px-2",
+                    'flex items-center rounded-r-md border bg-gray-100 px-2',
                     {
-                      "border-y-red-600 border-r-red-600 text-red-600":
+                      'border-y-red-600 border-r-red-600 text-red-600':
                         fieldState.invalid,
-                      "border-gray-100": !fieldState.invalid,
+                      'border-gray-100': !fieldState.invalid,
                     }
                   )}
                 >

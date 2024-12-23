@@ -1,20 +1,20 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { Container } from "@/components/elementary/Container"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { Container } from '@/components/elementary/Container'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from '@/components/ui/accordion'
 
 export function Faq({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<"sections.faq", false>
+  readonly component: Schema.Attribute.ComponentValue<'sections.faq', false>
 }) {
-  removeThisWhenYouNeedMe("Faq")
+  removeThisWhenYouNeedMe('Faq')
 
   return (
     <section>

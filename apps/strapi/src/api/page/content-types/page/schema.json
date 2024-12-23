@@ -50,7 +50,14 @@
         "sections.image-with-cta-button",
         "sections.animated-logo-row",
         "sections.newsletter",
-        "sections.contact-form"
+        "sections.contact-form",
+        "sections.welcome-hero",
+        "sections.cta-banner",
+        "sections.cta-banner-centered",
+        "sections.statistics-grid",
+        "sections.feature-cta-grid",
+        "sections.benefits-cta-grid",
+        "sections.tabbed-banner"
       ],
       "pluginOptions": {
         "i18n": {

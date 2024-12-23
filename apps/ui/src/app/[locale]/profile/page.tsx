@@ -1,14 +1,14 @@
-import { setRequestLocale } from "next-intl/server"
+import { setRequestLocale } from 'next-intl/server'
 
-import { PageProps } from "@/types/next"
+import { PageProps } from '@/types/next'
 
-import { getAuth } from "@/lib/auth"
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { Link } from "@/lib/navigation"
-import { Button } from "@/components/ui/button"
+import { getAuth } from '@/lib/auth'
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { Link } from '@/lib/navigation'
+import { Button } from '@/components/ui/button'
 
 export default async function ProfilePage({ params }: PageProps) {
-  removeThisWhenYouNeedMe("ProfilePage")
+  removeThisWhenYouNeedMe('ProfilePage')
   setRequestLocale(params.locale)
 
   const session = await getAuth()

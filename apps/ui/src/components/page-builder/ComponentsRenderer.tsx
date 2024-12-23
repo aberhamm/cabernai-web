@@ -1,34 +1,48 @@
-import { Schema, UID } from "@repo/strapi"
+import { Schema, UID } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 
-import { ErrorBoundary } from "../elementary/ErrorBoundary"
-import { AnimatedLogoRow } from "./components/AnimatedLogoRow"
-import { CarouselGrid } from "./components/CarouselGrid"
-import { ContactFormSection } from "./components/ContactFormSection"
-import { Faq } from "./components/Faq"
-import { FeatureGrid } from "./components/FeatureGrid"
-import { HeadingWithCTAButton } from "./components/HeadingWithCTAButton"
-import { Hero } from "./components/Hero"
-import { HorizontalImages } from "./components/HorizontalImagesSlider"
-import { ImageWithCTAButton } from "./components/ImageWithCTAButton"
-import { Newsletter } from "./components/Newsletter"
+import { ErrorBoundary } from '../elementary/ErrorBoundary'
+import { AnimatedLogoRow } from './components/AnimatedLogoRow'
+import { BenefitsCTAGrid } from './components/BenefitsCTAGrid'
+import { CarouselGrid } from './components/CarouselGrid'
+import { ContactFormSection } from './components/ContactFormSection'
+import { CTABanner } from './components/CTABanner'
+import { CTABannerCentered } from './components/CTABannerCentered'
+import { Faq } from './components/Faq'
+import { FeatureCTAGrid } from './components/FeatureCTAGrid'
+import { FeatureGrid } from './components/FeatureGrid'
+import { HeadingWithCTAButton } from './components/HeadingWithCTAButton'
+import { Hero } from './components/Hero'
+import { HorizontalImages } from './components/HorizontalImagesSlider'
+import { ImageWithCTAButton } from './components/ImageWithCTAButton'
+import { Newsletter } from './components/Newsletter'
+import { StatisticsGrid } from './components/StatisticsGrid'
+import { TabbedBanner } from './components/TabbedBanner'
+import { WelcomeHero } from './components/WelcomeHero'
 
 // Define page-level components supported by this switch
 const printableComps: {
   // eslint-disable-next-line no-unused-vars
   [K in UID.Component]?: React.ComponentType<any>
 } = {
-  "sections.animated-logo-row": AnimatedLogoRow,
-  "sections.carousel": CarouselGrid,
-  "sections.contact-form": ContactFormSection,
-  "sections.faq": Faq,
-  "sections.feature-grid": FeatureGrid,
-  "sections.hero": Hero,
-  "sections.heading-with-cta-button": HeadingWithCTAButton,
-  "sections.horizontal-images": HorizontalImages,
-  "sections.image-with-cta-button": ImageWithCTAButton,
-  "sections.newsletter": Newsletter,
+  'sections.animated-logo-row': AnimatedLogoRow,
+  'sections.carousel': CarouselGrid,
+  'sections.contact-form': ContactFormSection,
+  'sections.faq': Faq,
+  'sections.feature-grid': FeatureGrid,
+  'sections.hero': Hero,
+  'sections.heading-with-cta-button': HeadingWithCTAButton,
+  'sections.horizontal-images': HorizontalImages,
+  'sections.image-with-cta-button': ImageWithCTAButton,
+  'sections.newsletter': Newsletter,
+  'sections.welcome-hero': WelcomeHero,
+  'sections.cta-banner': CTABanner,
+  'sections.cta-banner-centered': CTABannerCentered,
+  'sections.statistics-grid': StatisticsGrid,
+  'sections.feature-cta-grid': FeatureCTAGrid,
+  'sections.benefits-cta-grid': BenefitsCTAGrid,
+  'sections.tabbed-banner': TabbedBanner,
   // Add more components here
 }
 
@@ -39,10 +53,8 @@ export function ComponentsRenderer({
     Schema.Attribute.DynamicZone<UID.Component[]>
   >
 }) {
-  removeThisWhenYouNeedMe("ComponentsRenderer")
-
   return (
-    <section>
+    <div>
       {pageComponents
         .filter((comp) => comp != null)
         .map((comp) => {
@@ -67,6 +79,6 @@ export function ComponentsRenderer({
             </ErrorBoundary>
           )
         })}
-    </section>
+    </div>
   )
 }

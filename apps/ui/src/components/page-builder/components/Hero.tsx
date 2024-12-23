@@ -1,22 +1,22 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { Container } from "@/components/elementary/Container"
-import Heading from "@/components/typography/Heading"
-import { Paragraph } from "@/components/typography/Paragraph"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { Container } from '@/components/elementary/Container'
+import Heading from '@/components/typography/Heading'
+import { Paragraph } from '@/components/typography/Paragraph'
 
-import { BasicImage } from "./BasicImage"
-import { LinkStrapi } from "./LinkStrapi"
+import { BasicImage } from './BasicImage'
+import { LinkStrapi } from './LinkStrapi'
 
 export function Hero({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<"sections.hero", false>
+  readonly component: Schema.Attribute.ComponentValue<'sections.hero', false>
 }) {
-  removeThisWhenYouNeedMe("Hero")
+  removeThisWhenYouNeedMe('Hero')
 
   return (
-    <section style={{ backgroundColor: component.bgColor ?? "transparent" }}>
+    <section style={{ backgroundColor: component.bgColor ?? 'transparent' }}>
       <Container className="grid gap-8 px-4 py-8 md:grid-cols-12 lg:py-16 xl:gap-0">
         <div className="mr-auto flex w-full flex-col items-center justify-center md:col-span-7">
           <Heading

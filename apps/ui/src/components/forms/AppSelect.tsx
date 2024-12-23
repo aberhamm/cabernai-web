@@ -1,16 +1,16 @@
-"use client"
+'use client'
 
-import React from "react"
-import { useFormContext } from "react-hook-form"
+import React from 'react'
+import { useFormContext } from 'react-hook-form'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form"
+} from '@/components/ui/form'
 
 import {
   Select as SelectComponent,
@@ -18,9 +18,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select"
-import { AppFormDescription } from "./AppFormDescription"
-import { AppFormLabel } from "./AppFormLabel"
+} from '../ui/select'
+import { AppFormDescription } from './AppFormDescription'
+import { AppFormLabel } from './AppFormLabel'
 
 type Props = {
   readonly name: string
@@ -30,7 +30,7 @@ type Props = {
   readonly containerClassName?: string
   readonly fieldClassName?: string
   readonly description?: React.ReactNode
-} & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "className">
+} & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'className'>
 
 export function AppSelect({
   name,
@@ -42,7 +42,7 @@ export function AppSelect({
   description,
   ...nativeProps
 }: Props) {
-  removeThisWhenYouNeedMe("AppSelect")
+  removeThisWhenYouNeedMe('AppSelect')
 
   const { control } = useFormContext()
 
@@ -61,15 +61,15 @@ export function AppSelect({
           <SelectComponent
             {...field}
             {...nativeProps}
-            dir={(nativeProps.dir ?? "ltr") as any}
+            dir={(nativeProps.dir ?? 'ltr') as any}
             onValueChange={field.onChange}
             defaultValue={field.value}
           >
             <FormControl>
               <SelectTrigger
                 className={cn(
-                  "w-full",
-                  { "border-red-600": fieldState.invalid },
+                  'w-full',
+                  { 'border-red-600': fieldState.invalid },
                   fieldClassName
                 )}
                 tabIndex={nativeProps.tabIndex}
@@ -79,7 +79,7 @@ export function AppSelect({
               </SelectTrigger>
             </FormControl>
 
-            <SelectContent className={cn("max-h-40 overflow-y-auto")}>
+            <SelectContent className={cn('max-h-40 overflow-y-auto')}>
               {options.map((option) => (
                 <SelectItem value={option.value} key={option.value}>
                   {option.label}

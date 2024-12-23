@@ -1,10 +1,10 @@
-import { removeThisWhenYouNeedMe } from "./general-helpers"
+import { removeThisWhenYouNeedMe } from './general-helpers'
 
 export const downloadBlob = (blob: Blob, fileName: string) => {
-  removeThisWhenYouNeedMe("downloadBlob")
+  removeThisWhenYouNeedMe('downloadBlob')
 
   const fileUrl = window.URL.createObjectURL(blob)
-  const link = document.createElement("a")
+  const link = document.createElement('a')
   link.href = fileUrl
   link.download = fileName
   document.body.appendChild(link)
@@ -13,8 +13,14 @@ export const downloadBlob = (blob: Blob, fileName: string) => {
 }
 
 export const openBlobInNewTab = (blob: Blob) => {
-  removeThisWhenYouNeedMe("openBlobInNewTab")
+  removeThisWhenYouNeedMe('openBlobInNewTab')
 
   const file = window.URL.createObjectURL(blob)
-  window.open(file, "_blank")
+  window.open(file, '_blank')
+}
+
+export const fetchSVG = async () => {
+  const response = await fetch('/api/media-library')
+  const data = await response.json()
+  return data
 }

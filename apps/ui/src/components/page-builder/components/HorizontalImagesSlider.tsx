@@ -1,20 +1,20 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
-import { Container } from "@/components/elementary/Container"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
+import { Container } from '@/components/elementary/Container'
 
-import { ImageWithLink } from "./ImageWithLink"
+import { ImageWithLink } from './ImageWithLink'
 
 export function HorizontalImages({
   component,
 }: {
   readonly component: Schema.Attribute.ComponentValue<
-    "sections.horizontal-images",
+    'sections.horizontal-images',
     false
   >
 }) {
-  removeThisWhenYouNeedMe("HorizontalImages")
+  removeThisWhenYouNeedMe('HorizontalImages')
 
   return (
     <section>
@@ -26,7 +26,7 @@ export function HorizontalImages({
 
           <div
             className={cn(
-              "no-scrollbar flex max-w-full overflow-x-auto",
+              'no-scrollbar flex max-w-full overflow-x-auto',
               `space-x-${component.spacing ?? 4}`
             )}
           >
@@ -39,7 +39,7 @@ export function HorizontalImages({
                     [`rounded-${component.imageRadius}`]: Boolean(
                       component.imageRadius
                     ),
-                    "object-cover": Boolean(
+                    'object-cover': Boolean(
                       component.fixedImageHeight ?? component.fixedImageWidth
                     ),
                   }),

@@ -18,6 +18,7 @@ const publicPages = [
   "/builder",
   "/builder/.*", // use regex to match all builder pages
   "/docs",
+  "/digital-ocean",
 ]
 
 const authMiddleware = withAuth(

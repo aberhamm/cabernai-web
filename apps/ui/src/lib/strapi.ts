@@ -1,20 +1,20 @@
-import { env } from "@/env.mjs"
-import { getSession } from "next-auth/react"
-import { useTranslations } from "next-intl"
-import qs from "qs"
+import { env } from '@/env.mjs'
+import { getSession } from 'next-auth/react'
+import { useTranslations } from 'next-intl'
+import qs from 'qs'
 
-import type { FindFirst, FindMany, ID, Result, UID } from "@repo/strapi"
-import { APIResponse, APIResponseCollection } from "@/types/api"
-import { AppError } from "@/types/general"
-import { AppSession } from "@/types/next-auth"
+import type { FindFirst, FindMany, ID, Result, UID } from '@repo/strapi'
+import { APIResponse, APIResponseCollection } from '@/types/api'
+import { AppError } from '@/types/general'
+import { AppSession } from '@/types/next-auth'
 
-import { getAuth } from "./auth"
-import { isDevelopment } from "./general-helpers"
+import { getAuth } from './auth'
+import { isDevelopment } from './general-helpers'
 
 type CustomFetchOptions = {
   // force JWT token for the request
   // if omitted, the token will be retrieved from the session
-  strapiJWT?: AppSession["strapiJWT"]
+  strapiJWT?: AppSession['strapiJWT']
   // omit "Authorization" header from the request
   omitAuthorization?: boolean
   // map error messages to translation keys
@@ -28,11 +28,12 @@ type CustomFetchOptions = {
  */
 // eslint-disable-next-line no-unused-vars
 export const API_ENDPOINTS: { [key in UID.ContentType]?: string } = {
-  "api::configuration.configuration": "/configuration",
-  "plugin::users-permissions.user": "/users",
-  "api::page.page": "/pages",
-  "api::footer.footer": "/footer",
-  "api::navbar.navbar": "/navbar",
+  'api::configuration.configuration': '/configuration',
+  'plugin::users-permissions.user': '/users',
+  'api::page.page': '/pages',
+  'api::footer.footer': '/footer',
+  'api::navbar.navbar': '/navbar',
+  'api::header.header': '/header',
   // Add UID<->endpoint mapping for ContentTypes here
 } as const
 
@@ -87,7 +88,7 @@ export default class Strapi {
     options?: CustomFetchOptions
   ): Promise<APIResponse<Result<TContentTypeUID, TParams>>> {
     const path = this.getStrapiApiPathByUId(uid)
-    const url = `${path}${documentId ? "/" + documentId : ""}`
+    const url = `${path}${documentId ? '/' + documentId : ''}`
     return this.fetchAPI(url, params, requestInit, options)
   }
 
@@ -171,7 +172,7 @@ export default class Strapi {
     const slugFilter = slug && slug.length > 0 ? { $eq: slug } : { $null: true }
     const mergedParams = {
       ...params,
-      sort: { publishedAt: "desc" },
+      sort: { publishedAt: 'desc' },
       filters: { ...params?.filters, slug: slugFilter },
     }
     const path = this.getStrapiApiPathByUId(uid)
@@ -191,10 +192,10 @@ export default class Strapi {
     jwt?: string,
     omitAuthorization?: boolean
   ) {
-    let url = `/api${path.startsWith("/") ? path : `/${path}`}`
+    let url = `/api${path.startsWith('/') ? path : `/${path}`}`
 
     const queryString =
-      typeof params === "object" ? qs.stringify(params) : params
+      typeof params === 'object' ? qs.stringify(params) : params
     if (queryString != null && queryString?.length > 0) {
       url += `?${queryString}`
     }
@@ -204,7 +205,7 @@ export default class Strapi {
     if (!omitAuthorization && !strapiToken) {
       // try to get token from session and use it for the request
 
-      const isRSC = typeof window === "undefined"
+      const isRSC = typeof window === 'undefined'
       if (isRSC) {
         // server side
         const session = await getAuth()
@@ -222,8 +223,8 @@ export default class Strapi {
     return {
       url: new URL(url, strapiAPIUrl),
       headers: {
-        Accept: "application/json",
-        "Content-type": "application/json",
+        Accept: 'application/json',
+        'Content-type': 'application/json',
         ...(strapiToken ? { Authorization: `Bearer ${strapiToken}` } : {}),
       },
     }

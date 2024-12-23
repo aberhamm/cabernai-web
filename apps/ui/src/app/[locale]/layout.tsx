@@ -1,19 +1,20 @@
-import "@/styles/globals.css"
+import '@/styles/globals.css'
 
-import { notFound } from "next/navigation"
-import { setRequestLocale } from "next-intl/server"
+import { notFound } from 'next/navigation'
+import { setRequestLocale } from 'next-intl/server'
 
-import { LayoutProps } from "@/types/next"
+import { LayoutProps } from '@/types/next'
 
-import { fontRoboto } from "@/lib/fonts"
-import { setupLibraries } from "@/lib/general-helpers"
-import { routing } from "@/lib/navigation"
-import { cn } from "@/lib/styles"
-import { Navbar } from "@/components/elementary/navbar/Navbar"
-import { TailwindIndicator } from "@/components/elementary/TailwindIndicator"
-import { ClientProviders } from "@/components/providers/ClientProviders"
-import { ServerProviders } from "@/components/providers/ServerProviders"
-import { Toaster } from "@/components/ui/toaster"
+import { fontInter, fontRoboto } from '@/lib/fonts'
+import { setupLibraries } from '@/lib/general-helpers'
+import { routing } from '@/lib/navigation'
+import { cn } from '@/lib/styles'
+import { TailwindIndicator } from '@/components/elementary/TailwindIndicator'
+import { Footer } from '@/components/page-builder/single-types/Footer'
+import { Header } from '@/components/page-builder/single-types/Header'
+import { ClientProviders } from '@/components/providers/ClientProviders'
+import { ServerProviders } from '@/components/providers/ServerProviders'
+import { Toaster } from '@/components/ui/toaster'
 
 setupLibraries()
 
@@ -32,25 +33,20 @@ export default async function RootLayout({ children, params }: LayoutProps) {
 
   return (
     <html lang={params.locale} suppressHydrationWarning>
-      <head />
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontRoboto.variable
+          fontInter.variable,
+          'font-sans antialiased',
+          'bg-background'
         )}
       >
         <ServerProviders params={params}>
           <ClientProviders>
-            <div className="relative flex min-h-screen flex-col">
-              <Navbar locale={params.locale} />
-              <div className="flex-1">
-                <div className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
-                  {children}
-                </div>
-              </div>
-            </div>
-            <TailwindIndicator />
+            <Header locale={params.locale} />
+            {children}
+            <Footer locale={params.locale} />
             <Toaster />
+            <TailwindIndicator />
           </ClientProviders>
         </ServerProviders>
       </body>

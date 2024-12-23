@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
 // Error boundaries must be Client Components - https://nextjs.org/docs/14/app/building-your-application/routing/error-handling
-import { useEffect } from "react"
-import * as Sentry from "@sentry/nextjs"
-import { useTranslations } from "next-intl"
+import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
+import { useTranslations } from 'next-intl'
 
-import { isDevelopment } from "@/lib/general-helpers"
-import { Button } from "@/components/ui/button"
+import { isDevelopment } from '@/lib/general-helpers'
+import { Button } from '@/components/ui/button'
 
 interface Props {
   readonly error: Error
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function Error({ error, reset }: Props) {
-  const t = useTranslations("errors.global")
+  const t = useTranslations('errors.global')
 
   useEffect(() => {
     Sentry.captureException(error)
@@ -30,20 +30,20 @@ export default function Error({ error, reset }: Props) {
   return (
     <div className="w-full overflow-x-hidden">
       <h1 className="text-xl font-semibold tracking-tight">
-        {t("somethingWentWrong")}
+        {t('somethingWentWrong')}
       </h1>
       <p className="mt-1 text-sm text-gray-600">
-        {t("invalidContent")}
+        {t('invalidContent')}
         {isDev ? `: ${error.message}` : null}
       </p>
       {isDev && (
         <p className="mt-2 w-full overflow-x-auto bg-gray-100 p-3 text-xs">
-          <pre>{error.stack?.split("\n").slice(0, 7).join("\n")}</pre>
+          <pre>{error.stack?.split('\n').slice(0, 7).join('\n')}</pre>
         </p>
       )}
 
       <Button type="button" size="sm" onClick={handleTryAgain} className="mt-2">
-        {t("tryAgain")}
+        {t('tryAgain')}
       </Button>
     </div>
   )

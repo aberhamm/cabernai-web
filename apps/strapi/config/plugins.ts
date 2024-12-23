@@ -1,14 +1,14 @@
 export default ({ env }) => {
-  const awsS3Config = prepareAwsS3Config(env)
-  if (!awsS3Config) {
+  const cloudinaryConfig = prepareCloudinaryConfig(env)
+  if (!cloudinaryConfig) {
     console.info(
-      "AWS S3 upload configuration is not complete. Local file storage will be used."
+      "Cloudinary configuration is not complete. Local file storage will be used."
     )
   }
 
   return {
     upload: {
-      config: awsS3Config ?? localUploadConfig,
+      config: cloudinaryConfig ?? localUploadConfig(env),
     },
 
     seo: {
@@ -59,49 +59,39 @@ export default ({ env }) => {
   }
 }
 
-const localUploadConfig: any = {
+const localUploadConfig = (env): any => ({
   // Local provider setup
   // https://docs.strapi.io/dev-docs/plugins/upload
   sizeLimit: 250 * 1024 * 1024, // 256mb in bytes,
-}
+  mimeTypes: ["image/svg+xml", "image/jpeg", "image/png"],
+})
 
-const prepareAwsS3Config = (env) => {
-  const awsAccessKeyId = env("AWS_ACCESS_KEY_ID")
-  const awsAccessSecret = env("AWS_ACCESS_SECRET")
-  const awsRegion = env("AWS_REGION")
-  const awsBucket = env("AWS_BUCKET")
-  const awsRequirements = [
-    awsAccessKeyId,
-    awsAccessSecret,
-    awsRegion,
-    awsBucket,
+const prepareCloudinaryConfig = (env) => {
+  const cloudinaryName = env("CLOUDINARY_NAME")
+  const cloudinaryApiKey = env("CLOUDINARY_API_KEY")
+  const cloudinaryApiSecret = env("CLOUDINARY_API_SECRET")
+
+  const cloudinaryRequirements = [
+    cloudinaryName,
+    cloudinaryApiKey,
+    cloudinaryApiSecret,
   ]
-  const awsRequirementsOk = awsRequirements.every(
+
+  const cloudinaryRequirementsOk = cloudinaryRequirements.every(
     (req) => req != null && req !== ""
   )
 
-  if (awsRequirementsOk) {
+  if (cloudinaryRequirementsOk) {
     return {
-      provider: "aws-s3",
+      provider: "cloudinary",
       providerOptions: {
-        baseUrl: env("CDN_URL"),
-        rootPath: env("CDN_ROOT_PATH"),
-        s3Options: {
-          credentials: {
-            accessKeyId: awsAccessKeyId,
-            secretAccessKey: awsAccessSecret,
-          },
-          region: awsRegion,
-          params: {
-            ACL: env("AWS_ACL", "public-read"),
-            signedUrlExpires: env("AWS_SIGNED_URL_EXPIRES", 15 * 60),
-            Bucket: awsBucket,
-          },
-        },
+        cloud_name: cloudinaryName,
+        api_key: cloudinaryApiKey,
+        api_secret: cloudinaryApiSecret,
+        secure: env("CLOUDINARY_SECURE", true),
       },
       actionOptions: {
         upload: {},
-        uploadStream: {},
         delete: {},
       },
     }

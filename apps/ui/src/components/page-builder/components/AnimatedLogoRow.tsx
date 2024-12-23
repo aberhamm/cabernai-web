@@ -1,19 +1,19 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { cn } from "@/lib/styles"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { cn } from '@/lib/styles'
 
-import { BasicImage } from "./BasicImage"
+import { BasicImage } from './BasicImage'
 
 export function AnimatedLogoRow({
   component,
 }: {
   readonly component: Schema.Attribute.ComponentValue<
-    "sections.animated-logo-row",
+    'sections.animated-logo-row',
     false
   >
 }) {
-  removeThisWhenYouNeedMe("AnimatedLogoRow")
+  removeThisWhenYouNeedMe('AnimatedLogoRow')
 
   if (!component.logos) return null
 
@@ -28,8 +28,8 @@ export function AnimatedLogoRow({
           <div className="infinite-scroll-container-horizontal w-full">
             <div
               className={cn(
-                "infinite-scroll-horizontal flex gap-14 overflow-hidden",
-                component.logos?.length > 10 && "justify-center"
+                'infinite-scroll-horizontal flex gap-14 overflow-hidden',
+                component.logos?.length > 10 && 'justify-center'
               )}
             >
               {sliderImages.map((logo, index) => (

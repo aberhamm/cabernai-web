@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useState } from "react"
+import { useState } from 'react'
 import {
   ColumnDef,
   flexRender,
@@ -11,12 +11,12 @@ import {
   HeaderGroup,
   SortingState,
   useReactTable,
-} from "@tanstack/react-table"
-import { useTranslations } from "next-intl"
+} from '@tanstack/react-table'
+import { useTranslations } from 'next-intl'
 
-import { removeThisWhenYouNeedMe } from "@/lib/general-helpers"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -24,15 +24,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table'
 
-import { DataTablePagination } from "./DataTablePagination"
+import { DataTablePagination } from './DataTablePagination'
 
 interface Props<TData, TValue> {
   readonly columns: ColumnDef<TData, TValue>[]
   readonly data: TData[]
   readonly isLoading?: boolean
-  readonly pagination?: "simple" | "extended" | false
+  readonly pagination?: 'simple' | 'extended' | false
   readonly allowSearching?: boolean
   readonly searchAdornment?: React.ReactNode
 }
@@ -45,12 +45,12 @@ export function DataTable<TData, TValue>({
   pagination,
   searchAdornment,
 }: Props<TData, TValue>) {
-  removeThisWhenYouNeedMe("DataTable")
+  removeThisWhenYouNeedMe('DataTable')
 
   const t = useTranslations()
 
   const [sorting, setSorting] = useState<SortingState>([])
-  const [globalFilter, setGlobalFilter] = useState("")
+  const [globalFilter, setGlobalFilter] = useState('')
 
   const table = useReactTable({
     data,
@@ -72,10 +72,10 @@ export function DataTable<TData, TValue>({
       {allowSearching && (
         <div className="flex items-center justify-between py-4">
           <Input
-            placeholder={`${t("general.search")} (${
+            placeholder={`${t('general.search')} (${
               table.getCoreRowModel().rows.length
             })...`}
-            value={globalFilter ?? ""}
+            value={globalFilter ?? ''}
             onChange={(event) => setGlobalFilter(String(event.target.value))}
             className="max-w-sm rounded-lg border"
           />
@@ -112,7 +112,7 @@ export function DataTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
+                    data-state={row.getIsSelected() && 'selected'}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -130,7 +130,7 @@ export function DataTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    {t("tables.noData")}
+                    {t('tables.noData')}
                   </TableCell>
                 </TableRow>
               )}
@@ -140,7 +140,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       {pagination && (
-        <DataTablePagination table={table} simple={pagination === "simple"} />
+        <DataTablePagination table={table} simple={pagination === 'simple'} />
       )}
     </div>
   )
