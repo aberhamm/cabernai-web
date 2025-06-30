@@ -308,46 +308,66 @@ deploy_to_server() {
 
     # Build and deploy with Docker Compose
     echo_step "Building Docker images..."
-    echo_debug "Starting build process - this may take 15-30 minutes..."
+    echo_debug "Starting build process - this may take 5-15 minutes with optimizations..."
     echo_debug "Build timeout set to: ${BUILD_TIMEOUT}s ($(($BUILD_TIMEOUT / 60)) minutes)"
 
     # Show system resources before build
     echo_debug "System resources before build:"
-    df -h /opt
-    free -h
+    timeout 15 df -h /opt || echo_warn "Disk usage check timed out"
+    timeout 10 free -h || echo_warn "Memory usage check timed out"
 
-    # Build with progress monitoring
-    echo_info "Building images (this will take several minutes)..."
+    # Enable Docker BuildKit for better performance
+    export DOCKER_BUILDKIT=1
+    export COMPOSE_DOCKER_CLI_BUILD=1
+
+    # Build with progress monitoring and optimized strategy
+    echo_info "Building images with Docker BuildKit and caching optimizations..."
+
+    # Try to pull existing images for cache
+    echo_debug "Pulling existing images for build cache..."
+    docker pull cabernai-web-ui:latest 2>/dev/null || echo_debug "No existing UI image found for cache"
+    docker pull cabernai-web-strapi:latest 2>/dev/null || echo_debug "No existing Strapi image found for cache"
 
     # Use a more efficient build strategy with progress monitoring
-    echo_info "Starting Docker build with parallel processing..."
+    echo_info "Starting optimized Docker build with parallel processing..."
 
     # Start build in background and monitor progress
-    docker-compose -f $DOCKER_COMPOSE_FILE build --parallel &
+    docker-compose -f $DOCKER_COMPOSE_FILE build --parallel --compress &
     BUILD_PID=$!
 
-    if monitor_progress $BUILD_PID "Docker image build (parallel)" $BUILD_TIMEOUT; then
-        echo_info "✓ Docker images built successfully with parallel processing"
+    if monitor_progress $BUILD_PID "Docker image build (parallel + optimized)" $BUILD_TIMEOUT; then
+        echo_info "✓ Docker images built successfully with parallel processing and optimizations"
     else
-        echo_error "Parallel build failed or timed out. Trying sequential build..."
+        echo_error "Optimized parallel build failed or timed out. Trying sequential build with cache..."
 
-        # Try sequential build as fallback
-        docker-compose -f $DOCKER_COMPOSE_FILE build &
+        # Try sequential build as fallback with cache
+        docker-compose -f $DOCKER_COMPOSE_FILE build --compress &
         BUILD_PID=$!
 
-        if monitor_progress $BUILD_PID "Docker image build (sequential)" $BUILD_TIMEOUT; then
-            echo_info "✓ Docker images built successfully with sequential processing"
+        if monitor_progress $BUILD_PID "Docker image build (sequential + optimized)" $BUILD_TIMEOUT; then
+            echo_info "✓ Docker images built successfully with sequential processing and optimizations"
         else
-            echo_error "Both parallel and sequential builds failed!"
-            exit 1
+            echo_error "Both optimized parallel and sequential builds failed!"
+            echo_debug "Trying basic build without optimizations as last resort..."
+
+            # Last resort: basic build
+            docker-compose -f $DOCKER_COMPOSE_FILE build &
+            BUILD_PID=$!
+
+            if monitor_progress $BUILD_PID "Docker image build (basic)" $BUILD_TIMEOUT; then
+                echo_info "✓ Docker images built successfully with basic build"
+            else
+                echo_error "All build strategies failed!"
+                exit 1
+            fi
         fi
     fi
 
     # Show system resources after build
     echo_debug "System resources after build:"
-    df -h /opt
-    free -h
-    docker images | head -20
+    timeout 15 df -h /opt || echo_warn "Disk usage check timed out"
+    timeout 10 free -h || echo_warn "Memory usage check timed out"
+    timeout 20 docker images | head -20 || echo_warn "Docker images listing timed out"
 
     echo_step "Starting services..."
     echo_debug "Starting containers with timeout..."

@@ -20,6 +20,8 @@
   ],
   "scripts": {
     "build": "turbo build --cache-dir=.turbo",
+    "build:fast": "turbo build --cache-dir=.turbo --parallel",
+    "build:production": "NODE_ENV=production turbo build --cache-dir=.turbo --parallel",
     "build:strapi": "turbo run build --filter=@repo/strapi",
     "build:ui": "turbo run build --filter=@repo/ui",
     "commit": "git-cz",
@@ -27,6 +29,9 @@
     "dev:strapi": "turbo run dev --filter=@repo/strapi",
     "dev:ui": "turbo run dev --filter=@repo/ui",
     "dev:unified": "docker-compose -f docker-compose.dev.yml up --build",
+    "docker:build": "DOCKER_BUILDKIT=1 docker-compose -f docker-compose.multi-site.yml build --parallel --compress",
+    "docker:build:fast": "DOCKER_BUILDKIT=1 docker-compose -f docker-compose.multi-site.yml build --parallel --compress --pull",
+    "docker:clean": "docker system prune -f && docker builder prune -f",
     "format": "prettier --write --cache --ignore-unknown \"**/*.{js,jsx,ts,tsx,md,css,scss}\"",
     "format:check": "prettier --check --cache --ignore-unknown \"**/*.{js,jsx,ts,tsx,md,css,scss}\"",
     "heroku-postbuild": "bash ./scripts/heroku/heroku-postbuild.sh",
@@ -57,7 +62,7 @@
     "husky": "^9.1.1",
     "lint-staged": "15.2.7",
     "prettier": "3.3.2",
-    "turbo": "^2.5.4"
+    "turbo": "^2.0.9"
   },
   "packageManager": "yarn@1.22.22",
   "engines": {

@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build all apps
-    timeout-minutes: 15
+    timeout-minutes: 10  # Reduced due to optimizations
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -34,21 +34,18 @@ jobs:
           cache: yarn
 
       - name: Install dependencies
-        run: yarn
+        run: yarn --prefer-offline --frozen-lockfile
 
-      - name: Build UI
+      - name: Build all apps (optimized)
         env:
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           NEXTAUTH_URL: https://${{ vars.DOMAIN_NAME }}
           NEXT_PUBLIC_APP_PUBLIC_URL: https://${{ vars.DOMAIN_NAME }}
           NEXT_PUBLIC_STRAPI_URL: https://${{ vars.DOMAIN_NAME }}
+          NODE_ENV: production
         run: |
           echo "🔍 Debug: DOMAIN_NAME = '${{ vars.DOMAIN_NAME }}'"
           echo "🔍 Debug: NEXT_PUBLIC_APP_PUBLIC_URL = '$NEXT_PUBLIC_APP_PUBLIC_URL'"
           echo "🔍 Debug: NEXT_PUBLIC_STRAPI_URL = '$NEXT_PUBLIC_STRAPI_URL'"
-          yarn build:ui
-
-      - name: Build Strapi
-        run: |
-          echo "🔍 Debug: Building Strapi..."
-          yarn build:strapi
+          echo "🚀 Building all apps in parallel..."
+          yarn build:production

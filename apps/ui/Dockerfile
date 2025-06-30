@@ -3,7 +3,7 @@
 
 # Created according to following examples:
 # - https://github.com/vercel/turbo/blob/main/examples/with-docker/apps/web/Dockerfile
-# - https://dev.to/moofoo/creating-a-development-dockerfile-and-docker-composeyml-for-yarn-122-monorepos-using-turborepo-896
+# - https://dev.to/moofoo/creating-a-development-dockerfile-and-docker-composeyml-for-yarn-122-monorepo-using-turborepo-896
 
 # Customize APP (name of folder in /apps) and WORKSPACE (name from package.json) to match this app
 ARG APP=ui
@@ -12,6 +12,8 @@ ARG WORKSPACE=@repo/ui
 FROM node:20-alpine AS base
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk update && apk add --no-cache libc6-compat
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
 
 # -------------------------- stage pruned ---------------------------------
 FROM base AS pruned
@@ -19,9 +21,16 @@ ARG WORKSPACE
 
 # Set working directory
 WORKDIR /app
-COPY . .
 
+# Install turbo globally with specific version for consistency
 RUN yarn global add turbo@^2.0.9
+
+# Copy only necessary files for pruning
+COPY package.json yarn.lock turbo.json ./
+COPY packages packages
+COPY apps/ui/package.json apps/ui/
+COPY apps/strapi/package.json apps/strapi/
+
 # see https://turbo.build/repo/docs/reference/command-line-reference#turbo-prune---scopetarget
 RUN turbo prune ${WORKSPACE} --docker
 
@@ -37,41 +46,52 @@ COPY .gitignore .gitignore
 COPY --from=pruned /app/out/json/ .
 COPY --from=pruned /app/out/yarn.lock ./yarn.lock
 
+# Install turbo globally
 RUN yarn global add turbo@^2.0.9
 
+# Install dependencies with better caching
 RUN \
-    --mount=type=cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-    yarn --prefer-offline --frozen-lockfile --ignore-scripts
+    --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
+    --mount=type=cache,id=node-modules,target=/app/node_modules,sharing=locked \
+    yarn install --prefer-offline --frozen-lockfile --ignore-scripts --network-timeout 100000
 
-# Because of yarn v1 install sharp explicitly with "--ignore-engines". See https://github.com/lovell/sharp/issues/3871
+# Install Sharp for Next.js image optimization
 RUN \
-    --mount=type=cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-    yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile
+    --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
+    yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile --network-timeout 100000
 
 # Build the project and its dependencies
 COPY --from=pruned /app/out/full/ .
 COPY turbo.json turbo.json
 
+# Set build environment
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN turbo run build --filter=${WORKSPACE}
+# Build with turbo cache
+RUN \
+    --mount=type=cache,id=turbo-cache,target=/app/.turbo,sharing=locked \
+    turbo run build --filter=${WORKSPACE}
 
 # -------------------------- stage runner ---------------------------------
 FROM base AS runner
 ARG APP
 ARG WORKSPACE
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN apk update && apk add --no-cache vips-dev
+# Install only runtime dependencies
+RUN apk add --no-cache vips-dev dumb-init
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nextjs
 RUN adduser --system --uid 1001 nextjs
-USER nextjs
 
 WORKDIR /app
-COPY --from=installer /app/apps/${APP}/next.config.mjs .
-COPY --from=installer /app/apps/${APP}/package.json .
+
+# Copy only necessary files for runtime
+COPY --from=installer --chown=nextjs:nextjs /app/apps/${APP}/next.config.mjs .
+COPY --from=installer --chown=nextjs:nextjs /app/apps/${APP}/package.json .
 
 # Automatically leverage output traces to reduce image size - https://nextjs.org/docs/14/pages/api-reference/next-config-js/output
 # next.config.mjs's `output` options has to be set to "standalone" to make this work (see README)
@@ -79,6 +99,11 @@ COPY --from=installer --chown=nextjs:nextjs /app/apps/${APP}/.next/standalone ./
 COPY --from=installer --chown=nextjs:nextjs /app/apps/${APP}/.next/static ./apps/${APP}/.next/static
 COPY --from=installer --chown=nextjs:nextjs /app/apps/${APP}/public ./apps/${APP}/public
 
+USER nextjs
+
 WORKDIR /app/apps/${APP}
 EXPOSE ${PORT:-3000}
+
+# Use dumb-init for proper signal handling
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "server.js"]

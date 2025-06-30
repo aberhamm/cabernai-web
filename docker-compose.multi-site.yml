@@ -9,6 +9,11 @@ services:
       args:
         APP: strapi
         WORKSPACE: '@repo/strapi'
+        BUILDKIT_INLINE_CACHE: 1
+      cache_from:
+        - cabernai-web-strapi:latest
+      target: runner
+    image: cabernai-web-strapi:latest
     restart: unless-stopped
     env_file: .env # 🎯 Automatically loads ALL environment variables
     environment:
@@ -26,6 +31,23 @@ services:
       - default # Connect to default network for external nginx access
     labels:
       - 'traefik.enable=false'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:1337/admin',
+          '||',
+          'exit',
+          '1',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Next.js Frontend - Internal network only
   ui:
@@ -35,6 +57,11 @@ services:
       args:
         APP: ui
         WORKSPACE: '@repo/ui'
+        BUILDKIT_INLINE_CACHE: 1
+      cache_from:
+        - cabernai-web-ui:latest
+      target: runner
+    image: cabernai-web-ui:latest
     restart: unless-stopped
     env_file: .env # 🎯 Automatically loads ALL environment variables
     environment:
@@ -46,9 +73,27 @@ services:
       - cabernai_network
       - default # Connect to default network for external nginx access
     depends_on:
-      - strapi
+      strapi:
+        condition: service_healthy
     labels:
       - 'traefik.enable=false'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--no-verbose',
+          '--tries=1',
+          '--spider',
+          'http://localhost:3000',
+          '||',
+          'exit',
+          '1',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Watchtower for automatic updates (optional)
   watchtower:
@@ -60,6 +105,8 @@ services:
       WATCHTOWER_CLEANUP: true
       WATCHTOWER_POLL_INTERVAL: 3600
       WATCHTOWER_INCLUDE_STOPPED: true
+      WATCHTOWER_REVIVE_STOPPED: false
+      WATCHTOWER_NO_STARTUP_MESSAGE: true
     command: --interval 3600 --cleanup --scope cabernai-web
     networks:
       - cabernai_network

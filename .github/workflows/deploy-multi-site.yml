@@ -186,10 +186,10 @@ jobs:
           "
 
       - name: Deploy application (Multi-Site)
-        timeout-minutes: 45  # Set timeout for entire deployment
+        timeout-minutes: 30  # Reduced timeout due to optimizations
         run: |
-          echo "🚀 Starting multi-site deployment..."
-          echo "⏱️  Deployment timeout: 45 minutes"
+          echo "🚀 Starting optimized multi-site deployment..."
+          echo "⏱️  Deployment timeout: 30 minutes (reduced from 45 due to build optimizations)"
           echo "📊 Deployment started at: $(date)"
 
           ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
@@ -201,11 +201,15 @@ jobs:
             free -h
             docker system df || true
 
+            # Enable Docker BuildKit for faster builds
+            export DOCKER_BUILDKIT=1
+            export COMPOSE_DOCKER_CLI_BUILD=1
+
             # Make scripts executable
             chmod +x scripts/deploy/deploy-multi-site.sh
 
             # Run MULTI-SITE deployment with verbose logging
-            echo '🚀 Starting deployment script...'
+            echo '🚀 Starting optimized deployment script...'
             ./scripts/deploy/deploy-multi-site.sh production
           "
 

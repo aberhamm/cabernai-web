@@ -4,10 +4,23 @@
   "globalEnv": ["NEXT_OUTPUT"],
   "tasks": {
     "build": {
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "public/**"]
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "public/**"],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_APP_PUBLIC_URL",
+        "NEXT_PUBLIC_STRAPI_URL",
+        "NEXTAUTH_URL",
+        "NEXTAUTH_SECRET"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
     },
     "dev": {
       "cache": false,
