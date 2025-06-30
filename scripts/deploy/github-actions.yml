@@ -52,6 +52,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://${{ vars.DOMAIN_NAME }}
 
     steps:
       - name: Checkout code
@@ -159,14 +162,14 @@ jobs:
           sleep 60
 
           # Check if services are responding
-          if curl -f -s https://${{ secrets.DOMAIN_NAME }}/health; then
+          if curl -f -s https://${{ vars.DOMAIN_NAME }}/health; then
             echo '✅ UI is responding'
           else
             echo '❌ UI is not responding'
             exit 1
           fi
 
-          if curl -f -s https://${{ secrets.DOMAIN_NAME }}/api/health; then
+          if curl -f -s https://${{ vars.DOMAIN_NAME }}/api/health; then
             echo '✅ API is responding'
           else
             echo '❌ API is not responding'
