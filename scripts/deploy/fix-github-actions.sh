@@ -83,6 +83,30 @@ fix_project_directory() {
     echo_info "✓ Project directories configured"
 }
 
+fix_ssh_access() {
+    echo_step "Checking SSH access for deploy user..."
+
+    # Ensure SSH directory exists
+    mkdir -p /home/$DEPLOY_USER/.ssh
+    chmod 700 /home/$DEPLOY_USER/.ssh
+    chown $DEPLOY_USER:$DEPLOY_USER /home/$DEPLOY_USER/.ssh
+
+    # Ensure authorized_keys exists
+    touch /home/$DEPLOY_USER/.ssh/authorized_keys
+    chmod 600 /home/$DEPLOY_USER/.ssh/authorized_keys
+    chown $DEPLOY_USER:$DEPLOY_USER /home/$DEPLOY_USER/.ssh/authorized_keys
+
+    echo_info "✓ SSH directory structure configured"
+
+    # Check if authorized_keys has content
+    if [[ -s /home/$DEPLOY_USER/.ssh/authorized_keys ]]; then
+        echo_info "✓ SSH authorized_keys file has content"
+    else
+        echo_warn "⚠ SSH authorized_keys file is empty"
+        echo_warn "Add your public key: echo 'your-public-key' >> /home/$DEPLOY_USER/.ssh/authorized_keys"
+    fi
+}
+
 test_configuration() {
     echo_step "Testing configuration..."
 
@@ -108,6 +132,15 @@ test_configuration() {
         echo_error "✗ Project directory not writable"
         return 1
     fi
+
+    # Test SSH service
+    if systemctl is-active --quiet ssh; then
+        echo_info "✓ SSH service is running"
+    else
+        echo_error "✗ SSH service is not running"
+        echo_warn "Start SSH: sudo systemctl start ssh"
+        return 1
+    fi
 }
 
 main() {
@@ -119,6 +152,7 @@ main() {
     fix_passwordless_sudo
     fix_docker_permissions
     fix_project_directory
+    fix_ssh_access
 
     echo ""
     echo_step "Testing configuration..."
@@ -129,8 +163,10 @@ main() {
         echo ""
         echo_warn "Next steps:"
         echo_warn "1. Ensure DOMAIN_NAME is set in GitHub Repository Variables"
-        echo_warn "2. Trigger your GitHub Actions workflow again"
-        echo_warn "3. If using manual SSH, logout and login to refresh group membership"
+        echo_warn "2. Verify SSH_PRIVATE_KEY and DROPLET_HOST secrets are correct"
+        echo_warn "3. Test SSH connection: ./scripts/utils/test-ssh-connection.sh YOUR_IP deploy"
+        echo_warn "4. Trigger your GitHub Actions workflow again"
+        echo_warn "5. If using manual SSH, logout and login to refresh group membership"
     else
         echo ""
         echo_error "Some issues remain. Please check the errors above."

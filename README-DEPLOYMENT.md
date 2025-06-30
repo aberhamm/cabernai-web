@@ -713,6 +713,63 @@ docker-compose -f docker-compose.prod.yml restart nginx
 
 ## 🔧 Troubleshooting
 
+### SSH Connection Issues
+
+If GitHub Actions fails with SSH connection errors, use the connection test script:
+
+```bash
+# Test SSH connection from your local machine
+./scripts/utils/test-ssh-connection.sh YOUR_DROPLET_IP deploy
+
+# Example
+./scripts/utils/test-ssh-connection.sh 159.203.146.14 deploy
+```
+
+This script will test:
+
+- Basic network connectivity
+- SSH port accessibility
+- SSH key authentication
+- Server configuration requirements
+
+### Common SSH Issues
+
+#### 1. SSH Connection Failed
+
+**Error**: `ssh-keyscan -H *** >> ~/.ssh/known_hosts` fails with exit code 1
+
+**Possible Causes**:
+
+- Server is down or unreachable
+- SSH service not running
+- Firewall blocking port 22
+- Incorrect DROPLET_HOST secret
+
+**Solutions**:
+
+1. **Test connectivity**: `./scripts/utils/test-ssh-connection.sh YOUR_IP`
+2. **Check server status**: Login via DigitalOcean console
+3. **Verify SSH service**: `sudo systemctl status ssh`
+4. **Check firewall**: `sudo ufw status`
+5. **Verify DROPLET_HOST secret** in GitHub repository settings
+
+#### 2. SSH Authentication Failed
+
+**Error**: SSH connection times out or authentication fails
+
+**Solutions**:
+
+1. **Verify SSH key**: Make sure `SSH_PRIVATE_KEY` secret contains the PRIVATE key (not .pub)
+2. **Check authorized_keys**: Ensure public key is in `/home/deploy/.ssh/authorized_keys`
+3. **Test locally**: `ssh -i ~/.ssh/your_key deploy@YOUR_IP`
+
+```bash
+# Add your public key to server
+ssh-copy-id -i ~/.ssh/id_ed25519 deploy@YOUR_IP
+# or manually
+echo "your-public-key-content" >> /home/deploy/.ssh/authorized_keys
+```
+
 ### GitHub Actions: "sudo: a password is required"
 
 If your GitHub Actions workflow fails with:
