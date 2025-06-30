@@ -189,6 +189,62 @@ All variables from app-specific `.env` files are now consolidated in the unified
    grep -E '^[^#]' .env | sort  # List all non-comment variables
    ```
 
+### **Development Issues**
+
+1. **Permission Errors (Strapi Build):**
+
+   ```bash
+   # Fix file ownership after Docker usage
+   sudo chown -R $USER:staff apps/strapi/dist/
+   sudo chown -R $USER:staff apps/strapi/.strapi/
+   ```
+
+2. **Symlink Issues:**
+
+   ```bash
+   # Check if symlinks exist (should be created automatically)
+   ls -la apps/strapi/.env apps/ui/.env.local
+
+   # Recreate if missing
+   ln -sf ../../.env apps/strapi/.env
+   ln -sf ../../.env apps/ui/.env.local
+   ```
+
+3. **Sharp Module Errors (macOS ARM64):**
+
+   ```bash
+   # Reinstall with correct binaries
+   cd apps/ui && yarn add sharp --ignore-engines
+   ```
+
+### **Production Deployment Issues**
+
+1. **GitHub Actions Environment Variables:**
+
+   ```bash
+   # Ensure DOMAIN_NAME is set in GitHub Repository Variables
+   # Check GitHub Actions logs for: DOMAIN_NAME = ''
+   ```
+
+2. **Database Connection Issues:**
+
+   ```bash
+   # Verify DATABASE_URL format
+   echo $DATABASE_URL
+
+   # Should be: postgresql://user:pass@host:port/database
+   ```
+
+3. **SSL Certificate Issues:**
+
+   ```bash
+   # Check nginx configuration
+   sudo nginx -t
+
+   # Verify SSL certificates
+   sudo certbot certificates
+   ```
+
 ### **Development vs Production Issues**
 
 1. **Check NODE_ENV:**
@@ -201,7 +257,23 @@ All variables from app-specific `.env` files are now consolidated in the unified
    NODE_ENV=production
    ```
 
-2. **Check DOMAIN_NAME:**
+2. **URL Configuration:**
+
+   ```bash
+   # Development (DOMAIN_NAME empty)
+   NEXT_PUBLIC_APP_PUBLIC_URL=http://localhost:3000
+
+   # Production (DOMAIN_NAME set)
+   NEXT_PUBLIC_APP_PUBLIC_URL=https://your-domain.com
+   ```
+
+   NODE_ENV=production
+
+   ```
+
+   ```
+
+3. **Check DOMAIN_NAME:**
 
    ```bash
    # Development should be empty

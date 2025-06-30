@@ -87,8 +87,12 @@ yarn
 **🎯 Unified Environment Approach:** Both development and production use the same root `.env` file!
 
 ```bash
-# Copy the example file
-cp .env.example .env
+# Quick setup for development
+bash ./scripts/utils/fix-dev-issues.sh
+
+# Or manually create .env file
+# (If .env.example exists, copy it. Otherwise, the script will create a minimal one)
+cp .env.example .env  # if .env.example exists
 
 # Edit .env with your values
 # For development: Leave DOMAIN_NAME empty (uses localhost)
@@ -142,6 +146,80 @@ Husky is installed by default and configured to run following tasks:
 
 2. `commitlint` on every commit message (`commit-msg` hook). It checks if commit messages meet [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) format.
 
+## 🔧 Troubleshooting
+
+### Development Issues
+
+**🔧 Quick Fix (Recommended):**
+
+```bash
+# Interactive troubleshooting script
+bash ./scripts/utils/fix-dev-issues.sh
+```
+
+**Manual Fixes:**
+
+**Permission Errors in Strapi Build:**
+
+```bash
+# Fix file ownership issues (common after Docker usage)
+sudo chown -R $USER:staff apps/strapi/dist/
+sudo chown -R $USER:staff apps/strapi/.strapi/
+```
+
+**Environment Variables Not Loading:**
+
+```bash
+# Ensure .env file exists in root
+ls -la .env
+
+# Check symlinks for app compatibility (created automatically)
+ls -la apps/strapi/.env apps/ui/.env.local
+```
+
+**Node Modules Issues:**
+
+```bash
+# Clean everything and reinstall
+bash ./scripts/utils/rm-all.sh
+yarn install
+```
+
+**Sharp Module Errors (macOS ARM64):**
+
+```bash
+# Reinstall Sharp with correct binaries
+cd apps/ui && yarn add sharp --ignore-engines
+```
+
+**Sentry DSN Warnings:**
+
+```bash
+# If you see "Invalid Sentry Dsn" warnings in development
+# Either set a valid Sentry DSN in your .env file:
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+NEXT_PUBLIC_SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+
+# Or leave empty to disable Sentry:
+SENTRY_DSN=
+NEXT_PUBLIC_SENTRY_DSN=
+```
+
+### Production Deployment Issues
+
+**GitHub Actions Failing:**
+
+```bash
+# Run automated troubleshooting script on your server
+sudo ./scripts/deploy/fix-github-actions.sh
+```
+
+**Environment Variable Issues:**
+
+- Ensure `DOMAIN_NAME` is set in GitHub Repository Variables
+- Use `./scripts/deploy/env-generator.sh` to create production `.env`
+- Check [README-DEPLOYMENT.md](README-DEPLOYMENT.md) for complete setup guide
+
 ## 📿 Scripts
 
 ### Package.json
@@ -153,6 +231,7 @@ Husky is installed by default and configured to run following tasks:
 
 - `bash ./scripts/utils/rm-modules.sh` - Remove all `node_modules` folders in the monorepo. Useful for scratch dependencies installation.
 - `bash ./scripts/utils/rm-all.sh` - Remove all `node_modules`, `.next`, `.turbo`, `.strapi`, `dist` folders.
+- `bash ./scripts/utils/fix-dev-issues.sh` - **Interactive development troubleshooting script** to fix common local development issues.
 
 ### Heroku
 
