@@ -1,10 +1,10 @@
-import { createEnv } from "@t3-oss/env-nextjs"
-import { z } from "zod"
+import { createEnv } from '@t3-oss/env-nextjs'
+import { z } from 'zod'
 
 const optionalZodBoolean = z
   .string()
   .toLowerCase()
-  .transform((x) => x === "true")
+  .transform((x) => x === 'true')
   .pipe(z.boolean())
   .optional()
 
@@ -32,8 +32,11 @@ export const env = createEnv({
    * You'll get type errors if these are not prefixed with NEXT_PUBLIC_.
    */
   client: {
-    NEXT_PUBLIC_APP_PUBLIC_URL: z.string().url(),
-    NEXT_PUBLIC_STRAPI_URL: z.string().url(),
+    // Required in production, optional during development/CI
+    NEXT_PUBLIC_APP_PUBLIC_URL:
+      process.env.NODE_ENV === 'production' ? z.string().url() : z.string().url().optional(),
+    NEXT_PUBLIC_STRAPI_URL:
+      process.env.NODE_ENV === 'production' ? z.string().url() : z.string().url().optional(),
     NEXT_PUBLIC_PREVENT_UNUSED_FUNCTIONS_ERROR_LOGS: optionalZodBoolean,
     NEXT_PUBLIC_NODE_ENV: z.string().optional(),
     NEXT_PUBLIC_REVALIDATE: z.number().or(z.literal(false)).optional(),
@@ -58,11 +61,7 @@ export const env = createEnv({
     NEXT_PUBLIC_REVALIDATE: (() => {
       const revalidate = process.env.NEXT_PUBLIC_REVALIDATE
       const coercedRevalidate =
-        revalidate != null
-          ? isNaN(Number(revalidate))
-            ? false
-            : Number(revalidate)
-          : undefined
+        revalidate != null ? (isNaN(Number(revalidate)) ? false : Number(revalidate)) : undefined
 
       return coercedRevalidate
     })(),
