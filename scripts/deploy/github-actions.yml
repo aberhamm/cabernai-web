@@ -45,7 +45,7 @@ jobs:
         env:
           # Skip Sharp module during linting to avoid platform compatibility issues
           NEXT_SHARP: 0
-        run: NODE_ENV=development turbo lint
+        run: NODE_ENV=development yarn turbo lint
 
       - name: Type check
         run: |
