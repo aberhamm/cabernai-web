@@ -112,26 +112,24 @@ After running the env generator locally, set up a GitHub environment and copy th
 # View your generated .env file
 cat .env
 
-# Copy EACH variable as a separate GitHub Secret with the SAME NAME
+# Copy sensitive variables as GitHub Secrets with the SAME NAME
 # GitHub → Repository → Settings → Secrets and variables → Actions
 
 # Example from your .env file:
-UI_PUBLIC_URL=https://example.com
-STRAPI_PUBLIC_URL=https://example.com
-NEXT_PUBLIC_APP_PUBLIC_URL=https://example.com
-NEXT_PUBLIC_STRAPI_URL=https://example.com
+DOMAIN_NAME=example.com  # ← This goes to GitHub Variables (not secrets)
 DATABASE_URL=postgresql://...
 APP_KEYS=abc123,def456,ghi789,jkl012
+NEXTAUTH_SECRET=generated-secret
 # ... etc
 
+# Create GitHub Variable (not secret):
+# - DOMAIN_NAME (value: example.com)
+
 # Create GitHub Secrets with EXACTLY these names:
-# - UI_PUBLIC_URL (value: https://example.com)
-# - STRAPI_PUBLIC_URL (value: https://example.com)
-# - NEXT_PUBLIC_APP_PUBLIC_URL (value: https://example.com)
-# - NEXT_PUBLIC_STRAPI_URL (value: https://example.com)
 # - DATABASE_URL (value: postgresql://...)
 # - APP_KEYS (value: abc123,def456,ghi789,jkl012)
-   # ... and so on for ALL variables in your .env file
+# - NEXTAUTH_SECRET (value: generated-secret)
+   # ... and so on for ALL sensitive variables in your .env file
 ```
 
 ### 🌍 **Step 1: Create GitHub Environment**
@@ -293,22 +291,22 @@ environment:
 Your single `.env` file will contain all variables needed by both Strapi and Next.js:
 
 ```bash
-# URLs - All derived from domain (consolidated!)
+# Domain (single source of truth!)
+DOMAIN_NAME=your-domain.com
+
+# URLs - All automatically derived from DOMAIN_NAME
 NEXT_PUBLIC_APP_PUBLIC_URL=https://your-domain.com
 NEXT_PUBLIC_STRAPI_URL=https://your-domain.com
 NEXTAUTH_URL=https://your-domain.com
-APP_URL=https://your-domain.com
 
-# Database (Supabase) - duplicated for compatibility
+# Database (Supabase) - single variable
 DATABASE_URL=postgresql://postgres.xxx:password@xxx.pooler.supabase.com:6543/postgres
-SUPABASE_DATABASE_URL=postgresql://postgres.xxx:password@xxx.pooler.supabase.com:6543/postgres
 
 # Strapi Configuration
 APP_KEYS=generated-key-1,generated-key-2,generated-key-3,generated-key-4
 ADMIN_JWT_SECRET=generated-secret
 API_TOKEN_SALT=generated-salt
 JWT_SECRET=generated-secret
-PUBLIC_URL=https://your-domain.com
 
 # NextAuth
 NEXTAUTH_SECRET=generated-secret

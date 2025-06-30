@@ -128,8 +128,9 @@ main() {
         echo_info "Your GitHub Actions deployment should now work."
         echo ""
         echo_warn "Next steps:"
-        echo_warn "1. Trigger your GitHub Actions workflow again"
-        echo_warn "2. If using manual SSH, logout and login to refresh group membership"
+        echo_warn "1. Ensure DOMAIN_NAME is set in GitHub Repository Variables"
+        echo_warn "2. Trigger your GitHub Actions workflow again"
+        echo_warn "3. If using manual SSH, logout and login to refresh group membership"
     else
         echo ""
         echo_error "Some issues remain. Please check the errors above."

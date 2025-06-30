@@ -35,12 +35,18 @@ jobs:
         run: yarn
 
       - name: Build UI
-        run: yarn build:ui
         env:
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           NEXTAUTH_URL: https://${{ vars.DOMAIN_NAME }}
           NEXT_PUBLIC_APP_PUBLIC_URL: https://${{ vars.DOMAIN_NAME }}
           NEXT_PUBLIC_STRAPI_URL: https://${{ vars.DOMAIN_NAME }}
+        run: |
+          echo "🔍 Debug: DOMAIN_NAME = '${{ vars.DOMAIN_NAME }}'"
+          echo "🔍 Debug: NEXT_PUBLIC_APP_PUBLIC_URL = '$NEXT_PUBLIC_APP_PUBLIC_URL'"
+          echo "🔍 Debug: NEXT_PUBLIC_STRAPI_URL = '$NEXT_PUBLIC_STRAPI_URL'"
+          yarn build:ui
 
       - name: Build Strapi
-        run: yarn build:strapi
+        run: |
+          echo "🔍 Debug: Building Strapi..."
+          yarn build:strapi

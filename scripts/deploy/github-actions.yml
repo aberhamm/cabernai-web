@@ -45,7 +45,11 @@ jobs:
           NEXT_PUBLIC_APP_PUBLIC_URL: https://${{ vars.DOMAIN_NAME }}
           NEXT_PUBLIC_STRAPI_URL: https://${{ vars.DOMAIN_NAME }}
           NODE_ENV: production
-        run: yarn build
+        run: |
+          echo "🔍 Debug: DOMAIN_NAME = '${{ vars.DOMAIN_NAME }}'"
+          echo "🔍 Debug: NEXT_PUBLIC_APP_PUBLIC_URL = '$NEXT_PUBLIC_APP_PUBLIC_URL'"
+          echo "🔍 Debug: NEXT_PUBLIC_STRAPI_URL = '$NEXT_PUBLIC_STRAPI_URL'"
+          yarn build
 
   deploy:
     name: Deploy to Production

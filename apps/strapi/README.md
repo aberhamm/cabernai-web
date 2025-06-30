@@ -92,8 +92,8 @@ To build and run Strapi in Docker container use [Dockerfile](Dockerfile) prepare
 ```bash
 # from monorepo root
 
-# build image, name it and pass APP_URL as build arg to override localhost:1337 default value
-docker build -t strapi:latest -f apps/strapi/Dockerfile --build-arg APP_URL=https://cms.strapi-domain.dev .
+# build image, name it and pass NEXT_PUBLIC_STRAPI_URL as build arg to override localhost:1337 default value
+docker build -t strapi:latest -f apps/strapi/Dockerfile --build-arg NEXT_PUBLIC_STRAPI_URL=https://cms.strapi-domain.dev .
 
 # run container using image
 docker run -it --rm --name strapi -p 1337:1337 --env-file apps/strapi/.env strapi:latest
