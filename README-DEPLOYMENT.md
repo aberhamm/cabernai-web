@@ -50,26 +50,94 @@ Supabase PostgreSQL is compatible with Strapi out of the box. No additional conf
 
 ### 1. Generate Environment Variables
 
+⚠️ **IMPORTANT: The env generator runs ONLY on your local machine, but the .env file is used differently for each deployment method.**
+
+#### **Step 1: Run Locally (Required for ALL deployment methods)**
+
 On your local machine:
 
 ```bash
 # Clone your repository
-git clone https://github.com/your-username/cabernai-web.git
+git clone https://github.com/aberhamm/cabernai-web.git
 cd cabernai-web
 
 # Make the generator script executable
 chmod +x scripts/deploy/env-generator.sh
 
-# Generate environment file
+# Generate environment file (interactive prompts)
 ./scripts/deploy/env-generator.sh
 ```
 
+**What this does:**
+
+- ✅ **Generates secure random secrets** (APP_KEYS, JWT secrets, salts)
+- ✅ **Prompts for your configuration** (domain, database URL, API keys)
+- ✅ **Creates a complete `.env` file** with all required variables
+- ✅ **Validates your inputs** and provides helpful hints
+
+#### **Step 2: How the .env file gets to your server**
+
+| Deployment Method         | How .env gets to server                                                             |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| **Manual/Git Deployment** | You copy the `.env` file manually: `scp .env deploy@droplet:/opt/cabernai-web/.env` |
+| **GitHub Actions**        | GitHub Secrets create the `.env` file automatically on the server                   |
+
+#### **For GitHub Actions: Copy values from your local .env to GitHub Secrets**
+
+After running the env generator locally, copy the generated values from your `.env` file to GitHub Secrets:
+
+```bash
+# View your generated .env file
+cat .env
+
+# Copy each value to GitHub → Repository → Settings → Secrets
+# Example: If your .env shows:
+# APP_KEYS=abc123,def456,ghi789,jkl012
+# Then create a GitHub Secret named "APP_KEYS" with value "abc123,def456,ghi789,jkl012"
+```
+
+## 📋 **Environment Setup Summary**
+
+| Step | What                                                     | Where            | Result                                            |
+| ---- | -------------------------------------------------------- | ---------------- | ------------------------------------------------- |
+| 1    | Run `env-generator.sh`                                   | 💻 Local Machine | Creates `.env` file with secrets                  |
+| 2a   | **Manual Deploy:** Copy `.env` to server                 | 🖥️ Server        | Server uses your `.env` directly                  |
+| 2b   | **GitHub Actions:** Copy `.env` values to GitHub Secrets | ☁️ GitHub        | GitHub creates `.env` on server during deployment |
+
+**Key Points:**
+
+- ✅ **Always run env generator locally first** - it creates the secure secrets
+- ✅ **Manual deployment** = copy the `.env` file to your server
+- ✅ **GitHub Actions** = copy values from `.env` to GitHub Secrets (not the file itself)
+- ❌ **Never commit `.env` to git** - it contains secrets!
+
+## 🤖 **GitHub Actions Automation Summary**
+
+| Deployment Type | Setup Required                                                | GitHub Actions Can Automate                                              | Manual Steps Still Needed                                     |
+| --------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| **Single-Site** | ❌ None                                                       | ✅ Complete server setup<br/>✅ Full deployment<br/>✅ SSL configuration | None! Fully automated                                         |
+| **Multi-Site**  | ✅ Run `setup-existing-droplet.sh`<br/>✅ Verify no conflicts | ✅ Code deployment<br/>✅ Container management<br/>✅ Health checks      | Server setup<br/>Conflict resolution<br/>Initial nginx config |
+
+**🎯 Key Takeaway:**
+
+- **Single-site GitHub Actions** = Complete automation (fresh droplet → running app)
+- **Multi-site GitHub Actions** = Deployment automation only (after manual setup)
+
+## 🚦 **Quick Decision Guide: Should I Use GitHub Actions?**
+
+| Your Situation                             | Recommendation                          | Reason                                    |
+| ------------------------------------------ | --------------------------------------- | ----------------------------------------- |
+| Fresh DigitalOcean droplet                 | ✅ **Use Single-Site GitHub Actions**   | Complete automation, zero manual steps    |
+| Existing droplet, comfortable with servers | ✅ **Use Multi-Site GitHub Actions**    | Automates deployments after initial setup |
+| Existing droplet, prefer simplicity        | ✅ **Use Multi-Site Manual Deployment** | No workflow complexity, full control      |
+| Learning/testing                           | ✅ **Start with Manual Deployment**     | Better understanding of the process       |
+
 This creates a `.env` file with:
 
-- Secure random secrets
-- Supabase database configuration
-- Your domain settings
-- Optional service configurations
+- Secure random secrets (generated automatically)
+- Supabase database configuration (you provide)
+- Your domain settings (you provide)
+- Optional service configurations (you provide)
 
 ### 2. Key Environment Variables
 
@@ -160,7 +228,7 @@ SSH_HOST=your-droplet-ip ./scripts/deploy/deploy.sh production
    ```bash
    ssh deploy@your-droplet-ip
    cd /opt/cabernai-web
-   git clone https://github.com/your-username/cabernai-web.git .
+   git clone https://github.com/aberhamm/cabernai-web.git .
    ```
 3. **Copy your environment file:**
    ```bash
@@ -181,26 +249,48 @@ SSH_HOST=your-droplet-ip ./scripts/deploy/deploy.sh production
    cp scripts/deploy/github-actions.yml .github/workflows/deploy.yml
    ```
 
-2. **Set up GitHub Secrets:** Go to your GitHub repository → Settings → Secrets and add:
+2. **Set up GitHub Secrets:**
 
+   **⚠️ CRITICAL: You MUST run `./scripts/deploy/env-generator.sh` locally first to get the actual secret values!**
+
+   After running the env generator, open your local `.env` file and copy the values:
+
+   ```bash
+   # View your generated secrets
+   cat .env
    ```
-   DROPLET_HOST=your-droplet-ip
-   SSH_PRIVATE_KEY=your-private-ssh-key
-   DOMAIN_NAME=your-domain.com
-   UI_PUBLIC_URL=https://your-domain.com
-   STRAPI_PUBLIC_URL=https://your-domain.com
-   SUPABASE_DATABASE_URL=your-supabase-connection-string
-   APP_KEYS=generated-app-keys
-   ADMIN_JWT_SECRET=generated-secret
-   API_TOKEN_SALT=generated-salt
-   TRANSFER_TOKEN_SALT=generated-salt
-   JWT_SECRET=generated-secret
-   NEXTAUTH_SECRET=generated-secret
-   CLOUDINARY_NAME=your-cloudinary-name
-   CLOUDINARY_API_KEY=your-cloudinary-key
-   CLOUDINARY_API_SECRET=your-cloudinary-secret
-   # ... other optional secrets
+
+   Then go to **GitHub → Repository → Settings → Secrets and Variables → Actions** and add:
+
+   ```bash
+   # Server Access (you provide these)
+   DROPLET_HOST=your-actual-droplet-ip
+   SSH_PRIVATE_KEY=your-actual-private-ssh-key
+   DOMAIN_NAME=your-actual-domain.com
+
+   # URLs (replace with your domain)
+   UI_PUBLIC_URL=https://your-actual-domain.com
+   STRAPI_PUBLIC_URL=https://your-actual-domain.com
+
+   # Database (from your Supabase dashboard)
+   SUPABASE_DATABASE_URL=your-actual-supabase-connection-string
+
+   # Generated Secrets (copy EXACT values from your local .env)
+   APP_KEYS=actual-generated-keys-from-env-file
+   ADMIN_JWT_SECRET=actual-generated-secret-from-env-file
+   API_TOKEN_SALT=actual-generated-salt-from-env-file
+   TRANSFER_TOKEN_SALT=actual-generated-salt-from-env-file
+   JWT_SECRET=actual-generated-secret-from-env-file
+   NEXTAUTH_SECRET=actual-generated-secret-from-env-file
+
+   # API Keys (your actual credentials)
+   CLOUDINARY_NAME=your-actual-cloudinary-name
+   CLOUDINARY_API_KEY=your-actual-cloudinary-key
+   CLOUDINARY_API_SECRET=your-actual-cloudinary-secret
+   # ... other optional secrets from your .env file
    ```
+
+   **🔑 Key Point: Never make up these values! Always copy them from your generated `.env` file.**
 
 3. **Push to main branch** - deployment will trigger automatically
 
@@ -269,12 +359,56 @@ This script will:
 
 ### Deploy to Multi-Site Droplet
 
+⚠️ **IMPORTANT: Multi-site deployment automation is different from single-site!**
+
+#### **Option A: Manual Deployment (Recommended)**
+
 ```bash
 # From your local machine
 SSH_HOST=your-droplet-ip ./scripts/deploy/deploy-multi-site.sh production
 ```
 
-This will:
+#### **Option B: GitHub Actions (Requires workflow modification)**
+
+**🚨 The default GitHub Actions workflow is for SINGLE-SITE only!**
+
+For multi-site GitHub Actions automation:
+
+1. **You still must run the setup steps manually first:**
+
+   ```bash
+   # These steps CANNOT be automated for multi-site:
+   # - Run setup-existing-droplet.sh on your server
+   # - Verify no conflicts with existing sites
+   ```
+
+2. **Use the multi-site GitHub Actions workflow:**
+
+   ```bash
+   # Copy the dedicated multi-site workflow (no editing needed!)
+   cp scripts/deploy/github-actions-multi-site.yml .github/workflows/deploy-multi-site.yml
+   ```
+
+   **This workflow includes:**
+
+   - ✅ Multi-site environment verification
+   - ✅ Checks for existing nginx setup
+   - ✅ Uses `deploy-multi-site.sh` script
+   - ✅ Validates localhost port binding
+   - ✅ Better error messages for multi-site issues
+
+3. **Set up GitHub Secrets** (same as single-site section above)
+
+4. **Push to trigger deployment**
+
+**Why multi-site is more complex:**
+
+- ❌ Cannot automate server conflicts detection
+- ❌ Cannot automate nginx integration safely
+- ❌ Requires manual verification of existing sites
+- ✅ Can automate the actual deployment once setup is complete
+
+**Manual deployment will:**
 
 - ✅ Copy project files to `/opt/cabernai-web/`
 - ✅ Build Docker containers (ports 127.0.0.1:3000, 127.0.0.1:1337)

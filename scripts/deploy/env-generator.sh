@@ -40,6 +40,17 @@ generate_uuid() {
     fi
 }
 
+# Cross-platform sed function
+sed_inplace() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i "" "$@"
+    else
+        # Linux
+        sed -i "$@"
+    fi
+}
+
 main() {
     echo_info "Cabernai Web Environment Generator"
     echo_info "=================================="
@@ -79,12 +90,12 @@ main() {
     NEXTAUTH_SECRET=$(generate_secret)
 
     # Replace secrets in .env file
-    sed -i "s/your-app-key-1,your-app-key-2,your-app-key-3,your-app-key-4/$APP_KEY_1,$APP_KEY_2,$APP_KEY_3,$APP_KEY_4/g" .env
-    sed -i "s/your-admin-jwt-secret/$ADMIN_JWT_SECRET/g" .env
-    sed -i "s/your-api-token-salt/$API_TOKEN_SALT/g" .env
-    sed -i "s/your-transfer-token-salt/$TRANSFER_TOKEN_SALT/g" .env
-    sed -i "s/your-jwt-secret/$JWT_SECRET/g" .env
-    sed -i "s/your-nextauth-secret/$NEXTAUTH_SECRET/g" .env
+    sed_inplace "s/your-app-key-1,your-app-key-2,your-app-key-3,your-app-key-4/$APP_KEY_1,$APP_KEY_2,$APP_KEY_3,$APP_KEY_4/g" .env
+    sed_inplace "s/your-admin-jwt-secret/$ADMIN_JWT_SECRET/g" .env
+    sed_inplace "s/your-api-token-salt/$API_TOKEN_SALT/g" .env
+    sed_inplace "s/your-transfer-token-salt/$TRANSFER_TOKEN_SALT/g" .env
+    sed_inplace "s/your-jwt-secret/$JWT_SECRET/g" .env
+    sed_inplace "s/your-nextauth-secret/$NEXTAUTH_SECRET/g" .env
 
     echo_info "✓ Generated secure secrets"
 
@@ -92,7 +103,7 @@ main() {
     echo_step "Domain Configuration"
     read -p "Enter your domain (e.g., example.com): " DOMAIN
     if [[ -n "$DOMAIN" ]]; then
-        sed -i "s/your-domain.com/$DOMAIN/g" .env
+        sed_inplace "s/your-domain.com/$DOMAIN/g" .env
         echo_info "✓ Set domain to $DOMAIN"
     fi
 
@@ -106,7 +117,7 @@ main() {
     if [[ -n "$SUPABASE_URL" ]]; then
         # Escape special characters for sed
         ESCAPED_URL=$(echo "$SUPABASE_URL" | sed 's/[[\.*^$()+?{|]/\\&/g')
-        sed -i "s|postgresql://postgres.your-project-ref:your-password@aws-0-region.pooler.supabase.com:6543/postgres|$ESCAPED_URL|g" .env
+        sed_inplace "s|postgresql://postgres.your-project-ref:your-password@aws-0-region.pooler.supabase.com:6543/postgres|$ESCAPED_URL|g" .env
         echo_info "✓ Set Supabase database URL"
     fi
 
@@ -126,17 +137,17 @@ main() {
             read -p "Cloudinary API secret: " CLOUDINARY_API_SECRET
 
             if [[ -n "$CLOUDINARY_NAME" && -n "$CLOUDINARY_API_KEY" && -n "$CLOUDINARY_API_SECRET" ]]; then
-                sed -i "s/your-cloudinary-name/$CLOUDINARY_NAME/g" .env
-                sed -i "s/your-cloudinary-api-key/$CLOUDINARY_API_KEY/g" .env
-                sed -i "s/your-cloudinary-api-secret/$CLOUDINARY_API_SECRET/g" .env
+                sed_inplace "s/your-cloudinary-name/$CLOUDINARY_NAME/g" .env
+                sed_inplace "s/your-cloudinary-api-key/$CLOUDINARY_API_KEY/g" .env
+                sed_inplace "s/your-cloudinary-api-secret/$CLOUDINARY_API_SECRET/g" .env
                 echo_info "✓ Configured Cloudinary"
             fi
             ;;
         2)
             echo_info "AWS S3 Configuration:"
             # Comment out Cloudinary and uncomment AWS
-            sed -i 's/^CLOUDINARY_/# CLOUDINARY_/g' .env
-            sed -i 's/^# AWS_/AWS_/g' .env
+            sed_inplace 's/^CLOUDINARY_/# CLOUDINARY_/g' .env
+            sed_inplace 's/^# AWS_/AWS_/g' .env
 
             read -p "AWS Access Key ID: " AWS_ACCESS_KEY_ID
             read -p "AWS Secret Access Key: " AWS_ACCESS_SECRET
@@ -144,10 +155,10 @@ main() {
             read -p "S3 Bucket Name: " AWS_BUCKET
 
             if [[ -n "$AWS_ACCESS_KEY_ID" && -n "$AWS_ACCESS_SECRET" && -n "$AWS_REGION" && -n "$AWS_BUCKET" ]]; then
-                sed -i "s/your-aws-access-key/$AWS_ACCESS_KEY_ID/g" .env
-                sed -i "s/your-aws-secret-key/$AWS_ACCESS_SECRET/g" .env
-                sed -i "s/your-aws-region/$AWS_REGION/g" .env
-                sed -i "s/your-s3-bucket-name/$AWS_BUCKET/g" .env
+                sed_inplace "s/your-aws-access-key/$AWS_ACCESS_KEY_ID/g" .env
+                sed_inplace "s/your-aws-secret-key/$AWS_ACCESS_SECRET/g" .env
+                sed_inplace "s/your-aws-region/$AWS_REGION/g" .env
+                sed_inplace "s/your-s3-bucket-name/$AWS_BUCKET/g" .env
                 echo_info "✓ Configured AWS S3"
             fi
             ;;
@@ -168,9 +179,9 @@ main() {
         read -p "Mailgun email: " MAILGUN_EMAIL
 
         if [[ -n "$MAILGUN_API_KEY" && -n "$MAILGUN_DOMAIN" && -n "$MAILGUN_EMAIL" ]]; then
-            sed -i "s/your-mailgun-api-key/$MAILGUN_API_KEY/g" .env
-            sed -i "s/your-mailgun-domain/$MAILGUN_DOMAIN/g" .env
-            sed -i "s/your-mailgun-email/$MAILGUN_EMAIL/g" .env
+            sed_inplace "s/your-mailgun-api-key/$MAILGUN_API_KEY/g" .env
+            sed_inplace "s/your-mailgun-domain/$MAILGUN_DOMAIN/g" .env
+            sed_inplace "s/your-mailgun-email/$MAILGUN_EMAIL/g" .env
             echo_info "✓ Configured Mailgun"
         fi
     fi
@@ -182,7 +193,7 @@ main() {
         read -p "Sentry DSN: " SENTRY_DSN
 
         if [[ -n "$SENTRY_DSN" ]]; then
-            sed -i "s/your-sentry-dsn/$SENTRY_DSN/g" .env
+            sed_inplace "s/your-sentry-dsn/$SENTRY_DSN/g" .env
             echo_info "✓ Configured Sentry"
         fi
     fi

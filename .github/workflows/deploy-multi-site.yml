@@ -1,7 +1,10 @@
-# GitHub Actions workflow for deploying to DigitalOcean droplet
-# Save this file as .github/workflows/deploy.yml
+# GitHub Actions workflow for deploying to DigitalOcean droplet (MULTI-SITE VERSION)
+# Save this file as .github/workflows/deploy-multi-site.yml
+#
+# IMPORTANT: This is for MULTI-SITE deployment only!
+# You MUST run setup-existing-droplet.sh on your server first!
 
-name: Deploy to DigitalOcean
+name: Deploy to DigitalOcean (Multi-Site)
 
 on:
   push:
@@ -43,7 +46,7 @@ jobs:
         run: yarn build
 
   deploy:
-    name: Deploy to Production
+    name: Deploy to Production (Multi-Site)
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -60,6 +63,26 @@ jobs:
       - name: Add server to known hosts
         run: |
           ssh-keyscan -H ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Verify multi-site setup exists
+        run: |
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            # Check if multi-site setup was completed
+            if [[ ! -f /opt/${{ env.PROJECT_NAME }}/docker-compose.multi-site.yml ]]; then
+              echo '❌ Multi-site setup not found!'
+              echo 'You must run setup-existing-droplet.sh on your server first.'
+              echo 'See README-DEPLOYMENT.md multi-site section for instructions.'
+              exit 1
+            fi
+
+            # Check if nginx is running (should exist for multi-site)
+            if ! systemctl is-active --quiet nginx; then
+              echo '❌ Nginx not running! Multi-site requires existing nginx.'
+              exit 1
+            fi
+
+            echo '✅ Multi-site environment verified'
+          "
 
       - name: Create deployment directory
         run: |
@@ -110,16 +133,16 @@ jobs:
           EOF
           "
 
-      - name: Deploy application
+      - name: Deploy application (Multi-Site)
         run: |
           ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
             cd /opt/${{ env.PROJECT_NAME }}
 
             # Make scripts executable
-            chmod +x scripts/deploy/deploy.sh
+            chmod +x scripts/deploy/deploy-multi-site.sh
 
-            # Run deployment
-            ./scripts/deploy/deploy.sh production
+            # Run MULTI-SITE deployment
+            ./scripts/deploy/deploy-multi-site.sh production
           "
 
       - name: Verify deployment
@@ -142,10 +165,30 @@ jobs:
             exit 1
           fi
 
+          # Verify local ports are bound (multi-site specific)
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            if curl -f -s http://127.0.0.1:3000/ > /dev/null; then
+              echo '✅ UI running on localhost:3000'
+            else
+              echo '❌ UI not accessible on localhost:3000'
+              exit 1
+            fi
+
+            if curl -f -s http://127.0.0.1:1337/ > /dev/null; then
+              echo '✅ Strapi running on localhost:1337'
+            else
+              echo '❌ Strapi not accessible on localhost:1337'
+              exit 1
+            fi
+          "
+
       - name: Notify deployment success
         if: success()
-        run: echo "🚀 Deployment successful!"
+        run: echo "🚀 Multi-Site Deployment successful!"
 
       - name: Notify deployment failure
         if: failure()
-        run: echo "❌ Deployment failed!"
+        run: |
+          echo "❌ Multi-Site Deployment failed!"
+          echo "Check that you have run setup-existing-droplet.sh first"
+          echo "and that your existing nginx configuration is compatible"

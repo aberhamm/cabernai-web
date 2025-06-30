@@ -1,0 +1,194 @@
+# GitHub Actions workflow for deploying to DigitalOcean droplet (MULTI-SITE VERSION)
+# Save this file as .github/workflows/deploy-multi-site.yml
+#
+# IMPORTANT: This is for MULTI-SITE deployment only!
+# You MUST run setup-existing-droplet.sh on your server first!
+
+name: Deploy to DigitalOcean (Multi-Site)
+
+on:
+  push:
+    branches:
+      - main
+      - production
+  workflow_dispatch:
+
+env:
+  PROJECT_NAME: cabernai-web
+  DEPLOY_USER: deploy
+
+jobs:
+  test:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint code
+        run: yarn lint
+
+      - name: Type check
+        run: |
+          cd apps/ui && yarn typecheck
+          cd ../strapi && yarn generate:types
+
+      - name: Build applications
+        run: yarn build
+
+  deploy:
+    name: Deploy to Production (Multi-Site)
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Verify multi-site setup exists
+        run: |
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            # Check if multi-site setup was completed
+            if [[ ! -f /opt/${{ env.PROJECT_NAME }}/docker-compose.multi-site.yml ]]; then
+              echo '❌ Multi-site setup not found!'
+              echo 'You must run setup-existing-droplet.sh on your server first.'
+              echo 'See README-DEPLOYMENT.md multi-site section for instructions.'
+              exit 1
+            fi
+
+            # Check if nginx is running (should exist for multi-site)
+            if ! systemctl is-active --quiet nginx; then
+              echo '❌ Nginx not running! Multi-site requires existing nginx.'
+              exit 1
+            fi
+
+            echo '✅ Multi-site environment verified'
+          "
+
+      - name: Create deployment directory
+        run: |
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            sudo mkdir -p /opt/${{ env.PROJECT_NAME }}
+            sudo chown ${{ env.DEPLOY_USER }}:${{ env.DEPLOY_USER }} /opt/${{ env.PROJECT_NAME }}
+          "
+
+      - name: Copy project files
+        run: |
+          rsync -avz --delete \
+            --exclude node_modules \
+            --exclude .git \
+            --exclude .env \
+            --exclude dist \
+            --exclude .next \
+            --exclude .cache \
+            --exclude .tmp \
+            ./ ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }}:/opt/${{ env.PROJECT_NAME }}/
+
+      - name: Create environment file
+        run: |
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            cd /opt/${{ env.PROJECT_NAME }}
+
+            # Create .env file from secrets
+            cat > .env << 'EOF'
+          UI_PUBLIC_URL=${{ secrets.UI_PUBLIC_URL }}
+          STRAPI_PUBLIC_URL=${{ secrets.STRAPI_PUBLIC_URL }}
+          SUPABASE_DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }}
+          APP_KEYS=${{ secrets.APP_KEYS }}
+          ADMIN_JWT_SECRET=${{ secrets.ADMIN_JWT_SECRET }}
+          API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }}
+          TRANSFER_TOKEN_SALT=${{ secrets.TRANSFER_TOKEN_SALT }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL=${{ secrets.UI_PUBLIC_URL }}
+          CLOUDINARY_NAME=${{ secrets.CLOUDINARY_NAME }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          MAILGUN_API_KEY=${{ secrets.MAILGUN_API_KEY }}
+          MAILGUN_DOMAIN=${{ secrets.MAILGUN_DOMAIN }}
+          MAILGUN_EMAIL=${{ secrets.MAILGUN_EMAIL }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+          CRON_ENABLED=true
+          NODE_ENV=production
+          EOF
+          "
+
+      - name: Deploy application (Multi-Site)
+        run: |
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            cd /opt/${{ env.PROJECT_NAME }}
+
+            # Make scripts executable
+            chmod +x scripts/deploy/deploy-multi-site.sh
+
+            # Run MULTI-SITE deployment
+            ./scripts/deploy/deploy-multi-site.sh production
+          "
+
+      - name: Verify deployment
+        run: |
+          # Wait for services to start
+          sleep 60
+
+          # Check if services are responding
+          if curl -f -s https://${{ secrets.DOMAIN_NAME }}/health; then
+            echo '✅ UI is responding'
+          else
+            echo '❌ UI is not responding'
+            exit 1
+          fi
+
+          if curl -f -s https://${{ secrets.DOMAIN_NAME }}/api/health; then
+            echo '✅ API is responding'
+          else
+            echo '❌ API is not responding'
+            exit 1
+          fi
+
+          # Verify local ports are bound (multi-site specific)
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            if curl -f -s http://127.0.0.1:3000/ > /dev/null; then
+              echo '✅ UI running on localhost:3000'
+            else
+              echo '❌ UI not accessible on localhost:3000'
+              exit 1
+            fi
+
+            if curl -f -s http://127.0.0.1:1337/ > /dev/null; then
+              echo '✅ Strapi running on localhost:1337'
+            else
+              echo '❌ Strapi not accessible on localhost:1337'
+              exit 1
+            fi
+          "
+
+      - name: Notify deployment success
+        if: success()
+        run: echo "🚀 Multi-Site Deployment successful!"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "❌ Multi-Site Deployment failed!"
+          echo "Check that you have run setup-existing-droplet.sh first"
+          echo "and that your existing nginx configuration is compatible"
