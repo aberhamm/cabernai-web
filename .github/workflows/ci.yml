@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
-    
+
       - name: Cache turbo build setup
         uses: actions/cache@v4
         with:
@@ -24,27 +24,23 @@ jobs:
           key: '${{ runner.os }}-turbo-${{ github.sha }}'
           restore-keys: |
             ${{ runner.os }}-turbo-
-      
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: yarn
-      
+
       - name: Install dependencies
         run: yarn
-      
+
       - name: Build UI
         run: yarn build:ui
         env:
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL: ${{ vars.NEXTAUTH_URL }}
-          NEXT_PUBLIC_APP_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_APP_PUBLIC_URL }}
-          NEXT_PUBLIC_STRAPI_URL: ${{ vars.NEXT_PUBLIC_STRAPI_URL }}
+          NEXTAUTH_URL: https://${{ vars.DOMAIN_NAME }}
+          NEXT_PUBLIC_APP_PUBLIC_URL: https://${{ vars.DOMAIN_NAME }}
+          NEXT_PUBLIC_STRAPI_URL: https://${{ vars.DOMAIN_NAME }}
 
       - name: Build Strapi
         run: yarn build:strapi
-        
-
-
-

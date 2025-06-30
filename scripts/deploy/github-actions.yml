@@ -41,9 +41,9 @@ jobs:
 
       - name: Build applications
         env:
-          # Production environment variables for build
-          NEXT_PUBLIC_APP_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_APP_PUBLIC_URL }}
-          NEXT_PUBLIC_STRAPI_URL: ${{ vars.NEXT_PUBLIC_STRAPI_URL }}
+          # Production environment variables for build - derived from domain
+          NEXT_PUBLIC_APP_PUBLIC_URL: https://${{ vars.DOMAIN_NAME }}
+          NEXT_PUBLIC_STRAPI_URL: https://${{ vars.DOMAIN_NAME }}
           NODE_ENV: production
         run: yarn build
 
@@ -95,15 +95,15 @@ jobs:
 
             # Create single .env file - automatically loaded into all containers via env_file directive
             cat > .env << 'EOF'
-          # URLs - using environment variables (not secrets)
-          UI_PUBLIC_URL=${{ vars.UI_PUBLIC_URL }}
-          STRAPI_PUBLIC_URL=${{ vars.STRAPI_PUBLIC_URL }}
-          NEXT_PUBLIC_APP_PUBLIC_URL=${{ vars.NEXT_PUBLIC_APP_PUBLIC_URL }}
-          NEXT_PUBLIC_STRAPI_URL=${{ vars.NEXT_PUBLIC_STRAPI_URL }}
+          # URLs - consolidated from domain name (public, not sensitive)
+          NEXT_PUBLIC_APP_PUBLIC_URL=https://${{ vars.DOMAIN_NAME }}
+          NEXT_PUBLIC_STRAPI_URL=https://${{ vars.DOMAIN_NAME }}
+          NEXTAUTH_URL=https://${{ vars.DOMAIN_NAME }}
+          APP_URL=https://${{ vars.DOMAIN_NAME }}
 
-          # Database - both variables for compatibility
-          SUPABASE_DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }}
+          # Database - single source, duplicated for compatibility
           DATABASE_URL=${{ secrets.DATABASE_URL }}
+          SUPABASE_DATABASE_URL=${{ secrets.DATABASE_URL }}
 
           # Strapi secrets
           APP_KEYS=${{ secrets.APP_KEYS }}
@@ -111,16 +111,15 @@ jobs:
           API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }}
           TRANSFER_TOKEN_SALT=${{ secrets.TRANSFER_TOKEN_SALT }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
-          PUBLIC_URL=${{ vars.PUBLIC_URL }}
-          APP_URL=${{ vars.APP_URL }}
+          PUBLIC_URL=https://${{ vars.DOMAIN_NAME }}
           HOST=0.0.0.0
           PORT=1337
 
           # NextAuth
           NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL=${{ vars.NEXTAUTH_URL }}
+          # NextAuth URL already set above
 
-          # File upload
+          # File upload - Cloudinary (name duplicated for Next.js compatibility)
           CLOUDINARY_NAME=${{ secrets.CLOUDINARY_NAME }}
           CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
@@ -130,6 +129,8 @@ jobs:
           MAILGUN_API_KEY=${{ secrets.MAILGUN_API_KEY }}
           MAILGUN_DOMAIN=${{ secrets.MAILGUN_DOMAIN }}
           MAILGUN_EMAIL=${{ secrets.MAILGUN_EMAIL }}
+
+          # Monitoring - Sentry (DSN duplicated for Next.js compatibility)
           SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           NEXT_PUBLIC_SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1

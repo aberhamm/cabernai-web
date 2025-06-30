@@ -2,7 +2,7 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env", "**/.env.*local"],
   "globalEnv": ["NEXT_OUTPUT"],
-  "tasks": {
+  "pipeline": {
     "build": {
       "outputs": [".next/**", "!.next/cache/**", "dist/**", "public/**"]
     },
