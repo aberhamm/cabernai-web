@@ -31,16 +31,21 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        env:
-          # Force Sharp to download correct binary for CI platform
-          SHARP_IGNORE_GLOBAL_LIBVIPS: 1
+        run: yarn install --frozen-lockfile
+
+      - name: Fix Sharp module for Linux CI
         run: |
-          yarn install --frozen-lockfile
-          echo "🔧 Rebuilding Sharp for CI platform..."
-          npm rebuild sharp || echo "Sharp rebuild failed, continuing..."
+          echo "🔧 Fixing Sharp module for Linux CI environment..."
+          # Force reinstall Sharp with correct platform binary
+          yarn workspace @repo/ui remove sharp
+          yarn workspace @repo/ui add sharp
+          echo "✅ Sharp module reinstalled for Linux platform"
 
       - name: Lint code
-        run: NODE_ENV=development yarn lint
+        env:
+          # Skip Sharp module during linting to avoid platform compatibility issues
+          NEXT_SHARP: 0
+        run: NODE_ENV=development turbo lint
 
       - name: Type check
         run: |

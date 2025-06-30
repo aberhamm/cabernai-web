@@ -1,8 +1,18 @@
-import withPlaiceholder from "@plaiceholder/next"
 import { withSentryConfig } from "@sentry/nextjs"
 import plugin from "next-intl/plugin"
 
 import { env } from "./src/env.mjs"
+
+// Conditionally import plaiceholder to avoid Sharp issues during linting
+let withPlaiceholder = (config) => config
+if (process.env.NEXT_SHARP !== '0') {
+  try {
+    const plaiceholderModule = require("@plaiceholder/next")
+    withPlaiceholder = plaiceholderModule.default || plaiceholderModule
+  } catch (error) {
+    console.log('Plaiceholder disabled (Sharp not available)')
+  }
+}
 
 const withNextIntl = plugin("./src/lib/i18n.ts")
 
