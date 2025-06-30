@@ -21,6 +21,17 @@ const nextConfig = {
   output: env.NEXT_OUTPUT,
   reactStrictMode: true,
   experimental: {},
+
+  webpack: (config, { isServer }) => {
+    // Ignore plaiceholder when Sharp is disabled to avoid build errors
+    if (process.env.NEXT_SHARP === '0') {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'plaiceholder': false,
+      }
+    }
+    return config
+  },
   // Good to know:
   images: {
     // Be aware that Strapi has optimization on by default

@@ -14,8 +14,14 @@ const generatePlaceholder = async (src: string) => {
   }
 
   try {
-    // Dynamically import plaiceholder to avoid Sharp dependency when disabled
-    const { getPlaiceholder } = await import('plaiceholder')
+    // Dynamically import plaiceholder only when needed and available
+    const plaiceholderModule = await import('plaiceholder').catch(() => null)
+    if (!plaiceholderModule) {
+      console.log('Plaiceholder module not available, skipping blur placeholder generation')
+      return { plaiceholderError: true }
+    }
+
+    const { getPlaiceholder } = plaiceholderModule
 
     const response = await fetch(src)
     const arrayBuffer = await response.arrayBuffer()
