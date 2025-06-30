@@ -61,7 +61,7 @@ export async function PageBuilderNavbar({
       />
 
       <div
-        className="grid h-16 w-full grid-cols-[auto_1fr_auto] grid-rows-[70px_min-content_min-content] overflow-y-hidden bg-slate-900 px-4 text-lg min-[600px]:h-16 min-[600px]:grid-rows-[72px_min-content_min-content] min-[600px]:pl-10 min-[600px]:pr-10 min-[1200px]:flex min-[1200px]:max-w-full min-[1200px]:items-center min-[1200px]:justify-between min-[1200px]:overflow-y-visible min-[1200px]:pl-24 min-[1200px]:pr-24 min-[1400px]:max-w-[76.00rem] min-[1400px]:pl-0 min-[1400px]:pr-0"
+        className="grid h-16 w-full grid-cols-[auto_1fr_auto] grid-rows-[70px_min-content_min-content] overflow-y-hidden bg-slate-900 px-4 text-lg min-[600px]:h-16 min-[600px]:grid-rows-[72px_min-content_min-content] min-[600px]:px-10 min-[1200px]:flex min-[1200px]:max-w-full min-[1200px]:items-center min-[1200px]:justify-between min-[1200px]:overflow-y-visible min-[1200px]:px-24 min-[1400px]:max-w-[76.00rem] min-[1400px]:px-0"
         style={{
           gridTemplateAreas:
             '"logo empty search aside" "nav nav nav nav" "buttons buttons buttons buttons"',
@@ -123,12 +123,13 @@ export async function PageBuilderNavbar({
             className="mb-1 w-full overflow-hidden py-3 min-[1200px]:mb-0 min-[1200px]:w-[unset] min-[1200px]:p-[unset]"
             id="div-2"
           >
-            <div className="flex items-center min-[1200px]:pb-3 min-[1200px]:pl-0 min-[1200px]:pr-0 min-[1200px]:pt-3">
+            <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <div className="flex w-full items-center justify-between min-[1200px]:w-[unset]">
                 <span className="w-full text-2xl text-white">Product</span>
                 <img
-                  className="h-6 w-6 min-[1200px]:ml-2"
+                  className="size-6 min-[1200px]:ml-2"
                   src="https://www.tidio.com/images/icons/icon-chevron-down-white.svg"
+                  alt=""
                   style={{
                     aspectRatio: 'auto 24 / 24',
                   }}
@@ -137,14 +138,14 @@ export async function PageBuilderNavbar({
             </div>
           </div>
           <div className="mb-1 w-full overflow-hidden py-3 text-2xl text-white min-[1200px]:relative min-[1200px]:mb-0 min-[1200px]:w-[unset] min-[1200px]:p-[unset]">
-            <div className="flex items-center min-[1200px]:pb-3 min-[1200px]:pl-0 min-[1200px]:pr-0 min-[1200px]:pt-3">
+            <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <a className="w-full" href="https://www.tidio.com/pricing/">
                 Pricing
               </a>
             </div>
           </div>
           <div className="mb-1 w-full overflow-hidden py-3 text-2xl text-white min-[1200px]:relative min-[1200px]:mb-0 min-[1200px]:w-[unset] min-[1200px]:p-[unset]">
-            <div className="flex items-center min-[1200px]:pb-3 min-[1200px]:pl-0 min-[1200px]:pr-0 min-[1200px]:pt-3">
+            <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <a className="w-full" href="https://www.tidio.com/industry/ecommerce/">
                 Ecommerce
               </a>
@@ -154,12 +155,13 @@ export async function PageBuilderNavbar({
             className="mb-1 w-full overflow-hidden py-3 min-[1200px]:mb-0 min-[1200px]:w-[unset] min-[1200px]:p-[unset]"
             id="div-3"
           >
-            <div className="flex items-center min-[1200px]:pb-3 min-[1200px]:pl-0 min-[1200px]:pr-0 min-[1200px]:pt-3">
+            <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <div className="flex w-full items-center justify-between min-[1200px]:w-[unset]">
                 <span className="w-full text-2xl text-white">Resources</span>
                 <img
-                  className="h-6 w-6 min-[1200px]:ml-2"
+                  className="size-6 min-[1200px]:ml-2"
                   src="https://www.tidio.com/images/icons/icon-chevron-down-white.svg"
+                  alt=""
                   style={{
                     aspectRatio: 'auto 24 / 24',
                   }}
@@ -168,12 +170,13 @@ export async function PageBuilderNavbar({
             </div>
           </div>
           <div className="mb-1 w-full overflow-hidden py-3 min-[1200px]:relative min-[1200px]:mb-0 min-[1200px]:w-[unset] min-[1200px]:p-[unset]">
-            <div className="flex items-center min-[1200px]:pb-3 min-[1200px]:pl-0 min-[1200px]:pr-0 min-[1200px]:pt-3">
+            <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <div className="flex w-full items-center justify-between min-[1200px]:w-[unset]">
                 <span className="w-full text-2xl text-white">Partners</span>
                 <img
-                  className="h-6 w-6 min-[1200px]:ml-2"
+                  className="size-6 min-[1200px]:ml-2"
                   src="https://www.tidio.com/images/icons/icon-chevron-down-white.svg"
+                  alt=""
                   style={{
                     aspectRatio: 'auto 24 / 24',
                   }}
@@ -182,12 +185,13 @@ export async function PageBuilderNavbar({
             </div>
           </div>
           <div className="mb-1 w-full overflow-hidden py-3 min-[1200px]:relative min-[1200px]:mb-0 min-[1200px]:hidden min-[1200px]:w-[unset] min-[1200px]:p-[unset]">
-            <div className="flex items-center min-[1200px]:pb-3 min-[1200px]:pl-0 min-[1200px]:pr-0 min-[1200px]:pt-3">
+            <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <div className="flex w-full items-center justify-between min-[1200px]:w-[unset]">
                 <span className="w-full text-2xl text-white">Contact</span>
                 <img
-                  className="h-6 w-6 min-[1200px]:ml-2"
+                  className="size-6 min-[1200px]:ml-2"
                   src="https://www.tidio.com/images/icons/icon-chevron-down-white.svg"
+                  alt=""
                   style={{
                     aspectRatio: 'auto 24 / 24',
                   }}

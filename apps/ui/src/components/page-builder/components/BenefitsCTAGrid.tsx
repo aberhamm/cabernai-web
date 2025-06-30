@@ -43,12 +43,12 @@ export const BenefitsCTAGrid = ({
                   className="col-span-6 col-end-auto md:col-span-3 md:col-end-auto lg:col-span-2 lg:col-end-auto"
                 >
                   <div className="relative flex min-h-full flex-col overflow-hidden rounded-2xl bg-card text-card-foreground after:pointer-events-none after:absolute after:inset-0 after:rounded-2xl after:border-2 after:border-solid after:border-[rgba(17,25,46,0.1)] after:content-['']">
-                    <div className="flex flex-grow flex-col justify-between px-8 pb-10 pt-8">
+                    <div className="flex grow flex-col justify-between px-8 pb-10 pt-8">
                       <div className="flex flex-col gap-4">
                         {benefit.image && (
-                          <div className="h-20 w-20">
+                          <div className="size-20">
                             <img
-                              className="h-full w-full max-w-full object-contain"
+                              className="size-full max-w-full object-contain"
                               src={benefit.image?.media?.url}
                               alt={benefit.image?.alt || ''}
                               style={{

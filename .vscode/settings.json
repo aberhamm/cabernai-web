@@ -1,29 +1,22 @@
 {
   "eslint.workingDirectories": ["./apps/ui", "./apps/strapi"],
-  "tailwindCSS.classAttributes": [
-    "class",
-    "className",
-    "ngClass",
-    ".*Styles*",
-    ".*ClassName*"
-  ],
+  "tailwindCSS.classAttributes": ["class", "className", "ngClass", ".*Styles*", ".*ClassName*"],
   "npm.packageManager": "yarn",
   "editor.formatOnSave": true,
-  // "[json]": {
-  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
-  // },
-  // "[typescript]": {
-  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
-  // },
-  // "[typescriptreact]": {
-  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
-  // },
-  // "[javascript]": {
-  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
-  // },
-  // "[javascriptreact]": {
-  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
-  // },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.experimental.classRegex": [["cn\\(([^)]*)\\)", "([\"'`][^\"'`]*.*?[\"'`])"]],
   "prettier.requireConfig": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": ["plaiceholder", "Strapi", "unoptimized"]

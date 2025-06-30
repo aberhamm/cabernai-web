@@ -41,6 +41,7 @@ export function TabbedBanner({
                   {tabs?.map((tab, index) => (
                     <button
                       key={index}
+                      type="button"
                       className={`block cursor-pointer whitespace-nowrap rounded-3xl border-0 px-4 py-2 text-base font-medium leading-6 ${
                         activeTab === index
                           ? 'bg-primary text-primary-foreground'
@@ -53,7 +54,7 @@ export function TabbedBanner({
                   ))}
                 </div>
                 <svg
-                  className="hidden h-[1px] max-w-full md:block"
+                  className="hidden h-px max-w-full md:block"
                   fill="rgb(0, 0, 0)"
                   preserveAspectRatio="none"
                   viewBox="0 0 1 0.002"

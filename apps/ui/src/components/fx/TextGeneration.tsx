@@ -3,11 +3,8 @@
 import { useEffect } from 'react'
 import { motion, stagger, useAnimate } from 'framer-motion'
 
-import { cn } from '@/lib/styles'
-
 export const TextGenerateEffect = ({
   words,
-  className,
   filter = true,
   duration = 0.5,
 }: {
@@ -30,7 +27,7 @@ export const TextGenerateEffect = ({
         delay: stagger(0.2),
       }
     )
-  }, [scope.current])
+  }, [animate, duration, filter])
 
   const renderWords = () => {
     return (

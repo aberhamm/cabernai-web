@@ -64,22 +64,21 @@ export function WelcomeHero({
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            className="opacity-[0.35]"
+            className="opacity-35"
             d="M793.028 0L241 488H819.828L1167.5 0H793.028Z"
             fill='url("#paint0_linear_1020_1373")'
             opacity="0.35"
           />
-          <defs fill="none">
+          <defs>
             <linearGradient
-              fill="none"
               gradientUnits="userSpaceOnUse"
               x1="1020.25"
               x2="711.545"
               y1="-42.8599"
               y2="406.177"
             >
-              <stop fill="none" stopColor="white" />
-              <stop fill="none" offset="1" stopColor="white" stopOpacity="0" />
+              <stop stopColor="white" />
+              <stop offset="1" stopColor="white" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
@@ -99,17 +98,16 @@ export function WelcomeHero({
             fill='url("#paint0_linear_1020_1364")'
             opacity="0.24"
           />
-          <defs fill="none">
+          <defs>
             <linearGradient
-              fill="none"
               gradientUnits="userSpaceOnUse"
               x1="1046.1"
               x2="821.178"
               y1="2.67301e-06"
               y2="512.939"
             >
-              <stop fill="none" stopColor="white" />
-              <stop fill="none" offset="1" stopColor="white" stopOpacity="0" />
+              <stop stopColor="white" />
+              <stop offset="1" stopColor="white" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
@@ -129,17 +127,16 @@ export function WelcomeHero({
             fill='url("#paint0_linear_1020_1369")'
             opacity="0.24"
           />
-          <defs fill="none">
+          <defs>
             <linearGradient
-              fill="none"
               gradientUnits="userSpaceOnUse"
               x1="811.228"
               x2="553.043"
               y1="-12.6692"
               y2="412.268"
             >
-              <stop fill="none" stopColor="white" />
-              <stop fill="none" offset="1" stopColor="white" stopOpacity="0" />
+              <stop stopColor="white" />
+              <stop offset="1" stopColor="white" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
@@ -159,17 +156,16 @@ export function WelcomeHero({
             fill='url("#paint0_linear_1020_1352")'
             opacity="0.24"
           />
-          <defs fill="none">
+          <defs>
             <linearGradient
-              fill="none"
               gradientUnits="userSpaceOnUse"
               x1="1010.76"
               x2="629.046"
               y1="-9.85197"
               y2="646.382"
             >
-              <stop fill="none" stopColor="white" />
-              <stop fill="none" offset="0.825556" stopColor="white" stopOpacity="0" />
+              <stop stopColor="white" />
+              <stop offset="0.825556" stopColor="white" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>

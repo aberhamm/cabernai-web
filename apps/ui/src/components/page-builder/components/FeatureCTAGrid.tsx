@@ -115,7 +115,7 @@ export const FeatureCTAGrid = ({
                               vectorEffect="non-scaling-stroke"
                             />
                           </svg>
-                          <div className="flex flex-grow items-start text-slate-600">
+                          <div className="flex grow items-start text-slate-600">
                             <ul
                               className="w-full list-none columns-1 gap-x-6"
                               style={{
