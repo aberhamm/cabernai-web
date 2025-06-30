@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 
 import Image from 'next/image'
-import { getPlaiceholder } from 'plaiceholder'
 
 import { ImageExtendedProps } from '@/types/next'
 
@@ -9,7 +8,15 @@ import { FALLBACK_IMAGE_PATH } from '@/lib/constants'
 import { formatImageUrl } from '@/lib/strapi-helpers'
 
 const generatePlaceholder = async (src: string) => {
+  // Skip plaiceholder generation if Sharp is disabled (CI environment)
+  if (process.env.NEXT_SHARP === '0') {
+    return { plaiceholderError: true }
+  }
+
   try {
+    // Dynamically import plaiceholder to avoid Sharp dependency when disabled
+    const { getPlaiceholder } = await import('plaiceholder')
+
     const response = await fetch(src)
     const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
@@ -29,8 +36,8 @@ const generatePlaceholder = async (src: string) => {
       return { plaiceholderError: true }
     }
   } catch (e) {
-    console.error(`Image ${src} wasn't fetched: `, e)
-    return null
+    console.error(`Image ${src} wasn't fetched or plaiceholder unavailable: `, e)
+    return { plaiceholderError: true }
   }
 }
 

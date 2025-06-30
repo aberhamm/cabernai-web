@@ -66,10 +66,13 @@ jobs:
           NEXT_PUBLIC_APP_PUBLIC_URL: https://${{ vars.DOMAIN_NAME }}
           NEXT_PUBLIC_STRAPI_URL: https://${{ vars.DOMAIN_NAME }}
           NODE_ENV: production
+          # Skip Sharp module during build to avoid platform compatibility issues
+          NEXT_SHARP: 0
         run: |
           echo "🔍 Debug: DOMAIN_NAME = '${{ vars.DOMAIN_NAME }}'"
           echo "🔍 Debug: NEXT_PUBLIC_APP_PUBLIC_URL = '$NEXT_PUBLIC_APP_PUBLIC_URL'"
           echo "🔍 Debug: NEXT_PUBLIC_STRAPI_URL = '$NEXT_PUBLIC_STRAPI_URL'"
+          echo "🔍 Debug: NEXT_SHARP = '$NEXT_SHARP'"
           yarn build
 
   deploy:
