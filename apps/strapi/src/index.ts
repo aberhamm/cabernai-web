@@ -1,7 +1,7 @@
-import type { Core } from "@strapi/strapi"
+import type { Core } from '@strapi/strapi'
 
-import { registerAdminUserSubscriber } from "./lifeCycles/adminUser"
-import { registerUserSubscriber } from "./lifeCycles/user"
+import { registerAdminUserSubscriber } from './lifeCycles/adminUser'
+import { registerUserSubscriber } from './lifeCycles/user'
 
 export default {
   /**

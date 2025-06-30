@@ -10,14 +10,10 @@ import { LinkStrapi } from './LinkStrapi'
 export const CTABannerCentered = ({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.cta-banner-centered',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.cta-banner-centered', false>
 }) => {
   // Destructure the component attributes
-  const { title, subText, image, link, isVisible, bgColor, footnote } =
-    component
+  const { title, subText, image, link, isVisible, bgColor, footnote } = component
 
   if (!isVisible) return null // Render nothing if isVisible is false
 
@@ -27,7 +23,7 @@ export const CTABannerCentered = ({
         <div className="mx-auto my-0 w-full max-w-[calc(1136px)] px-6 py-0">
           <div className="grid-cols-[repeat(1,minmax(0px,1fr)) grid h-full gap-6 md:gap-8">
             <div
-              className="bg-primary-gradient relative h-full overflow-hidden rounded-2xl px-4 pb-0 pt-6 text-center text-primary-foreground md:px-6 md:pb-20 md:pt-16"
+              className="relative h-full overflow-hidden rounded-2xl bg-primary-gradient px-4 pb-0 pt-6 text-center text-primary-foreground md:px-6 md:pb-20 md:pt-16"
               style={{
                 backgroundColor: bgColor || '',
               }}
@@ -43,9 +39,7 @@ export const CTABannerCentered = ({
 
                   {/* Subtitle */}
                   {subText && (
-                    <p className="m-0 text-base font-normal leading-6 tracking-normal">
-                      {subText}
-                    </p>
+                    <p className="m-0 text-base font-normal leading-6 tracking-normal">{subText}</p>
                   )}
                 </div>
 
@@ -76,9 +70,7 @@ export const CTABannerCentered = ({
                 </div>
               )} */}
             </div>
-            {footnote && (
-              <p className="text-center text-xs text-slate-600">{footnote}</p>
-            )}
+            {footnote && <p className="text-center text-xs text-slate-600">{footnote}</p>}
           </div>
         </div>
       </div>

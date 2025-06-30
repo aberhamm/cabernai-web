@@ -1,12 +1,7 @@
 'use client'
 
 import { BaseSyntheticEvent } from 'react'
-import {
-  FieldValues,
-  FormProvider,
-  SubmitErrorHandler,
-  UseFormReturn,
-} from 'react-hook-form'
+import { FieldValues, FormProvider, SubmitErrorHandler, UseFormReturn } from 'react-hook-form'
 
 import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 
@@ -40,12 +35,7 @@ export function AppForm<T extends FieldValues = FieldValues>({
 
   return (
     <FormProvider {...form}>
-      <form
-        onSubmit={handleSubmit(onSubmit, onError)}
-        className={className}
-        id={id}
-        noValidate
-      >
+      <form onSubmit={handleSubmit(onSubmit, onError)} className={className} id={id} noValidate>
         <fieldset disabled={disabled} className="space-y-4">
           {children}
         </fieldset>

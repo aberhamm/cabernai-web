@@ -1,16 +1,13 @@
-import { Schema } from "@repo/strapi"
+import { Schema } from '@repo/strapi'
 
-import AppLink from "@/components/elementary/AppLink"
-import { Container } from "@/components/elementary/Container"
-import { NewsletterForm } from "@/components/elementary/forms/NewsletterForm"
+import AppLink from '@/components/elementary/AppLink'
+import { Container } from '@/components/elementary/Container'
+import { NewsletterForm } from '@/components/elementary/forms/NewsletterForm'
 
 export function Newsletter({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    "sections.newsletter",
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.newsletter', false>
 }) {
   return (
     <div className="bg-blue-light pb-10">

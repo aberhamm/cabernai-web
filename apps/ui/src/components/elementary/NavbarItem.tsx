@@ -11,8 +11,7 @@ export function NavbarItem({ link }: { readonly link: AppLink }) {
 
   const t = useTranslations()
 
-  const label =
-    link.label ?? (link.translateKey != null ? t(link.translateKey) : null)
+  const label = link.label ?? (link.translateKey != null ? t(link.translateKey) : null)
 
   return (
     <Link

@@ -1,23 +1,22 @@
-import React from "react"
+import React from 'react'
 
-import { cn } from "@/lib/styles"
+import { cn } from '@/lib/styles'
 
 const variantStyles = {
-  heading1:
-    "text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl",
-  heading3: "md:text-4xl text-2xl font-bold",
+  heading1: 'text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl',
+  heading3: 'md:text-4xl text-2xl font-bold',
   // more variants will be added here
 }
 
 const textColorVariants = {
-  black: "text-black",
-  white: "text-white",
+  black: 'text-black',
+  white: 'text-white',
   // more variants will be added here
 }
 
 type Variant = keyof typeof variantStyles
 type TextColor = keyof typeof textColorVariants
-type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
+type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
 interface HeadingProps {
   children: React.ReactNode
@@ -30,9 +29,9 @@ interface HeadingProps {
 const Heading = ({
   children,
   className,
-  variant = "heading3",
-  textColor = "black",
-  tag = "h3",
+  variant = 'heading3',
+  textColor = 'black',
+  tag = 'h3',
 }: HeadingProps) => {
   const selectedVariant = variantStyles[variant]
   const selectedTextColor = textColorVariants[textColor]
@@ -43,11 +42,7 @@ const Heading = ({
     return null
   }
 
-  return (
-    <Tag className={cn(selectedVariant, selectedTextColor, className)}>
-      {children}
-    </Tag>
-  )
+  return <Tag className={cn(selectedVariant, selectedTextColor, className)}>{children}</Tag>
 }
 
 export default Heading

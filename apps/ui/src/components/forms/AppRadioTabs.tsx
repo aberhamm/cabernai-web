@@ -5,12 +5,7 @@ import { useFormContext } from 'react-hook-form'
 
 import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { cn } from '@/lib/styles'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { AppFormDescription } from './AppFormDescription'
@@ -61,10 +56,7 @@ export function AppRadioTabs({
                   className="text-md font-medium"
                 />
 
-                <TabsList
-                  {...tabListProps}
-                  className={cn('bg-primary', tabListProps?.className)}
-                >
+                <TabsList {...tabListProps} className={cn('bg-primary', tabListProps?.className)}>
                   {tabTriggers.map((tabTrigger) => (
                     <TabsTrigger
                       key={tabTrigger.value}

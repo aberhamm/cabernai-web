@@ -1,7 +1,7 @@
-import React from "react"
-import { Params } from "next/dist/shared/lib/router/utils/route-matcher"
-import { notFound } from "next/navigation"
-import { NextIntlClientProvider } from "next-intl"
+import React from 'react'
+import { Params } from 'next/dist/shared/lib/router/utils/route-matcher'
+import { notFound } from 'next/navigation'
+import { NextIntlClientProvider } from 'next-intl'
 
 interface Props {
   readonly children: React.ReactNode

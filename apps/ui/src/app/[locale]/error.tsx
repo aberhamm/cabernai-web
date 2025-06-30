@@ -29,9 +29,7 @@ export default function Error({ error, reset }: Props) {
 
   return (
     <div className="w-full overflow-x-hidden">
-      <h1 className="text-xl font-semibold tracking-tight">
-        {t('somethingWentWrong')}
-      </h1>
+      <h1 className="text-xl font-semibold tracking-tight">{t('somethingWentWrong')}</h1>
       <p className="mt-1 text-sm text-gray-600">
         {t('invalidContent')}
         {isDev ? `: ${error.message}` : null}

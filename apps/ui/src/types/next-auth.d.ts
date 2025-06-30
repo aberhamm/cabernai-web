@@ -1,8 +1,8 @@
 // https://next-auth.js.org/getting-started/typescript
 
-import { DefaultSession } from "next-auth"
+import { DefaultSession } from 'next-auth'
 
-type DefaultSessionUser = DefaultSession["user"]
+type DefaultSessionUser = DefaultSession['user']
 
 interface AppUser extends DefaultSessionUser {
   userId?: number
@@ -13,10 +13,10 @@ interface AppUser extends DefaultSessionUser {
 export interface AppSession {
   strapiJWT?: string
   user: AppUser
-  error?: "invalid_strapi_token" | "different_provider" | "oauth_error"
+  error?: 'invalid_strapi_token' | 'different_provider' | 'oauth_error'
 }
 
-declare module "next-auth" {
+declare module 'next-auth' {
   // Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
   // eslint-disable-next-line no-unused-vars
   interface Session extends AppSession {
@@ -30,13 +30,13 @@ declare module "next-auth" {
   interface User extends AppUser {}
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   // Returned by the `jwt` callback and `getToken`, when using JWT sessions
   // eslint-disable-next-line no-unused-vars
   interface JWT {
     userId?: number
     strapiJWT?: string
     blocked?: boolean
-    error?: "invalid_strapi_token" | "different_provider" | "oauth_error"
+    error?: 'invalid_strapi_token' | 'different_provider' | 'oauth_error'
   }
 }

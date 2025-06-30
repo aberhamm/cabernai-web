@@ -9,7 +9,7 @@ module.exports = (config, { strapi }) => {
         }
 
         if (data && data.attributes && data.attributes.url) {
-          const baseUrl = strapi.config.server.url || "http://localhost:1337"
+          const baseUrl = strapi.config.server.url || 'http://localhost:1337'
           data.attributes.url = `${baseUrl}${data.attributes.url}`
         }
 

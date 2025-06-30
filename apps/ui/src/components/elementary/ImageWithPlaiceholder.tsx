@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/alt-text */
 
-import Image from "next/image"
-import { getPlaiceholder } from "plaiceholder"
+import Image from 'next/image'
+import { getPlaiceholder } from 'plaiceholder'
 
-import { ImageExtendedProps } from "@/types/next"
+import { ImageExtendedProps } from '@/types/next'
 
-import { FALLBACK_IMAGE_PATH } from "@/lib/constants"
-import { formatImageUrl } from "@/lib/strapi-helpers"
+import { FALLBACK_IMAGE_PATH } from '@/lib/constants'
+import { formatImageUrl } from '@/lib/strapi-helpers'
 
 const generatePlaceholder = async (src: string) => {
   try {
@@ -38,8 +38,7 @@ export const ImageWithPlaiceholder = async (props: ImageExtendedProps) => {
   const src = formatImageUrl(props.src)
   const fallbackSrc = formatImageUrl(props.fallbackSrc)
 
-  const srcPlaceholder =
-    src != null ? await generatePlaceholder(src) : undefined
+  const srcPlaceholder = src != null ? await generatePlaceholder(src) : undefined
 
   const fallbackSrcPlaceholder =
     srcPlaceholder == null && fallbackSrc != null
@@ -53,9 +52,7 @@ export const ImageWithPlaiceholder = async (props: ImageExtendedProps) => {
 
   if (placeholder == null) {
     // Image and fallback image weren't loaded -> show local fallback image
-    return (
-      <Image {...imageProps} src={FALLBACK_IMAGE_PATH} width={50} height={50} />
-    )
+    return <Image {...imageProps} src={FALLBACK_IMAGE_PATH} width={50} height={50} />
   }
 
   if (placeholder.plaiceholderError) {

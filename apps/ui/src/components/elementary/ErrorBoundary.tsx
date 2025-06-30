@@ -44,9 +44,7 @@ function ErrorBoundaryFallback({
       <ExclamationTriangleIcon className="s-4" />
       <AlertTitle>{customErrorTitle ?? t('invalidContent')}</AlertTitle>
       <AlertDescription>
-        {(showErrorMessage || isDev) && (
-          <p className="mt-1 text-sm text-black">{error.message}</p>
-        )}
+        {(showErrorMessage || isDev) && <p className="mt-1 text-sm text-black">{error.message}</p>}
 
         {isDev && (
           <div className="mt-2 w-full overflow-x-auto bg-gray-100 p-3 text-xs">
@@ -68,10 +66,7 @@ function ErrorBoundaryFallback({
       </AlertDescription>
 
       <span className="absolute right-2 top-2 block">
-        <XIcon
-          className="size-4 cursor-pointer"
-          onClick={() => setHidden(true)}
-        />
+        <XIcon className="size-4 cursor-pointer" onClick={() => setHidden(true)} />
       </span>
     </Alert>
   )

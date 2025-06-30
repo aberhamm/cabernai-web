@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl"
+import { useTranslations } from 'next-intl'
 
-import { AppError } from "@/types/general"
+import { AppError } from '@/types/general'
 
 export function useErrorMessage() {
   const t = useTranslations()
@@ -22,15 +22,11 @@ export function useErrorMessage() {
       return tHttpErrorMessage
     }
 
-    return t("errors.global.title")
+    return t('errors.global.title')
   }
 
   function parseAppError(error: AppError) {
-    return getErrorMessage(
-      error.translateKeyPrefixForErrors,
-      error.message,
-      error.status
-    )
+    return getErrorMessage(error.translateKeyPrefixForErrors, error.message, error.status)
   }
 
   return { getErrorMessage, parseAppError }

@@ -1,18 +1,13 @@
-"use client"
+'use client'
 
-import React from "react"
-import { useFormContext } from "react-hook-form"
+import React from 'react'
+import { useFormContext } from 'react-hook-form'
 
-import { cn } from "@/lib/styles"
-import { AppFormDescription } from "@/components/forms/AppFormDescription"
-import { AppFormLabel } from "@/components/forms/AppFormLabel"
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form"
-import { Textarea } from "@/components/ui/textarea"
+import { cn } from '@/lib/styles'
+import { AppFormDescription } from '@/components/forms/AppFormDescription'
+import { AppFormLabel } from '@/components/forms/AppFormLabel'
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Textarea } from '@/components/ui/textarea'
 
 type Props = {
   readonly name: string
@@ -20,7 +15,7 @@ type Props = {
   readonly containerClassName?: string
   readonly fieldClassName?: string
   readonly description?: React.ReactNode
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'>
 
 export function AppTextArea({
   name,
@@ -44,13 +39,13 @@ export function AppTextArea({
             <div className="relative flex items-stretch overflow-hidden">
               <Textarea
                 {...field}
-                value={field.value ?? ""}
+                value={field.value ?? ''}
                 onChange={field.onChange}
                 className={cn(
-                  "w-full border ease-in-out",
+                  'w-full border ease-in-out',
                   {
-                    "border-red-600": fieldState.invalid,
-                    "border-primary": fieldState.invalid,
+                    'border-red-600': fieldState.invalid,
+                    'border-primary': fieldState.invalid,
                   },
                   fieldClassName
                 )}

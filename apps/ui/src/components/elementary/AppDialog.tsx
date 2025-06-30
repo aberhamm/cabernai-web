@@ -52,9 +52,7 @@ export function AppDialog({
 
   const t = useTranslations('comps.dialog')
   const [open, setOpen] = useState<boolean>(false)
-  const [confirmClose, setConfirmClose] = useState<boolean>(
-    confirmDialogClose ?? false
-  )
+  const [confirmClose, setConfirmClose] = useState<boolean>(confirmDialogClose ?? false)
 
   const providerValue = useMemo(
     () => ({
@@ -81,25 +79,15 @@ export function AppDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{triggerButton}</DialogTrigger>
-      <DialogContent
-        className={cn('max-h-screen overflow-auto', dialogContentClassName)}
-      >
+      <DialogContent className={cn('max-h-screen overflow-auto', dialogContentClassName)}>
         <DialogHeader className="mb-4">
-          <DialogTitle className="text-2xl font-semibold">
-            {header.title}
-          </DialogTitle>
+          <DialogTitle className="text-2xl font-semibold">{header.title}</DialogTitle>
           {header.description && (
-            <DialogDescription className="text-justify">
-              {header.description}
-            </DialogDescription>
+            <DialogDescription className="text-justify">{header.description}</DialogDescription>
           )}
         </DialogHeader>
-        <DialogContext.Provider value={providerValue}>
-          {children}
-        </DialogContext.Provider>
-        {footerChildren && (
-          <DialogFooter className="mt-4">{footerChildren}</DialogFooter>
-        )}
+        <DialogContext.Provider value={providerValue}>{children}</DialogContext.Provider>
+        {footerChildren && <DialogFooter className="mt-4">{footerChildren}</DialogFooter>}
       </DialogContent>
     </Dialog>
   )

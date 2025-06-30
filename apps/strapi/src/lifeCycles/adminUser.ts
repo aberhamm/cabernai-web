@@ -1,13 +1,9 @@
-import { Event } from "@strapi/database/dist/lifecycles"
-import { Core } from "@strapi/strapi"
+import { Event } from '@strapi/database/dist/lifecycles'
+import { Core } from '@strapi/strapi'
 
-export const registerAdminUserSubscriber = async ({
-  strapi,
-}: {
-  strapi: Core.Strapi
-}) => {
+export const registerAdminUserSubscriber = async ({ strapi }: { strapi: Core.Strapi }) => {
   strapi.db.lifecycles.subscribe({
-    models: ["admin::user"],
+    models: ['admin::user'],
 
     async afterCreate(event) {
       await sendEmail(strapi, event)
@@ -29,9 +25,9 @@ const sendEmail = async (strapi: Core.Strapi, event: Event) => {
          </p>`
 
     try {
-      await strapi.plugins["email"].services.email.send({
+      await strapi.plugins['email'].services.email.send({
         to: email,
-        subject: "Strapi invitation to the administration panel",
+        subject: 'Strapi invitation to the administration panel',
         html,
       })
     } catch (e) {

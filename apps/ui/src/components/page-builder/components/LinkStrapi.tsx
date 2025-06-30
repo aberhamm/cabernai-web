@@ -5,22 +5,14 @@ import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { Link } from '@/lib/navigation'
 
 export interface LinkStrapiProps {
-  readonly component:
-    | Schema.Attribute.ComponentValue<'shared.link', false>
-    | undefined
-    | null
+  readonly component: Schema.Attribute.ComponentValue<'shared.link', false> | undefined | null
 
   readonly children?: React.ReactNode
   readonly className?: string
   readonly hideWhenMissing?: boolean
 }
 
-export function LinkStrapi({
-  component,
-  children,
-  className,
-  hideWhenMissing,
-}: LinkStrapiProps) {
+export function LinkStrapi({ component, children, className, hideWhenMissing }: LinkStrapiProps) {
   if (component == null && hideWhenMissing) {
     return null
   }

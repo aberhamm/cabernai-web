@@ -9,12 +9,7 @@ interface InlineSVGProps {
   style?: React.CSSProperties
 }
 
-const InlineSVG: React.FC<InlineSVGProps> = ({
-  url,
-  altText,
-  className,
-  style,
-}) => {
+const InlineSVG: React.FC<InlineSVGProps> = ({ url, altText, className, style }) => {
   const [svgContent, setSvgContent] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 

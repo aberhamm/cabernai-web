@@ -7,8 +7,7 @@ import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { ImageWithFallback } from '@/components/elementary/ImageWithFallback'
 import { ImageWithPlaiceholder } from '@/components/elementary/ImageWithPlaiceholder'
 
-export interface BasicImageProps
-  extends Omit<ImageExtendedProps, 'src' | 'alt'> {
+export interface BasicImageProps extends Omit<ImageExtendedProps, 'src' | 'alt'> {
   readonly component:
     | Schema.Attribute.ComponentValue<'shared.basic-image', false>
     | undefined
@@ -41,11 +40,7 @@ export function BasicImage({
 
   const sizes = {
     width:
-      forcedSizes?.width ??
-      component?.width ??
-      media?.width ??
-      fallbackSizes?.width ??
-      undefined,
+      forcedSizes?.width ?? component?.width ?? media?.width ?? fallbackSizes?.width ?? undefined,
 
     height:
       forcedSizes?.height ??

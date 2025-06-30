@@ -12,14 +12,8 @@ import InlineSVG from '@/components/page-builder/InlineSVG'
 export async function Header({ locale }: { readonly locale: AppLocale }) {
   const data = await fetchData(locale)
 
-  const {
-    logoImage,
-    topBarLinks,
-    primaryNavigationLinks,
-    logoLink,
-    logoIcon,
-    announcements,
-  } = data?.data ?? {}
+  const { logoImage, topBarLinks, primaryNavigationLinks, logoLink, logoIcon, announcements } =
+    data?.data ?? {}
 
   const session = await getAuth()
 
@@ -114,18 +108,14 @@ export async function Header({ locale }: { readonly locale: AppLocale }) {
                           className="flex w-full items-center justify-between rounded-full pb-3 pt-2 lg:w-auto lg:justify-start lg:px-4 lg:py-2"
                           href={link.href}
                         >
-                          <span className="cursor-pointer font-medium">
-                            {link.label}
-                          </span>
+                          <span className="cursor-pointer font-medium">{link.label}</span>
                         </Link>
                       ) : (
                         <button
                           type="button"
                           className="flex h-10 w-full cursor-pointer items-center justify-between gap-[0.13rem] overflow-visible rounded-full pb-3 pt-2 text-center lg:w-auto lg:justify-start lg:px-4 lg:py-2"
                         >
-                          <span className="font-medium">
-                            Dropdown Not Implemented
-                          </span>
+                          <span className="font-medium">Dropdown Not Implemented</span>
                           <svg
                             className="size-4 max-w-full"
                             fill="none"
@@ -135,10 +125,7 @@ export async function Header({ locale }: { readonly locale: AppLocale }) {
                             viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg"
                           >
-                            <polyline
-                              points="6 9 12 15 18 9"
-                              stroke="#4d5b7c"
-                            />
+                            <polyline points="6 9 12 15 18 9" stroke="#4d5b7c" />
                           </svg>
                         </button>
                       )}
@@ -149,14 +136,11 @@ export async function Header({ locale }: { readonly locale: AppLocale }) {
           </nav>
 
           {/* Auth Links */}
-          {!isAuthenticated && (
+          {/* {!isAuthenticated && (
             <div className="hidden font-medium md:ml-auto md:block">
               <ul className="flex list-none gap-2">
                 <li className="list-item text-foreground">
-                  <Link
-                    className="inline-block rounded-3xl px-4 py-2"
-                    href="/auth/signin"
-                  >
+                  <Link className="inline-block rounded-3xl px-4 py-2" href="/auth/signin">
                     Log in
                   </Link>
                 </li>
@@ -170,7 +154,7 @@ export async function Header({ locale }: { readonly locale: AppLocale }) {
                 </li>
               </ul>
             </div>
-          )}
+          )} */}
         </div>
       </header>
     </div>
@@ -197,10 +181,7 @@ async function fetchData(locale: string) {
       { omitAuthorization: true }
     )
   } catch (e: any) {
-    console.error(
-      `Data for "api::header.header" content type wasn't fetched: `,
-      e?.message
-    )
+    console.error(`Data for "api::header.header" content type wasn't fetched: `, e?.message)
     return undefined
   }
 }

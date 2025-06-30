@@ -8,10 +8,7 @@ import InlineSVG from '@/components/page-builder/InlineSVG'
 export const FeatureCTAGrid = ({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.feature-cta-grid',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.feature-cta-grid', false>
 }) => {
   const { title, subTitle, link, features, isVisible } = component
 
@@ -34,9 +31,7 @@ export const FeatureCTAGrid = ({
             <div className="m-auto w-full max-w-[54.00rem]">
               <div className="flex flex-col gap-6 pb-16 text-center md:pb-20">
                 <div className="flex flex-col gap-2">
-                  <h2 className="text-4xl font-bold text-foreground">
-                    {title}
-                  </h2>
+                  <h2 className="text-4xl font-bold text-foreground">{title}</h2>
                   <div className="m-auto max-w-[40.00rem] text-slate-600">
                     <p>{subTitle}</p>
                   </div>
@@ -109,11 +104,7 @@ export const FeatureCTAGrid = ({
                               </div>
                             </div>
                           </div>
-                          <svg
-                            fill="rgb(0, 0, 0)"
-                            preserveAspectRatio="none"
-                            viewBox="0 0 1 0.002"
-                          >
+                          <svg fill="rgb(0, 0, 0)" preserveAspectRatio="none" viewBox="0 0 1 0.002">
                             <path
                               d="M0 0 l12 0"
                               fill="rgb(0, 0, 0)"

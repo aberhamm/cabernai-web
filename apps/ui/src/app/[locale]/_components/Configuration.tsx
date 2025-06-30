@@ -1,7 +1,7 @@
-import Strapi from "@/lib/strapi"
+import Strapi from '@/lib/strapi'
 
 async function getData() {
-  return Strapi.fetchOne("api::configuration.configuration", undefined, {
+  return Strapi.fetchOne('api::configuration.configuration', undefined, {
     populate: { example: true },
   })
 }
@@ -22,7 +22,7 @@ export async function ConfigurationExample() {
           <strong>Configuration fetched from API</strong>
         </h4>
         <p>Dark mode (boolean): {String(darkMode)}</p>
-        <p>Author: {example?.author ?? "not set"}</p>
+        <p>Author: {example?.author ?? 'not set'}</p>
       </div>
     </div>
   )

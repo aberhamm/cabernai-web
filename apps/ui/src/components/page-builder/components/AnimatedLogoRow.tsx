@@ -8,10 +8,7 @@ import { BasicImage } from './BasicImage'
 export function AnimatedLogoRow({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.animated-logo-row',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.animated-logo-row', false>
 }) {
   removeThisWhenYouNeedMe('AnimatedLogoRow')
 

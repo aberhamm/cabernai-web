@@ -6,12 +6,7 @@ import { useFormContext } from 'react-hook-form'
 import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { cn } from '@/lib/styles'
 import { Checkbox as CheckboxComponent } from '@/components/ui/checkbox'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 
 import { AppFormDescription } from './AppFormDescription'
 import { AppFormLabel } from './AppFormLabel'
@@ -42,10 +37,7 @@ export function AppCheckbox({
       name={name}
       render={({ field, fieldState }) => (
         <FormItem
-          className={cn(
-            containerClassName,
-            'flex flex-col justify-center justify-items-center'
-          )}
+          className={cn(containerClassName, 'flex flex-col justify-center justify-items-center')}
         >
           <div className="flex flex-row items-start space-x-3 space-y-0">
             <FormControl>
@@ -59,11 +51,7 @@ export function AppCheckbox({
             </FormControl>
 
             <div className="space-y-1 leading-none">
-              <AppFormLabel
-                label={label}
-                fieldState={fieldState}
-                required={nativeProps.required}
-              />
+              <AppFormLabel label={label} fieldState={fieldState} required={nativeProps.required} />
 
               <AppFormDescription description={description} />
             </div>

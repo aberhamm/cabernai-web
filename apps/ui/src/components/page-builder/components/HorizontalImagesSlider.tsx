@@ -9,10 +9,7 @@ import { ImageWithLink } from './ImageWithLink'
 export function HorizontalImages({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.horizontal-images',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.horizontal-images', false>
 }) {
   removeThisWhenYouNeedMe('HorizontalImages')
 
@@ -20,9 +17,7 @@ export function HorizontalImages({
     <section>
       <Container className="py-8">
         <div className="flex flex-col items-center">
-          <p className="mb-6 text-center tracking-tight text-gray-900">
-            {component.title}
-          </p>
+          <p className="mb-6 text-center tracking-tight text-gray-900">{component.title}</p>
 
           <div
             className={cn(
@@ -36,9 +31,7 @@ export function HorizontalImages({
                 key={String(x.id) + i}
                 imageProps={{
                   className: cn({
-                    [`rounded-${component.imageRadius}`]: Boolean(
-                      component.imageRadius
-                    ),
+                    [`rounded-${component.imageRadius}`]: Boolean(component.imageRadius),
                     'object-cover': Boolean(
                       component.fixedImageHeight ?? component.fixedImageWidth
                     ),

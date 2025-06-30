@@ -52,19 +52,31 @@
     --color-primary-light: var(--rose-taupe);
     --color-primary-dark: var(--chocolate-cosmos--color-muted);
     --color-primary-foreground: var(--white); /* Main text color */
-    --color-primary-gradient: linear-gradient(to top left, var(--wine) 0%, var(--chocolate-cosmos--color-muted) 100%);
+    --color-primary-gradient: linear-gradient(
+      to top left,
+      var(--wine) 0%,
+      var(--chocolate-cosmos--color-muted) 100%
+    );
 
     /* Secondary Colors */
     --color-secondary: var(--peach-yellow);
     --color-secondary-light: var(--dutch-white);
     --color-secondary-dark: var(--ecru);
     --color-secondary-foreground: var(--neutral-900); /* Text color for secondary backgrounds */
-    --color-secondary-gradient: linear-gradient(to top left, var(--ecru) 0%, var(--peach-yellow) 100%);
+    --color-secondary-gradient: linear-gradient(
+      to top left,
+      var(--ecru) 0%,
+      var(--peach-yellow) 100%
+    );
 
     /* Tertiary Colors */
     --color-tertiary: var(--english-violet);
     --color-tertiary-foreground: var(--white); /* Text color for tertiary backgrounds */
-    --color-tertiary-gradient: linear-gradient(to top left, var(--dark-purple) 0%, var(--dark-purple--dark) 100%);
+    --color-tertiary-gradient: linear-gradient(
+      to top left,
+      var(--dark-purple) 0%,
+      var(--dark-purple--dark) 100%
+    );
 
     /* Muted Colors */
     --color-muted: var(--davys-gray);
@@ -161,5 +173,11 @@
 }
 
 .bg-gradient-slider {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 31%, rgba(255, 255, 255, 0) 69.5%, rgba(255, 255, 255, 0.8) 100%) !important;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0) 31%,
+    rgba(255, 255, 255, 0) 69.5%,
+    rgba(255, 255, 255, 0.8) 100%
+  ) !important;
 }

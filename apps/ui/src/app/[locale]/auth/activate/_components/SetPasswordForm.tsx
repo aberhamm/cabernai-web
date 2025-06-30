@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
-import { useSearchParams } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
-import { useTranslations } from "next-intl"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import { useSearchParams } from 'next/navigation'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 
-import { PASSWORD_MIN_LENGTH } from "@/lib/constants"
-import { useRouter } from "@/lib/navigation"
-import Strapi from "@/lib/strapi"
-import { AppField } from "@/components/forms/AppField"
-import { AppForm } from "@/components/forms/AppForm"
-import { Button } from "@/components/ui/button"
+import { PASSWORD_MIN_LENGTH } from '@/lib/constants'
+import { useRouter } from '@/lib/navigation'
+import Strapi from '@/lib/strapi'
+import { AppField } from '@/components/forms/AppField'
+import { AppForm } from '@/components/forms/AppForm'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -20,30 +20,24 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { useToast } from "@/components/ui/use-toast"
+} from '@/components/ui/card'
+import { useToast } from '@/components/ui/use-toast'
 
 export function SetPasswordForm({ accountActivation = false }) {
-  const t = useTranslations(
-    accountActivation ? "auth.accountActivation" : "auth.resetPassword"
-  )
+  const t = useTranslations(accountActivation ? 'auth.accountActivation' : 'auth.resetPassword')
   const { toast } = useToast()
 
   const { mutate } = useMutation({
-    mutationFn: (values: {
-      password: string
-      passwordConfirmation: string
-      code: string
-    }) => {
+    mutationFn: (values: { password: string; passwordConfirmation: string; code: string }) => {
       return Strapi.fetchAPI(
         `/auth/reset-password`,
         undefined,
         {
           body: JSON.stringify(values),
-          method: "POST",
+          method: 'POST',
         },
         {
-          translateKeyPrefixForErrors: "auth.accountActivation.errors",
+          translateKeyPrefixForErrors: 'auth.accountActivation.errors',
         }
       )
     },
@@ -51,14 +45,14 @@ export function SetPasswordForm({ accountActivation = false }) {
 
   const form = useForm<z.infer<FormSchemaType>>({
     resolver: zodResolver(SetPasswordFormSchema),
-    mode: "onBlur",
-    reValidateMode: "onBlur",
-    defaultValues: { password: "", passwordConfirmation: "" },
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    defaultValues: { password: '', passwordConfirmation: '' },
   })
 
   const router = useRouter()
   const params = useSearchParams()
-  const code = params.get("code") as string
+  const code = params.get('code') as string
 
   const onSubmit = (data: z.infer<FormSchemaType>) =>
     mutate(
@@ -66,11 +60,11 @@ export function SetPasswordForm({ accountActivation = false }) {
       {
         onSuccess: () => {
           toast({
-            variant: "default",
-            description: t("successfullySet"),
+            variant: 'default',
+            description: t('successfullySet'),
           })
           form.reset()
-          router.push("/auth/signin")
+          router.push('/auth/signin')
         },
       }
     )
@@ -78,33 +72,23 @@ export function SetPasswordForm({ accountActivation = false }) {
   return (
     <Card className="m-auto w-[400px]">
       <CardHeader>
-        <CardTitle>{t("header")}</CardTitle>
-        <CardDescription>{t("description")}</CardDescription>
+        <CardTitle>{t('header')}</CardTitle>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <AppForm form={form} onSubmit={onSubmit} id={setPasswordFormName}>
-          <AppField
-            name="password"
-            type="password"
-            required
-            label={t("password")}
-          />
+          <AppField name="password" type="password" required label={t('password')} />
           <AppField
             name="passwordConfirmation"
             type="password"
             required
-            label={t("confirmPassword")}
+            label={t('confirmPassword')}
           />
         </AppForm>
       </CardContent>
       <CardFooter>
-        <Button
-          type="submit"
-          size="lg"
-          variant="default"
-          form={setPasswordFormName}
-        >
-          {t("submit")}
+        <Button type="submit" size="lg" variant="default" form={setPasswordFormName}>
+          {t('submit')}
         </Button>
       </CardFooter>
     </Card>
@@ -120,7 +104,7 @@ const SetPasswordFormSchema = z
         if (!/\d/.test(pwd)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            params: { type: "passwordNumber" },
+            params: { type: 'passwordNumber' },
           })
         }
       }),
@@ -130,12 +114,12 @@ const SetPasswordFormSchema = z
     if (data.password !== data.passwordConfirmation) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        params: { type: "checkPassword" },
-        path: ["passwordConfirmation"],
+        params: { type: 'checkPassword' },
+        path: ['passwordConfirmation'],
       })
     }
   })
 
 type FormSchemaType = typeof SetPasswordFormSchema
 
-const setPasswordFormName = "setPasswordForm"
+const setPasswordFormName = 'setPasswordForm'

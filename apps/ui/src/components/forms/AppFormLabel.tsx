@@ -12,12 +12,7 @@ type Props = {
   readonly className?: string
 }
 
-export function AppFormLabel({
-  fieldState,
-  label,
-  required,
-  className,
-}: Props) {
+export function AppFormLabel({ fieldState, label, required, className }: Props) {
   removeThisWhenYouNeedMe('AppFormLabel')
 
   if (label == null) {

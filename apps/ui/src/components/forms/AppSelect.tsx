@@ -5,12 +5,7 @@ import { useFormContext } from 'react-hook-form'
 
 import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { cn } from '@/lib/styles'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 
 import {
   Select as SelectComponent,
@@ -52,11 +47,7 @@ export function AppSelect({
       name={name}
       render={({ field, fieldState }) => (
         <FormItem className={cn(containerClassName)}>
-          <AppFormLabel
-            label={label}
-            fieldState={fieldState}
-            required={nativeProps.required}
-          />
+          <AppFormLabel label={label} fieldState={fieldState} required={nativeProps.required} />
 
           <SelectComponent
             {...field}
@@ -67,11 +58,7 @@ export function AppSelect({
           >
             <FormControl>
               <SelectTrigger
-                className={cn(
-                  'w-full',
-                  { 'border-red-600': fieldState.invalid },
-                  fieldClassName
-                )}
+                className={cn('w-full', { 'border-red-600': fieldState.invalid }, fieldClassName)}
                 tabIndex={nativeProps.tabIndex}
                 onBlur={field.onBlur}
               >

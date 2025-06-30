@@ -1,11 +1,10 @@
 /* eslint-disable jsx-a11y/alt-text */
 
-import Image from "next/image"
+import Image from 'next/image'
 
-import { ImageExtendedProps } from "@/types/next"
+import { ImageExtendedProps } from '@/types/next'
 
-const keyStr =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+const keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
 
 const triplet = (e1: number, e2: number, e3: number) =>
   keyStr.charAt(e1 >> 2) +
@@ -27,11 +26,5 @@ export const ImageWithBlur = ({
 }: ImageExtendedProps & {
   blurRgb?: [number, number, number]
 }) => {
-  return (
-    <Image
-      placeholder="blur"
-      blurDataURL={rgbDataURL(...blurRgb)}
-      {...imgProps}
-    />
-  )
+  return <Image placeholder="blur" blurDataURL={rgbDataURL(...blurRgb)} {...imgProps} />
 }

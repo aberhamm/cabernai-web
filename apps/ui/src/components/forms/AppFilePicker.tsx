@@ -128,10 +128,7 @@ export function AppFilePicker({
                 <span className="flex items-center gap-1">
                   <PaperclipIcon size={16} /> {selectedFile.name}
                 </span>
-                <Tooltip
-                  contentProps={{ side: 'left' }}
-                  content={t('removeFile')}
-                >
+                <Tooltip contentProps={{ side: 'left' }} content={t('removeFile')}>
                   <button
                     type="button"
                     tabIndex={tabIndex}

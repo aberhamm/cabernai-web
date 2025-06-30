@@ -4,9 +4,7 @@ import { env } from '@/env.mjs'
 import { removeThisWhenYouNeedMe } from './general-helpers'
 
 // TODO: make this generic - return same type as argument has
-export const formatImageUrl = (
-  imageUrl: string | StaticImport | undefined | null
-): any => {
+export const formatImageUrl = (imageUrl: string | StaticImport | undefined | null): any => {
   removeThisWhenYouNeedMe('formatImageUrl')
 
   if (!imageUrl) {

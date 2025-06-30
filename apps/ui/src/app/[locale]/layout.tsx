@@ -33,13 +33,7 @@ export default async function RootLayout({ children, params }: LayoutProps) {
 
   return (
     <html lang={params.locale} suppressHydrationWarning>
-      <body
-        className={cn(
-          fontInter.variable,
-          'font-sans antialiased',
-          'bg-background'
-        )}
-      >
+      <body className={cn(fontInter.variable, 'font-sans antialiased', 'bg-background')}>
         <ServerProviders params={params}>
           <ClientProviders>
             <Header locale={params.locale} />

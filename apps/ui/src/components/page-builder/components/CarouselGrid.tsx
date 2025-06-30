@@ -18,10 +18,7 @@ const DEFAULT_IMG_SIZE = 110
 export function CarouselGrid({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.carousel',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.carousel', false>
 }) {
   removeThisWhenYouNeedMe('CarouselGrid')
 

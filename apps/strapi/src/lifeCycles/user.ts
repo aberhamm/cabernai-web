@@ -1,15 +1,11 @@
-import { Event } from "@strapi/database/dist/lifecycles"
-import { Core } from "@strapi/strapi"
+import { Event } from '@strapi/database/dist/lifecycles'
+import { Core } from '@strapi/strapi'
 
-const crypto = require("crypto")
+const crypto = require('crypto')
 
-export const registerUserSubscriber = async ({
-  strapi,
-}: {
-  strapi: Core.Strapi
-}) => {
+export const registerUserSubscriber = async ({ strapi }: { strapi: Core.Strapi }) => {
   strapi.db.lifecycles.subscribe({
-    models: ["plugin::users-permissions.user"],
+    models: ['plugin::users-permissions.user'],
 
     async afterCreate(event) {
       await sendEmail(strapi, event)
@@ -24,8 +20,7 @@ export const registerUserSubscriber = async ({
  *  - if the user is created via "/auth/local/register" - `confirmed` is always set to true by default
  */
 const sendEmail = async (strapi: Core.Strapi, event: Event) => {
-  const { email, documentId, firstName, lastName, confirmed } =
-    event.result ?? {}
+  const { email, documentId, firstName, lastName, confirmed } = event.result ?? {}
 
   if (confirmed) {
     // do not send email if the user is already confirmed
@@ -39,17 +34,15 @@ const sendEmail = async (strapi: Core.Strapi, event: Event) => {
 
   const feAccountActivationUrl = process.env.CLIENT_ACCOUNT_ACTIVATION_URL
   if (!feAccountActivationUrl) {
-    console.warn(
-      "CLIENT_ACCOUNT_ACTIVATION_URL is not set. After creation email will not be sent."
-    )
+    console.warn('CLIENT_ACCOUNT_ACTIVATION_URL is not set. After creation email will not be sent.')
     return
   }
 
-  const name = [firstName, lastName].filter(Boolean).join(" ")
-  const resetPasswordToken: string = crypto.randomBytes(64).toString("hex")
+  const name = [firstName, lastName].filter(Boolean).join(' ')
+  const resetPasswordToken: string = crypto.randomBytes(64).toString('hex')
 
   try {
-    await strapi.documents("plugin::users-permissions.user").update({
+    await strapi.documents('plugin::users-permissions.user').update({
       documentId,
       data: { resetPasswordToken },
     })
@@ -59,9 +52,9 @@ const sendEmail = async (strapi: Core.Strapi, event: Event) => {
              You can change your password <a href="${feAccountActivationUrl}?code=${resetPasswordToken}&email=${email}&name=${name}" target="_blank">here</a>.
            </p>`
 
-    await strapi.plugins["email"].services.email.send({
+    await strapi.plugins['email'].services.email.send({
       to: email,
-      subject: "Account Creation",
+      subject: 'Account Creation',
       html,
     })
   } catch (err) {

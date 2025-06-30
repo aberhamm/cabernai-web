@@ -9,10 +9,7 @@ import { LinkStrapi } from './LinkStrapi'
 export const ImageWithCTAButton = ({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.image-with-cta-button',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.image-with-cta-button', false>
 }) => {
   removeThisWhenYouNeedMe('ImageWithCTAButton')
 

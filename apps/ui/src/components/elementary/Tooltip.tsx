@@ -9,9 +9,7 @@ import {
 interface Props {
   readonly children: React.ReactNode
   readonly content: React.ReactNode
-  readonly contentProps?: Partial<
-    React.ComponentPropsWithoutRef<typeof TooltipContent>
-  >
+  readonly contentProps?: Partial<React.ComponentPropsWithoutRef<typeof TooltipContent>>
 }
 
 export function Tooltip({ children, content, contentProps }: Props) {

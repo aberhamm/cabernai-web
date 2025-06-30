@@ -1,9 +1,7 @@
 export default ({ env }) => {
   const cloudinaryConfig = prepareCloudinaryConfig(env)
   if (!cloudinaryConfig) {
-    console.info(
-      "Cloudinary configuration is not complete. Local file storage will be used."
-    )
+    console.info('Cloudinary configuration is not complete. Local file storage will be used.')
   }
 
   return {
@@ -15,20 +13,20 @@ export default ({ env }) => {
       enabled: true,
     },
 
-    "config-sync": {
+    'config-sync': {
       enabled: true,
     },
 
-    "strapi-v5-plugin-populate-deep": {
+    'strapi-v5-plugin-populate-deep': {
       config: {
         defaultDepth: 5,
       },
     },
 
-    "users-permissions": {
+    'users-permissions': {
       config: {
         jwt: {
-          expiresIn: "30d", // this value is synced with NextAuth session maxAge
+          expiresIn: '30d', // this value is synced with NextAuth session maxAge
         },
       },
     },
@@ -37,7 +35,7 @@ export default ({ env }) => {
       enabled: true,
       config: {
         // Only set `dsn` property in production
-        dsn: env("NODE_ENV") === "production" ? env("SENTRY_DSN") : null,
+        dsn: env('NODE_ENV') === 'production' ? env('SENTRY_DSN') : null,
         sendMetadata: true,
       },
     },
@@ -63,32 +61,26 @@ const localUploadConfig = (env): any => ({
   // Local provider setup
   // https://docs.strapi.io/dev-docs/plugins/upload
   sizeLimit: 250 * 1024 * 1024, // 256mb in bytes,
-  mimeTypes: ["image/svg+xml", "image/jpeg", "image/png"],
+  mimeTypes: ['image/svg+xml', 'image/jpeg', 'image/png'],
 })
 
 const prepareCloudinaryConfig = (env) => {
-  const cloudinaryName = env("CLOUDINARY_NAME")
-  const cloudinaryApiKey = env("CLOUDINARY_API_KEY")
-  const cloudinaryApiSecret = env("CLOUDINARY_API_SECRET")
+  const cloudinaryName = env('CLOUDINARY_NAME')
+  const cloudinaryApiKey = env('CLOUDINARY_API_KEY')
+  const cloudinaryApiSecret = env('CLOUDINARY_API_SECRET')
 
-  const cloudinaryRequirements = [
-    cloudinaryName,
-    cloudinaryApiKey,
-    cloudinaryApiSecret,
-  ]
+  const cloudinaryRequirements = [cloudinaryName, cloudinaryApiKey, cloudinaryApiSecret]
 
-  const cloudinaryRequirementsOk = cloudinaryRequirements.every(
-    (req) => req != null && req !== ""
-  )
+  const cloudinaryRequirementsOk = cloudinaryRequirements.every((req) => req != null && req !== '')
 
   if (cloudinaryRequirementsOk) {
     return {
-      provider: "cloudinary",
+      provider: 'cloudinary',
       providerOptions: {
         cloud_name: cloudinaryName,
         api_key: cloudinaryApiKey,
         api_secret: cloudinaryApiSecret,
-        secure: env("CLOUDINARY_SECURE", true),
+        secure: env('CLOUDINARY_SECURE', true),
       },
       actionOptions: {
         upload: {},

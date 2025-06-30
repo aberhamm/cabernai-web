@@ -1,8 +1,8 @@
-import { useTranslations } from "next-intl"
+import { useTranslations } from 'next-intl'
 
-import { routing } from "@/lib/navigation"
+import { routing } from '@/lib/navigation'
 
-import { IntlKeysPath } from "./helpers"
+import { IntlKeysPath } from './helpers'
 
 export type AppLocale = (typeof routing.locales)[number]
 

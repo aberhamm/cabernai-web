@@ -9,11 +9,7 @@ import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { cn } from '@/lib/styles'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 export function DatePicker({
   defaultDate = dayjs(new Date()).subtract(2, 'D').toDate(),

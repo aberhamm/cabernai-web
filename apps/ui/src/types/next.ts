@@ -1,7 +1,7 @@
-import { StaticImport } from "next/dist/shared/lib/get-img-props"
-import { ImageProps } from "next/image"
+import { StaticImport } from 'next/dist/shared/lib/get-img-props'
+import { ImageProps } from 'next/image'
 
-import { AppLocale } from "./general"
+import { AppLocale } from './general'
 
 export interface LayoutProps<TParams = {}> {
   children: React.ReactNode
@@ -13,7 +13,7 @@ export interface PageProps<TParams = {}> {
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export type ImageExtendedProps = Omit<ImageProps, "src"> & {
+export type ImageExtendedProps = Omit<ImageProps, 'src'> & {
   fallbackSrc?: string
   src: string | StaticImport
 }

@@ -9,10 +9,7 @@ import { LinkStrapi } from './LinkStrapi'
 export const HeadingWithCTAButton = ({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.heading-with-cta-button',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.heading-with-cta-button', false>
 }) => {
   removeThisWhenYouNeedMe('HeadingWithCTAButton')
 
@@ -24,9 +21,7 @@ export const HeadingWithCTAButton = ({
             {component.title}
           </h2>
           {component.subText && (
-            <p className="mb-6 font-light text-gray-500 md:text-lg">
-              {component.subText}
-            </p>
+            <p className="mb-6 font-light text-gray-500 md:text-lg">{component.subText}</p>
           )}
 
           <LinkStrapi

@@ -122,25 +122,27 @@ export default class Strapi {
   ): Promise<APIResponseCollection<Result<TContentTypeUID, TParams>>> {
     const path = this.getStrapiApiPathByUId(uid)
 
-    const firstPage: APIResponseCollection<Result<TContentTypeUID, TParams>> =
-      await this.fetchAPI(path, { ...params }, requestInit, options)
+    const firstPage: APIResponseCollection<Result<TContentTypeUID, TParams>> = await this.fetchAPI(
+      path,
+      { ...params },
+      requestInit,
+      options
+    )
 
     if (firstPage.meta.pagination.pageCount === 1) {
       return firstPage
     }
 
-    const otherPages = Array.from(
-      { length: firstPage.meta.pagination.pageCount - 1 },
-      (_, i) =>
-        this.fetchAPI(
-          path,
-          {
-            ...params,
-            pagination: { page: i + 2 },
-          },
-          requestInit,
-          options
-        )
+    const otherPages = Array.from({ length: firstPage.meta.pagination.pageCount - 1 }, (_, i) =>
+      this.fetchAPI(
+        path,
+        {
+          ...params,
+          pagination: { page: i + 2 },
+        },
+        requestInit,
+        options
+      )
     )
 
     return Promise.all(otherPages).then((res) => ({
@@ -176,8 +178,12 @@ export default class Strapi {
       filters: { ...params?.filters, slug: slugFilter },
     }
     const path = this.getStrapiApiPathByUId(uid)
-    const response: APIResponseCollection<Result<TContentTypeUID, TParams>> =
-      await this.fetchAPI(path, mergedParams, requestInit, options)
+    const response: APIResponseCollection<Result<TContentTypeUID, TParams>> = await this.fetchAPI(
+      path,
+      mergedParams,
+      requestInit,
+      options
+    )
 
     // return last published entry
     return {
@@ -194,8 +200,7 @@ export default class Strapi {
   ) {
     let url = `/api${path.startsWith('/') ? path : `/${path}`}`
 
-    const queryString =
-      typeof params === 'object' ? qs.stringify(params) : params
+    const queryString = typeof params === 'object' ? qs.stringify(params) : params
     if (queryString != null && queryString?.length > 0) {
       url += `?${queryString}`
     }
@@ -235,9 +240,7 @@ export default class Strapi {
    * @param uid - UID of the Endpoint
    * @returns API Endpoint path
    */
-  private static getStrapiApiPathByUId(
-    uid: keyof typeof API_ENDPOINTS
-  ): string {
+  private static getStrapiApiPathByUId(uid: keyof typeof API_ENDPOINTS): string {
     const path = API_ENDPOINTS[uid]
     if (path) {
       return path

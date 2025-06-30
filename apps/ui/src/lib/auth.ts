@@ -1,27 +1,23 @@
-import { Result } from "@repo/strapi"
-import { getServerSession } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
+import { Result } from '@repo/strapi'
+import { getServerSession } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
-import type {
-  GetServerSidePropsContext,
-  NextApiRequest,
-  NextApiResponse,
-} from "next"
-import type { NextAuthOptions } from "next-auth"
+import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next'
+import type { NextAuthOptions } from 'next-auth'
 
-import Strapi from "./strapi"
+import Strapi from './strapi'
 
 export const authOptions: NextAuthOptions = {
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
     maxAge: 2592000, // 30 days - synced with strapi
   },
   providers: [
     CredentialsProvider({
-      name: "StrapiCredentials",
+      name: 'StrapiCredentials',
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) {
@@ -37,7 +33,7 @@ export const authOptions: NextAuthOptions = {
                 identifier: credentials.email,
                 password: credentials.password,
               }),
-              method: "POST",
+              method: 'POST',
             },
             { omitAuthorization: true }
           )
@@ -67,12 +63,12 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     jwt: async ({ token, user, trigger, account, session }) => {
-      if (trigger === "update" && session?.username) {
+      if (trigger === 'update' && session?.username) {
         // change username update
         token.name = session.username
       }
 
-      if (trigger === "update" && session?.strapiJWT) {
+      if (trigger === 'update' && session?.strapiJWT) {
         // change password update
         token.strapiJWT = session.strapiJWT
       }
@@ -89,7 +85,7 @@ export const authOptions: NextAuthOptions = {
             const { jwt, user } = data
 
             if (jwt == null) {
-              throw new Error("No JWT provided by Strapi API")
+              throw new Error('No JWT provided by Strapi API')
             }
 
             // add only necessary data to the token
@@ -97,15 +93,15 @@ export const authOptions: NextAuthOptions = {
             token.userId = user?.id
             token.blocked = user?.blocked
           } catch (error: any) {
-            token.error = "oauth_error"
+            token.error = 'oauth_error'
 
-            if (error?.message?.includes("Email is already taken")) {
-              token.error = "different_provider"
+            if (error?.message?.includes('Email is already taken')) {
+              token.error = 'different_provider'
             }
           }
         }
 
-        if (account.provider === "credentials") {
+        if (account.provider === 'credentials') {
           // credentials login
           // add only necessary data to the token
           // make sure structure is the same as in OAuth login
@@ -129,10 +125,14 @@ export const authOptions: NextAuthOptions = {
         // it can be removed to improve performance but weird things can happen
         // (user is logged in within NextAuth and UI but not in Strapi API)
         try {
-          const fetchedUser: Result<"plugin::users-permissions.user"> =
-            await Strapi.fetchAPI("/users/me", undefined, undefined, {
+          const fetchedUser: Result<'plugin::users-permissions.user'> = await Strapi.fetchAPI(
+            '/users/me',
+            undefined,
+            undefined,
+            {
               strapiJWT: token.strapiJWT,
-            })
+            }
+          )
 
           // API token is valid - update/reload user data or add more data
           token.name = fetchedUser.username
@@ -140,7 +140,7 @@ export const authOptions: NextAuthOptions = {
         } catch (error: any) {
           // API token is invalid - send error to client and user is logged out
           // console.error("Strapi JWT token is invalid: ", error.message)
-          token.error = "invalid_strapi_token"
+          token.error = 'invalid_strapi_token'
         }
       }
 
@@ -159,15 +159,15 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/auth/signin",
-    signOut: "/auth/signout",
+    signIn: '/auth/signin',
+    signOut: '/auth/signout',
   },
 }
 
 // Use it in server contexts
 export function getAuth(
   ...args:
-    | [GetServerSidePropsContext["req"], GetServerSidePropsContext["res"]]
+    | [GetServerSidePropsContext['req'], GetServerSidePropsContext['res']]
     | [NextApiRequest, NextApiResponse]
     | []
 ) {

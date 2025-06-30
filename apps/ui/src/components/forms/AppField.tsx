@@ -5,12 +5,7 @@ import { useFormContext } from 'react-hook-form'
 
 import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { cn } from '@/lib/styles'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
 import { AppFormDescription } from './AppFormDescription'
@@ -44,11 +39,7 @@ export function AppField({
       name={name}
       render={({ field, fieldState }) => (
         <FormItem className={cn(containerClassName)}>
-          <AppFormLabel
-            fieldState={fieldState}
-            label={label}
-            required={nativeProps.required}
-          />
+          <AppFormLabel fieldState={fieldState} label={label} required={nativeProps.required} />
 
           <FormControl>
             <div className="relative flex items-stretch overflow-hidden">
@@ -76,14 +67,10 @@ export function AppField({
               />
               {endAdornment && (
                 <div
-                  className={cn(
-                    'flex items-center rounded-r-md border bg-gray-100 px-2',
-                    {
-                      'border-y-red-600 border-r-red-600 text-red-600':
-                        fieldState.invalid,
-                      'border-gray-100': !fieldState.invalid,
-                    }
-                  )}
+                  className={cn('flex items-center rounded-r-md border bg-gray-100 px-2', {
+                    'border-y-red-600 border-r-red-600 text-red-600': fieldState.invalid,
+                    'border-gray-100': !fieldState.invalid,
+                  })}
                 >
                   {endAdornment}
                 </div>

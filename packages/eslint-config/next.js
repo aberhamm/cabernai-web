@@ -1,15 +1,15 @@
-const { resolve } = require("node:path")
+const { resolve } = require('node:path')
 
-const project = resolve(process.cwd(), "tsconfig.json")
+const project = resolve(process.cwd(), 'tsconfig.json')
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
   extends: [
-    "eslint:recommended",
-    "prettier",
-    require.resolve("@vercel/style-guide/eslint/next"),
-    require.resolve("@vercel/style-guide/eslint/react"),
-    "eslint-config-turbo",
+    'eslint:recommended',
+    'prettier',
+    require.resolve('@vercel/style-guide/eslint/next'),
+    require.resolve('@vercel/style-guide/eslint/react'),
+    'eslint-config-turbo',
   ],
   globals: {
     React: true,
@@ -20,7 +20,7 @@ module.exports = {
     browser: true,
   },
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       typescript: {
         project,
       },
@@ -28,16 +28,16 @@ module.exports = {
   },
   ignorePatterns: [
     // Ignore dotfiles
-    ".*.js",
-    "node_modules/",
+    '.*.js',
+    'node_modules/',
   ],
   overrides: [
-    { files: ["*.js?(x)", "*.ts?(x)"] },
+    { files: ['*.js?(x)', '*.ts?(x)'] },
     {
       // https://typescript-eslint.io/linting/troubleshooting/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-      files: ["*.ts", "*.mts", "*.cts", "*.tsx"],
+      files: ['*.ts', '*.mts', '*.cts', '*.tsx'],
       rules: {
-        "no-undef": "off",
+        'no-undef': 'off',
       },
     },
   ],

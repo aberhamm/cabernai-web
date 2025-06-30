@@ -31,9 +31,7 @@ export default async function RootBuilderPage({ params }: PageProps) {
 
   return (
     <div>
-      <h3 className="text-center text-3xl font-bold text-gray-900">
-        Welcome to Page Builder
-      </h3>
+      <h3 className="text-center text-3xl font-bold text-gray-900">Welcome to Page Builder</h3>
 
       {pages.length ? (
         <div>
@@ -57,9 +55,7 @@ export default async function RootBuilderPage({ params }: PageProps) {
           </div>
         </div>
       ) : (
-        <p className="text-center text-xl text-red-700">
-          No page available. Check Strapi.
-        </p>
+        <p className="text-center text-xl text-red-700">No page available. Check Strapi.</p>
       )}
     </div>
   )

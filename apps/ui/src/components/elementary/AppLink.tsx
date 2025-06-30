@@ -1,9 +1,9 @@
-import React from "react"
-import { VariantProps } from "class-variance-authority"
+import React from 'react'
+import { VariantProps } from 'class-variance-authority'
 
-import { isAppLink, Link } from "@/lib/navigation"
-import { cn } from "@/lib/styles"
-import { buttonVariants } from "@/components/ui/button"
+import { isAppLink, Link } from '@/lib/navigation'
+import { cn } from '@/lib/styles'
+import { buttonVariants } from '@/components/ui/button'
 
 export interface AppLinkProps
   extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -23,8 +23,8 @@ const AppLink = React.forwardRef<HTMLAnchorElement, AppLinkProps>(
     children,
     icon,
     openExternalInNewTab = false,
-    variant = "link",
-    size = "default",
+    variant = 'link',
+    size = 'default',
     ...props
   }) => {
     const combinedClassName = cn(buttonVariants({ variant, size }), className)
@@ -35,7 +35,7 @@ const AppLink = React.forwardRef<HTMLAnchorElement, AppLinkProps>(
           <div className="group flex flex-row items-center">
             {children}
             <div className="flex cursor-pointer items-center gap-2">
-              <div className={cn("flex justify-between", {})}>{label}</div>
+              <div className={cn('flex justify-between', {})}>{label}</div>
               {icon && (
                 <span className="transition-transform duration-200 ease-in group-hover:translate-x-2">
                   {icon}
@@ -50,8 +50,8 @@ const AppLink = React.forwardRef<HTMLAnchorElement, AppLinkProps>(
     return (
       <a
         href={href}
-        target={openExternalInNewTab ? "_blank" : ""}
-        rel={openExternalInNewTab ? "noopener noreferrer" : ""}
+        target={openExternalInNewTab ? '_blank' : ''}
+        rel={openExternalInNewTab ? 'noopener noreferrer' : ''}
         className={combinedClassName}
       >
         <div className="group flex flex-row items-center">
@@ -70,6 +70,6 @@ const AppLink = React.forwardRef<HTMLAnchorElement, AppLinkProps>(
   }
 )
 
-AppLink.displayName = "AppLink"
+AppLink.displayName = 'AppLink'
 
 export default AppLink

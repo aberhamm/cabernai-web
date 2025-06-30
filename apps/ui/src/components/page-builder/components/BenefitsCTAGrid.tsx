@@ -5,10 +5,7 @@ import { cn } from '@/lib/styles'
 export const BenefitsCTAGrid = ({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.benefits-cta-grid',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.benefits-cta-grid', false>
 }) => {
   const { title, subTitle, benefits, isVisible, bgImage } = component
 

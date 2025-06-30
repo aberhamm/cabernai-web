@@ -35,27 +35,20 @@ const LocaleSwitcher = ({ locale }: { locale: AppLocale }) => {
 
     // next-intl router.replace does not persist query params
     startTransition(() => {
-      router.replace(
-        queryParams.length > 0 ? `${pathname}?${queryParams}` : pathname,
-        { locale }
-      )
+      router.replace(queryParams.length > 0 ? `${pathname}?${queryParams}` : pathname, { locale })
     })
   }
 
   return (
     <Select value={locale} onValueChange={handleLocaleChange}>
-      <SelectTrigger className="w-32 font-bold uppercase">
-        {locale}
-      </SelectTrigger>
+      <SelectTrigger className="w-32 font-bold uppercase">{locale}</SelectTrigger>
       <SelectContent>
         {routing.locales.map((locale, index) => (
           <React.Fragment key={locale}>
             <SelectItem key={locale} value={locale}>
               {localeTranslation[locale]}
             </SelectItem>
-            {index < routing.locales.length - 1 && (
-              <SelectSeparator key={`${locale}-separator`} />
-            )}
+            {index < routing.locales.length - 1 && <SelectSeparator key={`${locale}-separator`} />}
           </React.Fragment>
         ))}
       </SelectContent>

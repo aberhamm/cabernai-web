@@ -11,10 +11,7 @@ const DEFAULT_IMG_SIZE = 50
 export function FeatureGrid({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.feature-grid',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.feature-grid', false>
 }) {
   removeThisWhenYouNeedMe('FeatureGrid')
 

@@ -138,9 +138,9 @@ It is possible to build your own theme at [https://ui.shadcn.com/themes](https:/
 To merge several Tailwind classes and to work more conveniently with dynamic classes, **strictly use** the `cn` function declared in [lib/styles.ts](src/lib/styles.ts).
 
 ```tsx
-import { cn } from "@/lib/styles"
+import { cn } from '@/lib/styles'
 
-;<div className={cn("flex items-center justify-center", className)}>...</div>
+;<div className={cn('flex items-center justify-center', className)}>...</div>
 ```
 
 ## ✨ Features
@@ -167,9 +167,9 @@ export default async function ProfilePage() {
 To get session (logged user) in client components use `useSession()` from `next-auth`:
 
 ```tsx
-"use client"
+'use client'
 
-import { useSession } from "next-auth/react"
+import { useSession } from 'next-auth/react'
 
 export default function ProfilePage() {
   const session = useSession()
@@ -193,25 +193,25 @@ Usage:
 ```tsx
 // Client or Server component without "async" - `useTranslations()`
 
-import { useTranslations } from "next-intl"
+import { useTranslations } from 'next-intl'
 
 export default function Page() {
-  const t = useTranslations("general")
-  return <div>{t("loading")}...</div> // "Loading..."
+  const t = useTranslations('general')
+  return <div>{t('loading')}...</div> // "Loading..."
 }
 ```
 
 ```tsx
 // Server component with "async" - `getTranslations()`
 
-import { getTranslations } from "next-intl/server"
+import { getTranslations } from 'next-intl/server'
 
 export default async function ProfilePage() {
   const user = await fetchUser()
-  const t = await getTranslations("ProfilePage")
+  const t = await getTranslations('ProfilePage')
 
   return (
-    <PageLayout title={t("title", { username: user.name })}>
+    <PageLayout title={t('title', { username: user.name })}>
       <UserDetails user={user} />
     </PageLayout>
   )
@@ -238,7 +238,7 @@ Define them in `.env.local.example`, `.env.local` and `src/env.mjs` file where [
 Usage:
 
 ```tsx
-import { env } from "@/env.mjs"
+import { env } from '@/env.mjs'
 
 // ✅ OK
 console.log(env.NEXT_PUBLIC_STRAPI_URL)
@@ -254,14 +254,11 @@ General unexpected **rendering** and **lifecycle** errors (not event handlers, n
 For even more granular error handling use custom [ErrorBoundary](src/components/elementary/ErrorBoundary.tsx) component. ErrorBoundary is easily configurable client-side component that utilizes [react-error-boundary](https://github.com/bvaughn/react-error-boundary) package and catches errors in smaller parts of the UI or individual components. By default it wraps Strapi components as their content is fetched from CMS and don't guarantee correctness.
 
 ```tsx
-import { ErrorBoundary } from "@/components/elementary/ErrorBoundary"
+import { ErrorBoundary } from '@/components/elementary/ErrorBoundary'
 
 export default function Page() {
   return (
-    <ErrorBoundary
-      customErrorTitle="Uh-oh, we broke something! Again..."
-      showErrorMessage
-    >
+    <ErrorBoundary customErrorTitle="Uh-oh, we broke something! Again..." showErrorMessage>
       <PageBuilderNavbar />
     </ErrorBoundary>
   )
@@ -284,12 +281,16 @@ To fetch data from API use `Strapi` class defined in [lib/strapi.ts](src/lib/str
   - it's already in use by different handler (e.g. content type `"plugin::users-permissions.user"` is reserved for `GET /users` so `GET /users/me` has to use `fetchAPI` - see bellow):
 
 ```ts
-import { Result } from "@repo/strapi"
+import { Result } from '@repo/strapi'
 
-const fetchedUser: Result<"plugin::users-permissions.user"> =
-  await Strapi.fetchAPI("/users/me", undefined, undefined, {
+const fetchedUser: Result<'plugin::users-permissions.user'> = await Strapi.fetchAPI(
+  '/users/me',
+  undefined,
+  undefined,
+  {
     strapiJWT: token.strapiJWT,
-  })
+  }
+)
 ```
 
 - `fetchOne`, `fetchMany`, `fetchAll` or `fetchOneBySlug` - these functions are linked directly to Strapi content types. This means that during the call it is necessary to specify the UUID (`"api::", "admin::"` etc.) of `ContentType` you want to fetch. Based on this, the response is automatically typed. **To make this working** you have to maintain a mapping between `ContentType` UUID and endpoint URL path - see `API_ENDPOINTS` object in [lib/strapi.ts](src/lib/strapi.ts) file.

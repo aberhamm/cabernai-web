@@ -142,27 +142,17 @@ export async function getMetadataFromStrapi({
           siteId: twitterSeo.siteId ?? undefined,
           creator: twitterSeo.creator ?? undefined,
           creatorId: twitterSeo.creatorId ?? undefined,
-          images:
-            twitterSeo.images != null
-              ? twitterSeo.images.map((image: any) => image.url)
-              : [],
+          images: twitterSeo.images != null ? twitterSeo.images.map((image: any) => image.url) : [],
         }
       : undefined
 
     return {
       ...mergeWith(defaultMeta, strapiMeta, seoMergeCustomizer),
       openGraph: mergeWith(defaultOgMeta, strapiOgMeta, seoMergeCustomizer),
-      twitter: mergeWith(
-        defaultTwitterMeta,
-        strapiTwitterMeta,
-        seoMergeCustomizer
-      ),
+      twitter: mergeWith(defaultTwitterMeta, strapiTwitterMeta, seoMergeCustomizer),
     }
   } catch (e: any) {
-    console.warn(
-      `SEO for ${uid} content type ("${pageUrl}") wasn't fetched: `,
-      e?.message
-    )
+    console.warn(`SEO for ${uid} content type ("${pageUrl}") wasn't fetched: `, e?.message)
     return {
       ...defaultMeta,
       openGraph: defaultOgMeta,
@@ -171,5 +161,4 @@ export async function getMetadataFromStrapi({
   }
 }
 
-const seoMergeCustomizer = (defaultValue: any, strapiValue: any) =>
-  strapiValue ?? defaultValue
+const seoMergeCustomizer = (defaultValue: any, strapiValue: any) => strapiValue ?? defaultValue

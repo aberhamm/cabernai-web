@@ -10,11 +10,7 @@ import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { cn } from '@/lib/styles'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 const DATE_FORMAT = 'LLL dd, y'
 
@@ -51,10 +47,7 @@ export function DateRangePicker({ className, date, setDate }: Props) {
           <Button
             id="date"
             variant="outline"
-            className={cn(
-              'w-[300px] justify-center font-normal',
-              !date && 'text-muted-foreground'
-            )}
+            className={cn('w-[300px] justify-center font-normal', !date && 'text-muted-foreground')}
           >
             <CalendarIcon className="mr-2 size-4" />
             {selectedDate}
