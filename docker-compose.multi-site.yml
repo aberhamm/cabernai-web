@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # Strapi CMS Backend - Internal network only
+  strapi:
+    build:
+      context: .
+      dockerfile: apps/strapi/Dockerfile
+      args:
+        APP: strapi
+        WORKSPACE: '@repo/strapi'
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_CLIENT: postgres
+      DATABASE_URL: ${SUPABASE_DATABASE_URL}
+      DATABASE_SSL: true
+      DATABASE_SSL_REJECT_UNAUTHORIZED: false
+      APP_KEYS: ${APP_KEYS}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      JWT_SECRET: ${JWT_SECRET}
+      PUBLIC_URL: ${STRAPI_PUBLIC_URL}
+      APP_URL: ${STRAPI_PUBLIC_URL}
+      # File upload (Cloudinary or AWS S3)
+      CLOUDINARY_NAME: ${CLOUDINARY_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      # Optional: Sentry monitoring
+      SENTRY_DSN: ${SENTRY_DSN}
+      # Optional: Email (Mailgun)
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY}
+      MAILGUN_DOMAIN: ${MAILGUN_DOMAIN}
+      MAILGUN_EMAIL: ${MAILGUN_EMAIL}
+    ports:
+      - '127.0.0.1:1337:1337' # Only bind to localhost
+    volumes:
+      - strapi_uploads:/app/apps/strapi/public/uploads
+    networks:
+      - cabernai_network
+      - default # Connect to default network for external nginx access
+    labels:
+      - 'traefik.enable=false'
+
+  # Next.js Frontend - Internal network only
+  ui:
+    build:
+      context: .
+      dockerfile: apps/ui/Dockerfile
+      args:
+        APP: ui
+        WORKSPACE: '@repo/ui'
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_APP_PUBLIC_URL: ${UI_PUBLIC_URL}
+      NEXT_PUBLIC_STRAPI_URL: ${STRAPI_PUBLIC_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${UI_PUBLIC_URL}
+      # Optional: Sentry monitoring
+      NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN}
+    ports:
+      - '127.0.0.1:3000:3000' # Only bind to localhost
+    networks:
+      - cabernai_network
+      - default # Connect to default network for external nginx access
+    depends_on:
+      - strapi
+    labels:
+      - 'traefik.enable=false'
+
+  # Watchtower for automatic updates (optional)
+  watchtower:
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_POLL_INTERVAL: 3600
+      WATCHTOWER_INCLUDE_STOPPED: true
+    command: --interval 3600 --cleanup --scope cabernai-web
+    networks:
+      - cabernai_network
+    labels:
+      - 'com.centurylinklabs.watchtower.scope=cabernai-web'
+
+volumes:
+  strapi_uploads:
+    name: cabernai_strapi_uploads
+
+networks:
+  cabernai_network:
+    name: cabernai_network
+    driver: bridge
