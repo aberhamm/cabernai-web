@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
@@ -51,8 +51,8 @@ export function ContactForm({
                 name="first-name"
                 type="text"
                 required
-                label={t('firstName')}
-                placeholder={t('firstNamePlaceholder')}
+                label={t('name')}
+                placeholder={t('namePlaceholder')}
               />
             </div>
           </div>
@@ -68,8 +68,8 @@ export function ContactForm({
                 name="lest-name"
                 type="text"
                 required
-                label={t('lastName')}
-                placeholder={t('lastNamePlaceholder')}
+                label={t('name')}
+                placeholder={t('namePlaceholder')}
               />
             </div>
           </div>

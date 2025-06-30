@@ -19,5 +19,6 @@
   "tailwindCSS.experimental.classRegex": [["cn\\(([^)]*)\\)", "([\"'`][^\"'`]*.*?[\"'`])"]],
   "prettier.requireConfig": true,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": ["plaiceholder", "Strapi", "unoptimized"]
+  "cSpell.words": ["plaiceholder", "Strapi", "unoptimized"],
+  "prettier.prettierPath": "apps/ui/node_modules/prettier"
 }

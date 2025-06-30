@@ -1,11 +1,13 @@
 module.exports = {
-  // UI app files - ESLint only for now
+  // UI app files
   'apps/ui/**/*.{js,jsx,ts,tsx}': ['eslint --fix --max-warnings=0'],
+  'apps/ui/**/*.{css,md,json}': ['prettier --write --cache'],
 
-  // Strapi app files - ESLint only for now
+  // Strapi app files
   'apps/strapi/**/*.{js,jsx,ts,tsx}': ['eslint --fix --max-warnings=0'],
+  'apps/strapi/**/*.{css,md,json}': ['prettier --write --cache'],
 
-  // Root level files - ESLint only for now (excluding config files)
+  // Root level files (excluding config files)
   '*.{js,jsx,ts,tsx}': (files) => {
     const filteredFiles = files.filter(
       (file) =>
@@ -17,9 +19,5 @@ module.exports = {
       ? [`eslint --fix --max-warnings=0 ${filteredFiles.join(' ')}`]
       : []
   },
-
-  // Temporarily disabled Prettier due to ES module issues
-  // 'apps/ui/**/*.{css,md,json}': ['prettier --write --cache'],
-  // 'apps/strapi/**/*.{css,md,json}': ['prettier --write --cache'],
-  // '*.{md,css,scss,json,yaml,yml}': ['prettier --write --cache'],
+  '*.{md,css,scss,json,yaml,yml}': ['prettier --write --cache'],
 }

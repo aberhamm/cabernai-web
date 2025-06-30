@@ -1,26 +1,26 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { Link, useRouter } from '@/lib/navigation'
-import { useErrorMessage } from '@/hooks/useErrorMessage'
 import { AppField } from '@/components/forms/AppField'
 import { AppForm } from '@/components/forms/AppForm'
 import { Button } from '@/components/ui/button'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
+import { useErrorMessage } from '@/hooks/useErrorMessage'
+import { Link, useRouter } from '@/lib/navigation'
 
 export function SignInForm() {
   const t = useTranslations('auth.signIn')
@@ -83,7 +83,7 @@ export function SignInForm() {
         </AppForm>
       </CardContent>
       <CardFooter className="flex flex-col items-center gap-2">
-        <Button type="submit" size="lg" variant="default" form={signInFormName}>
+        <Button type="submit" size="lg" variant="primary" form={signInFormName}>
           {t('submit')}
         </Button>
 

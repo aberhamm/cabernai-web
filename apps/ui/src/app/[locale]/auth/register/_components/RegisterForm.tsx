@@ -6,22 +6,22 @@ import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { PASSWORD_MIN_LENGTH } from '@/lib/constants'
-import { Link } from '@/lib/navigation'
-import Strapi from '@/lib/strapi'
-import { cn } from '@/lib/styles'
 import { AppField } from '@/components/forms/AppField'
 import { AppForm } from '@/components/forms/AppForm'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
+import { PASSWORD_MIN_LENGTH } from '@/lib/constants'
+import { Link } from '@/lib/navigation'
+import Strapi from '@/lib/strapi'
+import { cn } from '@/lib/styles'
 
 export function RegisterForm() {
   const t = useTranslations('auth.register')
@@ -105,7 +105,7 @@ export function RegisterForm() {
         <CardContent>
           <Link
             href="/auth/signin"
-            className={cn(buttonVariants({ variant: 'default' }), 'h-[44px] w-full')}
+            className={cn(buttonVariants({ variant: 'primary' }), 'h-[44px] w-full')}
           >
             <p>{t('signInLink')}</p>
           </Link>
@@ -139,7 +139,7 @@ export function RegisterForm() {
           <Button
             type="submit"
             size="lg"
-            variant="default"
+            variant="primary"
             form={registerFormName}
             className="w-full"
           >

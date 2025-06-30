@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
-import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 
 import { SetPasswordForm } from './_components/SetPasswordForm'
 
@@ -33,7 +33,7 @@ export default function ActivateAccountPage() {
         <div>
           <h4 className="text-2xl">{title}!</h4>
           <p className="mb-4 text-base">{t('activateAccount', { email })}</p>
-          <Button variant="default" onClick={() => setFormToggled(true)}>
+          <Button variant="primary" onClick={() => setFormToggled(true)}>
             {t('activate')}
           </Button>
         </div>

@@ -6,21 +6,21 @@ import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { PASSWORD_MIN_LENGTH } from '@/lib/constants'
-import { useRouter } from '@/lib/navigation'
-import Strapi from '@/lib/strapi'
 import { AppField } from '@/components/forms/AppField'
 import { AppForm } from '@/components/forms/AppForm'
 import { Button } from '@/components/ui/button'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
+import { PASSWORD_MIN_LENGTH } from '@/lib/constants'
+import { useRouter } from '@/lib/navigation'
+import Strapi from '@/lib/strapi'
 
 export function ChangePasswordForm() {
   const t = useTranslations('auth.changePassword')
@@ -89,7 +89,7 @@ export function ChangePasswordForm() {
         </AppForm>
       </CardContent>
       <CardFooter>
-        <Button type="submit" size="lg" variant="default" form={changePasswordFormName}>
+        <Button type="submit" size="lg" variant="primary" form={changePasswordFormName}>
           {t('submit')}
         </Button>
       </CardFooter>

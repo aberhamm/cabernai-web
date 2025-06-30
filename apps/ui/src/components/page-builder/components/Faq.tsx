@@ -1,13 +1,6 @@
 import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { Container } from '@/components/elementary/Container'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
 
 export function Faq({
   component,
@@ -39,24 +32,18 @@ export function Faq({
             {}
           </h2>
           <p className="mt-4 text-lg tracking-tight text-slate-700">
-            If you can’t find what you’re looking for, email our support team and if you’re lucky
+            If you can&apos;t find what you&apos;re looking for, email our support team and if you&apos;re lucky
             someone will get back to you.
           </p>
         </div>
         <ul className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3">
           {faqs &&
-            faqs.map((column, columnIndex) => (
-              <li key={columnIndex}>
-                <ul className="flex flex-col gap-y-8">
-                  {column.map((faq, faqIndex) => (
-                    <li key={faqIndex}>
-                      <h3 className="font-display text-lg leading-7 text-slate-900">
-                        {faq.question}
-                      </h3>
-                      <p className="mt-4 text-sm text-slate-700">{faq.answer}</p>
-                    </li>
-                  ))}
-                </ul>
+            faqs.map((faq, faqIndex) => (
+              <li key={faqIndex}>
+                <h3 className="font-display text-lg leading-7 text-slate-900">
+                  {faq.question}
+                </h3>
+                <p className="mt-4 text-sm text-slate-700">{faq.answer}</p>
               </li>
             ))}
         </ul>
