@@ -43,9 +43,11 @@ _[After this preparation is done, delete this section]_
 
 ### Environment variables
 
-**For Production Deployment:** Use the unified environment approach via `scripts/deploy/env-generator.sh` from the project root. This creates a single comprehensive `.env` file that automatically loads into both Strapi and UI containers. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for complete deployment guide.
+**🎯 Unified Environment Approach (Recommended):** Both development and production use the root `.env` file! Copy `../../.env.example` to `../../.env` and configure it. This approach ensures consistency between development and production environments.
 
-**For Local Development:** Copy & rename `.env.local.example` to `.env.local` in this directory and fill or update the values.
+**Legacy Development (App-specific):** This approach is deprecated. Use the unified root `.env` approach instead (see main README.md).
+
+**Production Deployment:** Use `scripts/deploy/env-generator.sh` from the project root to create the unified `.env` file. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for complete deployment guide.
 
 ### Run locally in dev mode (with hot-reloading)
 
@@ -71,7 +73,7 @@ To build and run NextJS in Docker container use [Dockerfile](Dockerfile) prepare
 docker build -t ui:latest -f apps/ui/Dockerfile .
 
 # run container using image
-docker run -it --rm --name ui -p 3000:3000 --env-file apps/ui/.env.local ui:latest
+docker run -it --rm --name ui -p 3000:3000 --env-file .env ui:latest
 
 # For production deployment, the root .env file is used instead:
 # docker run -it --rm --name ui -p 3000:3000 --env-file .env ui:latest
@@ -157,6 +159,9 @@ To merge several Tailwind classes and to work more conveniently with dynamic cla
 
 ```tsx
 import { cn } from '@/lib/styles'
+import { cn } from '@/lib/styles'
+import { cn } from '@/lib/styles'
+import { cn } from '@/lib/styles'
 
 ;<div className={cn('flex items-center justify-center', className)}>...</div>
 ```
@@ -188,6 +193,9 @@ To get session (logged user) in client components use `useSession()` from `next-
 'use client'
 
 import { useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 
 export default function ProfilePage() {
   const session = useSession()
@@ -210,7 +218,9 @@ Usage:
 
 ```tsx
 // Client or Server component without "async" - `useTranslations()`
-
+import { useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { useTranslations } from 'next-intl'
 
 export default function Page() {
@@ -221,7 +231,9 @@ export default function Page() {
 
 ```tsx
 // Server component with "async" - `getTranslations()`
-
+import { getTranslations } from 'next-intl/server'
+import { getTranslations } from 'next-intl/server'
+import { getTranslations } from 'next-intl/server'
 import { getTranslations } from 'next-intl/server'
 
 export default async function ProfilePage() {
@@ -251,13 +263,16 @@ import { Link, useRouter, redirect } from "next/navigation"
 
 ### Environment variables
 
-**For Local Development:** Define them in `.env.local.example`, `.env.local` and `src/env.mjs` file where [@t3-oss/env-nextjs](https://github.com/t3-oss/t3-env) validation package is used. This package is used to validate and type-check environment variables.
+**For Local Development:** Use the unified root `.env` file approach. Environment variables are validated in `src/env.mjs` using [@t3-oss/env-nextjs](https://github.com/t3-oss/t3-env) package.
 
 **For Production Deployment:** The unified environment approach automatically provides all necessary variables to the UI container via Docker Compose's `env_file` directive. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for details.
 
 Usage:
 
 ```tsx
+import { env } from '@/env.mjs'
+import { env } from '@/env.mjs'
+import { env } from '@/env.mjs'
 import { env } from '@/env.mjs'
 
 // ✅ OK
@@ -274,6 +289,9 @@ General unexpected **rendering** and **lifecycle** errors (not event handlers, n
 For even more granular error handling use custom [ErrorBoundary](src/components/elementary/ErrorBoundary.tsx) component. ErrorBoundary is easily configurable client-side component that utilizes [react-error-boundary](https://github.com/bvaughn/react-error-boundary) package and catches errors in smaller parts of the UI or individual components. By default it wraps Strapi components as their content is fetched from CMS and don't guarantee correctness.
 
 ```tsx
+import { ErrorBoundary } from '@/components/elementary/ErrorBoundary'
+import { ErrorBoundary } from '@/components/elementary/ErrorBoundary'
+import { ErrorBoundary } from '@/components/elementary/ErrorBoundary'
 import { ErrorBoundary } from '@/components/elementary/ErrorBoundary'
 
 export default function Page() {
@@ -301,6 +319,9 @@ To fetch data from API use `Strapi` class defined in [lib/strapi.ts](src/lib/str
   - it's already in use by different handler (e.g. content type `"plugin::users-permissions.user"` is reserved for `GET /users` so `GET /users/me` has to use `fetchAPI` - see bellow):
 
 ```ts
+import { Result } from '@repo/strapi'
+import { Result } from '@repo/strapi'
+import { Result } from '@repo/strapi'
 import { Result } from '@repo/strapi'
 
 const fetchedUser: Result<'plugin::users-permissions.user'> = await Strapi.fetchAPI(

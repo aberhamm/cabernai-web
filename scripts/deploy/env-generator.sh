@@ -89,15 +89,27 @@ main() {
 
     # Prompt for domain
     echo_step "Domain Configuration"
-    read -p "Enter your domain (e.g., example.com): " DOMAIN
+    echo_info "For development, you can use localhost URLs"
+    echo_info "For production, enter your actual domain"
+    read -p "Enter your domain (leave empty for localhost development): " DOMAIN
 
     # Prompt for Supabase database URL
-    echo_step "Supabase Database Configuration"
-    echo_info "Go to your Supabase project:"
+    echo_step "Database Configuration"
+    echo_info "For development, you can use local PostgreSQL or Supabase"
+    echo_info "For production, use your Supabase connection string:"
     echo_info "Dashboard > Settings > Database > Connection string (URI)"
     echo_info "Copy the connection string and replace 'your-password' with your actual password"
     echo ""
-    read -p "Enter your Supabase database URL: " SUPABASE_URL
+    read -p "Enter your database URL (leave empty for local PostgreSQL): " SUPABASE_URL
+
+    # Database schema configuration
+    echo ""
+    echo_info "Database Schema Configuration:"
+    echo_info "- 'public' is the default PostgreSQL schema"
+    echo_info "- Custom schemas can be used for multi-tenant applications"
+    echo_info "- Leave empty to use default 'public' schema"
+    read -p "Enter database schema name (default: public): " DATABASE_SCHEMA
+    DATABASE_SCHEMA=${DATABASE_SCHEMA:-public}
 
     # File upload configuration
     echo_step "File Upload Configuration"
@@ -160,11 +172,39 @@ NEXT_PUBLIC_APP_PUBLIC_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:
 NEXT_PUBLIC_STRAPI_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:1337}
 NEXTAUTH_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:3000}
 APP_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:1337}
+PUBLIC_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:1337}
 
-# ----- Database (Supabase) -----
-# Both variables point to same URL for compatibility
-DATABASE_URL=$SUPABASE_URL
-SUPABASE_DATABASE_URL=$SUPABASE_URL
+# ----- Database -----
+# Primary connection method - DATABASE_URL
+DATABASE_URL=${SUPABASE_URL:-postgresql://admin:mFm8z7z8@localhost:5432/strapi-db}
+DATABASE_SCHEMA=$DATABASE_SCHEMA
+DATABASE_CLIENT=postgres
+DATABASE_HOST=$DATABASE_HOST
+DATABASE_PORT=$DATABASE_PORT
+DATABASE_NAME=$DATABASE_NAME
+DATABASE_USERNAME=$DATABASE_USERNAME
+DATABASE_PASSWORD=$DATABASE_PASSWORD
+DATABASE_SSL=$DATABASE_SSL
+
+# Individual parameters for Strapi compatibility (auto-derived from DATABASE_URL)
+if [[ -n "$SUPABASE_URL" ]]; then
+    # Production: Extract from Supabase URL
+    # Example: postgresql://postgres.xxx:password@xxx.pooler.supabase.com:6543/postgres
+    DATABASE_HOST=$(echo "$SUPABASE_URL" | sed -n 's/.*@\([^:]*\):.*/\1/p')
+    DATABASE_PORT=$(echo "$SUPABASE_URL" | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
+    DATABASE_NAME=$(echo "$SUPABASE_URL" | sed -n 's/.*\/\([^?]*\).*/\1/p')
+    DATABASE_USERNAME=$(echo "$SUPABASE_URL" | sed -n 's/.*\/\/\([^:]*\):.*/\1/p')
+    DATABASE_PASSWORD=$(echo "$SUPABASE_URL" | sed -n 's/.*\/\/[^:]*:\([^@]*\)@.*/\1/p')
+    DATABASE_SSL=true
+else
+    # Development: Local PostgreSQL defaults
+    DATABASE_HOST=localhost
+    DATABASE_PORT=5432
+    DATABASE_NAME=strapi-db
+    DATABASE_USERNAME=admin
+    DATABASE_PASSWORD=mFm8z7z8
+    DATABASE_SSL=false
+fi
 
 # ----- Strapi Secrets -----
 APP_KEYS=$APP_KEY_1,$APP_KEY_2,$APP_KEY_3,$APP_KEY_4
@@ -172,7 +212,6 @@ ADMIN_JWT_SECRET=$ADMIN_JWT_SECRET
 API_TOKEN_SALT=$API_TOKEN_SALT
 TRANSFER_TOKEN_SALT=$TRANSFER_TOKEN_SALT
 JWT_SECRET=$JWT_SECRET
-PUBLIC_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:1337}
 HOST=0.0.0.0
 PORT=1337
 
@@ -226,9 +265,13 @@ EOF
 
 # ----- System -----
 CRON_ENABLED=true
-NODE_ENV=production
-NEXT_OUTPUT=standalone
+NODE_ENV=${DOMAIN:+production}${DOMAIN:-development}
+NEXT_OUTPUT=${DOMAIN:+standalone}
 NEXT_IMAGES_UNOPTIMIZED=false
+
+# ----- Additional Strapi Configuration -----
+CLIENT_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:3000}
+CLIENT_ACCOUNT_ACTIVATION_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:3000}/auth/activate
 EOF
 
     echo_info "✓ Comprehensive .env file created with all variables for both services"

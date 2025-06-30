@@ -38,9 +38,11 @@ _[After this preparation is done, delete this section]_
 
 ### Environment variables
 
-**For Production Deployment:** Use the unified environment approach via `scripts/deploy/env-generator.sh` from the project root. This creates a single comprehensive `.env` file that automatically loads into both Strapi and UI containers. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for complete deployment guide.
+**🎯 Unified Environment Approach (Recommended):** Both development and production use the root `.env` file! Copy `../../.env.example` to `../../.env` and configure it. This approach ensures consistency between development and production environments.
 
-**For Local Development:** Copy & rename `.env.example` to `.env` in this directory and fill or update the values (most values are already set to defaults, but you may want to tweak them for your needs).
+**Legacy Development (App-specific):** Copy & rename `.env.example` to `.env` in this directory and fill or update the values. Note: This approach is deprecated in favor of the unified root `.env` approach.
+
+**Production Deployment:** Use `scripts/deploy/env-generator.sh` from the project root to create the unified `.env` file. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for complete deployment guide.
 
 ### Run locally in dev mode (with hot-reloading)
 
@@ -96,7 +98,7 @@ To build and run Strapi in Docker container use [Dockerfile](Dockerfile) prepare
 docker build -t strapi:latest -f apps/strapi/Dockerfile --build-arg NEXT_PUBLIC_STRAPI_URL=https://cms.strapi-domain.dev .
 
 # run container using image
-docker run -it --rm --name strapi -p 1337:1337 --env-file apps/strapi/.env strapi:latest
+docker run -it --rm --name strapi -p 1337:1337 --env-file .env strapi:latest
 
 # For production deployment, the root .env file is used instead:
 # docker run -it --rm --name strapi -p 1337:1337 --env-file .env strapi:latest
@@ -113,7 +115,7 @@ To connect 2 different containers (Strapi and Postgres) in Docker, you have to c
 docker compose up -d db
 
 # run Strapi in docker and connect to same network. In docker-compose.yml there is a "db_network" network already defined, so you don't need to create it manually again, but just reference it in this run command
-docker run -it --rm --name strapi -p 1337:1337 --env-file apps/strapi/.env --network=dev-templates_db_network strapi:latest
+docker run -it --rm --name strapi -p 1337:1337 --env-file .env --network=dev-templates_db_network strapi:latest
 
 # For production deployment, the root .env file is used instead:
 # docker run -it --rm --name strapi -p 1337:1337 --env-file .env --network=dev-templates_db_network strapi:latest

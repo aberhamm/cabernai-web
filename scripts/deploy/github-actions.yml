@@ -107,9 +107,16 @@ jobs:
           NEXTAUTH_URL=https://${{ vars.DOMAIN_NAME }}
           APP_URL=https://${{ vars.DOMAIN_NAME }}
 
-          # Database - single source, duplicated for compatibility
+          # Database - DATABASE_URL is primary, individual params for compatibility
           DATABASE_URL=${{ secrets.DATABASE_URL }}
-          SUPABASE_DATABASE_URL=${{ secrets.DATABASE_URL }}
+          DATABASE_SCHEMA=${{ secrets.DATABASE_SCHEMA }}
+          DATABASE_CLIENT=postgres
+          DATABASE_HOST=${{ secrets.DATABASE_HOST }}
+          DATABASE_PORT=${{ secrets.DATABASE_PORT }}
+          DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+          DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_SSL=${{ secrets.DATABASE_SSL }}
 
           # Strapi secrets
           APP_KEYS=${{ secrets.APP_KEYS }}
@@ -146,6 +153,10 @@ jobs:
           NODE_ENV=production
           NEXT_OUTPUT=standalone
           NEXT_IMAGES_UNOPTIMIZED=false
+
+          # Additional Strapi Configuration
+          CLIENT_URL=https://${{ vars.DOMAIN_NAME }}
+          CLIENT_ACCOUNT_ACTIVATION_URL=https://${{ vars.DOMAIN_NAME }}/auth/activate
           EOF
 
             echo '✅ Created single .env file - automatically loaded into ALL containers!'

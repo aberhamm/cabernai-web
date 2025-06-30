@@ -82,26 +82,57 @@ yarn
 # https://github.com/yarnpkg/yarn/issues/8580
 ```
 
-It will install dependencies for all `packages/` and `apps/`:
+### Environment Setup
 
-- `packages/` don't require any additional setup
-- `apps/` probably do and the instructions are described in their READMEs ([UI](./apps/ui/README.md), [Strapi](./apps/strapi/README.md)). **Please, follow them first** (e.g. set env vars)
-
-### Run - turborepo scripts
-
-After installing dependencies and setting up projects (previous step), you can control all apps using Turbo CLI. Some common commands are wrapped into `yarn` scripts. You can find them in root `package.json` file. For example:
+**🎯 Unified Environment Approach:** Both development and production use the same root `.env` file!
 
 ```bash
-# run all apps in dev mode (this triggers `yarn dev` script in each app from `/apps` directory)
+# Copy the example file
+cp .env.example .env
+
+# Edit .env with your values
+# For development: Leave DOMAIN_NAME empty (uses localhost)
+# For production: Set DOMAIN_NAME to your domain
+```
+
+**Benefits:**
+
+- ✅ **Same file structure** for development and production
+- ✅ **No app-specific .env files** needed
+- ✅ **Consistent environment** across all deployment types
+- ✅ **Single source of truth** for all configuration
+
+### Run - Development Options
+
+After installing dependencies and setting up environment (previous step), you can run the project in multiple ways:
+
+**🎯 Unified Development (Recommended):**
+
+```bash
+# Uses unified root .env file with Docker (consistent with production)
+yarn dev:unified
+```
+
+**Traditional Development:**
+
+```bash
+# Run all apps in dev mode (requires app-specific .env files - DEPRECATED)
 yarn dev
 
-# build all apps
+# Build all apps
 yarn build
 
-# dev run of specific app(s)
+# Dev run of specific app(s)
 yarn dev:ui
 yarn dev:strapi
 ```
+
+**🎯 Unified approach benefits:**
+
+- ✅ **Same environment setup** as production
+- ✅ **Single .env file** for all services
+- ✅ **Docker consistency** across environments
+- ✅ **No app-specific configuration** needed
 
 ## 🔱 Husky tasks
 

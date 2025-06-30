@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  strapi:
+    build:
+      context: .
+      dockerfile: ./apps/strapi/Dockerfile
+      target: development
+    env_file: .env # 🎯 Uses unified root .env file
+    ports:
+      - '1337:1337'
+    volumes:
+      - ./apps/strapi:/app/apps/strapi
+      - strapi_uploads:/app/apps/strapi/public/uploads
+      - strapi_node_modules:/app/apps/strapi/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:1337/admin']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ui:
+    build:
+      context: .
+      dockerfile: ./apps/ui/Dockerfile
+      target: development
+    env_file: .env # 🎯 Uses unified root .env file
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./apps/ui:/app/apps/ui
+      - ui_node_modules:/app/apps/ui/node_modules
+      - ui_next:/app/apps/ui/.next
+    restart: unless-stopped
+    depends_on:
+      - strapi
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  strapi_uploads:
+  strapi_node_modules:
+  ui_node_modules:
+  ui_next:
