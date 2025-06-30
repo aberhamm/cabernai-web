@@ -34,7 +34,13 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        env:
+          # Force Sharp to download correct binary for CI platform
+          SHARP_IGNORE_GLOBAL_LIBVIPS: 1
+        run: |
+          yarn install --frozen-lockfile
+          echo "🔧 Rebuilding Sharp for CI platform..."
+          npm rebuild sharp || echo "Sharp rebuild failed, continuing..."
 
       - name: Lint code
         run: NODE_ENV=development yarn lint
