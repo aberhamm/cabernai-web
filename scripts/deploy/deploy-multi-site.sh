@@ -456,8 +456,8 @@ check_services() {
 
     if [[ -z "$CONTAINERS" ]]; then
         echo_error "No containers found! Docker Compose may have failed."
-        echo_debug "Checking docker-compose logs..."
-        docker-compose -f $DOCKER_COMPOSE_FILE logs --tail=50
+                    echo_debug "Checking docker-compose logs..."
+            timeout 60 docker-compose -f $DOCKER_COMPOSE_FILE logs --tail=50 || echo_warn "Docker logs collection timed out"
         return 1
     fi
 
@@ -471,7 +471,7 @@ check_services() {
         else
             echo_error "✗ $NAME is not running (Status: $STATUS)"
             echo_debug "Container logs for $NAME:"
-            docker logs --tail=20 $container 2>&1 || true
+            timeout 30 docker logs --tail=20 $container 2>&1 || echo_warn "Container log collection timed out for $NAME"
         fi
     done
 
@@ -551,16 +551,16 @@ check_services() {
         else
             echo_warn "✗ Nginx proxy may need additional configuration"
             echo_debug "Checking nginx error logs..."
-            sudo tail -20 /var/log/nginx/error.log || true
+            timeout 15 sudo tail -20 /var/log/nginx/error.log || echo_warn "Nginx log collection timed out"
         fi
     fi
 
     # Show resource usage after deployment
     echo_debug "System resources after deployment:"
-    df -h /opt
-    free -h
+    timeout 15 df -h /opt || echo_warn "Disk usage check timed out"
+    timeout 10 free -h || echo_warn "Memory usage check timed out"
     echo_debug "Docker system usage:"
-    docker system df
+    timeout 30 docker system df || echo_warn "Docker system usage check timed out"
 }
 
 cleanup_old_images() {

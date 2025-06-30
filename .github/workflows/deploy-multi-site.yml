@@ -367,43 +367,51 @@ jobs:
 
       - name: Debug deployment failure
         if: failure()
+        timeout-minutes: 5  # Limit debug collection to 5 minutes
         run: |
           echo "❌ Multi-Site Deployment failed!"
           echo "📊 Collecting debug information..."
+          echo "⏱️  Debug collection timeout: 5 minutes"
+          echo "📊 Debug collection started at: $(date)"
 
-          # Collect system information
-          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+          # Collect system information with timeouts
+          timeout 300 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
             echo '=== SYSTEM STATUS ==='
-            date
-            uptime
-            df -h
-            free -h
+            timeout 10 date || echo 'date command timed out'
+            timeout 10 uptime || echo 'uptime command timed out'
+            timeout 15 df -h || echo 'df command timed out'
+            timeout 10 free -h || echo 'free command timed out'
 
             echo '=== DOCKER STATUS ==='
-            docker --version
-            docker-compose --version
-            docker system df
-            docker images | head -10
+            timeout 10 docker --version || echo 'docker version check timed out'
+            timeout 10 docker-compose --version || echo 'docker-compose version check timed out'
+            timeout 30 docker system df || echo 'docker system df timed out'
+            timeout 20 docker images | head -10 || echo 'docker images command timed out'
 
             echo '=== CONTAINER STATUS ==='
             cd /opt/${{ env.PROJECT_NAME }} || exit 1
-            docker-compose -f docker-compose.multi-site.yml ps
+            timeout 30 docker-compose -f docker-compose.multi-site.yml ps || echo 'container status check timed out'
 
             echo '=== CONTAINER LOGS (last 50 lines each) ==='
-            docker-compose -f docker-compose.multi-site.yml logs --tail=50 ui || true
-            docker-compose -f docker-compose.multi-site.yml logs --tail=50 strapi || true
+            timeout 60 docker-compose -f docker-compose.multi-site.yml logs --tail=50 ui || echo 'UI logs collection timed out'
+            timeout 60 docker-compose -f docker-compose.multi-site.yml logs --tail=50 strapi || echo 'Strapi logs collection timed out'
 
             echo '=== NGINX STATUS ==='
-            systemctl status nginx || true
-            nginx -t || true
-            ls -la /etc/nginx/sites-enabled/ || true
+            timeout 15 systemctl status nginx || echo 'nginx status check timed out'
+            timeout 10 nginx -t || echo 'nginx config test timed out'
+            timeout 10 ls -la /etc/nginx/sites-enabled/ || echo 'nginx sites listing timed out'
 
             echo '=== NETWORK STATUS ==='
-            netstat -tulpn | grep -E ':(80|443|3000|1337)' || true
+            timeout 15 netstat -tulpn | grep -E ':(80|443|3000|1337)' || echo 'network status check timed out'
 
             echo '=== RECENT SYSTEM LOGS ==='
-            journalctl --since '10 minutes ago' --no-pager | tail -50 || true
-          " || echo "Failed to collect debug information"
+            timeout 30 journalctl --since '10 minutes ago' --no-pager | tail -50 || echo 'system logs collection timed out'
+
+            echo '=== DEBUG COLLECTION COMPLETED ==='
+            date
+          " || echo "⚠️ Debug information collection failed or timed out"
+
+          echo "📊 Debug collection completed at: $(date)"
 
       - name: Notify deployment failure
         if: failure()

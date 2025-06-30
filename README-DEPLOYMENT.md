@@ -1302,6 +1302,7 @@ To prevent deployment hangs and infinite loops, comprehensive safeguards have be
 | `deploy-multi-site.sh` | Service retry loops   | Max attempts (1-5), timeout per operation, input validation         |
 | GitHub Actions         | Verification loops    | Bounded iterations (1-12), total timeout (300s), attempt validation |
 | GitHub Actions         | Public endpoint tests | Max attempts (1-5), timeout per curl, sleep timeout                 |
+| GitHub Actions         | Debug collection      | **NEW**: 5-minute timeout, per-command timeouts (10-60s)            |
 | `fix-dev-issues.sh`    | User input            | Max input attempts (3), timeout per read (60s)                      |
 
 ### **Safety Mechanisms**
@@ -1367,6 +1368,7 @@ All loops include emergency stop conditions:
 - **Invalid State:** If iteration counters become invalid
 - **Resource Exhaustion:** If system resources are critically low
 - **Time Exceeded:** If any timeout is reached
+- **Debug Collection Hangs:** **NEW**: Debug information collection limited to 5 minutes total with individual command timeouts
 
 ### **Monitoring and Alerts**
 
