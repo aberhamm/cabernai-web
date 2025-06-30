@@ -12,10 +12,7 @@ import { LinkStrapi } from './LinkStrapi'
 export const CTABanner = ({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.cta-banner',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.cta-banner', false>
 }) => {
   // Destructure the component attributes
   const { title, subText, image, link, isVisible, bgColor } = component
@@ -32,7 +29,7 @@ export const CTABanner = ({
   }
 
   return (
-    <section className={cn('relative isolate', fontColorClass)}>
+    <section className={cn('cta-banner', 'relative isolate', fontColorClass)}>
       <div className="py-[128px]">
         <div className="m-auto w-full max-w-[calc(1136px)] px-6">
           <div
@@ -45,9 +42,7 @@ export const CTABanner = ({
               <div className="flex flex-col gap-2">
                 {/* Title */}
                 {title && (
-                  <h2 className="m-0 text-2xl font-bold leading-8 tracking-normal">
-                    {title}
-                  </h2>
+                  <h2 className="m-0 text-2xl font-bold leading-8 tracking-normal">{title}</h2>
                 )}
                 {/* Subtitle */}
                 {subText && <p>{subText}</p>}

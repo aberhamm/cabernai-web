@@ -10,11 +10,6 @@
       "type": "string",
       "required": true
     },
-    "accordions": {
-      "type": "component",
-      "repeatable": true,
-      "component": "shared.accordions"
-    },
     "subTitle": {
       "type": "string",
       "required": false
@@ -23,6 +18,12 @@
       "type": "boolean",
       "default": true,
       "required": false
+    },
+    "faqs": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.faq-item",
+      "required": true
     }
   }
 }

@@ -16,16 +16,13 @@ import { LinkStrapi } from './LinkStrapi'
 export function WelcomeHero({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.welcome-hero',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.welcome-hero', false>
 }) {
   const { title, subTitle, image, links, bgColor, bgImage } = component
-  console.log('WelcomeHero', image)
   return (
     <section
       className={cn(
+        'welcome-hero',
         `relative mb-[30vw] bg-cover pb-0 pt-8 md:px-0 md:pt-32 lg:mb-[15vw]`,
         `bg-${bgColor}`
       )}
@@ -172,12 +169,7 @@ export function WelcomeHero({
               y2="646.382"
             >
               <stop fill="none" stopColor="white" />
-              <stop
-                fill="none"
-                offset="0.825556"
-                stopColor="white"
-                stopOpacity="0"
-              />
+              <stop fill="none" offset="0.825556" stopColor="white" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
@@ -211,7 +203,7 @@ export function WelcomeHero({
                     {links.map((link, i) => (
                       <a
                         key={i}
-                        className="inline-block w-full rounded-3xl bg-background px-6 py-2 font-semibold text-secondary-foreground md:w-auto"
+                        className="inline-block w-full rounded-3xl bg-background px-6 py-2 font-semibold text-foreground md:w-auto"
                         href={link.href || ''}
                       >
                         {link.label}

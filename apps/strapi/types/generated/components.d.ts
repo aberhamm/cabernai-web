@@ -1,13 +1,30 @@
 import type { Schema, Struct } from '@strapi/strapi'
 
-export interface ExampleExample extends Struct.ComponentSchema {
-  collectionName: 'components_example_examples'
+export interface ElementsFeature extends Struct.ComponentSchema {
+  collectionName: 'components_elements_features'
   info: {
-    displayName: 'example'
-    icon: 'emotionUnhappy'
+    displayName: 'Feature'
+    icon: 'traffic-light'
   }
   attributes: {
-    author: Schema.Attribute.String
+    name: Schema.Attribute.String
+  }
+}
+
+export interface ElementsPlan extends Struct.ComponentSchema {
+  collectionName: 'components_elements_plans'
+  info: {
+    description: ''
+    displayName: 'Plan'
+    icon: 'search-dollar'
+  }
+  attributes: {
+    description: Schema.Attribute.Text
+    features: Schema.Attribute.Component<'elements.feature', true>
+    isRecommended: Schema.Attribute.Boolean
+    monthPrice: Schema.Attribute.Decimal
+    name: Schema.Attribute.String
+    yearPrice: Schema.Attribute.Decimal
   }
 }
 
@@ -89,17 +106,17 @@ export interface SectionsCtaBanner extends Struct.ComponentSchema {
     bgColor: Schema.Attribute.Enumeration<
       [
         'none',
-        'primary',
-        'primary-foreground',
-        'primary-gradient',
-        'secondary',
-        'secondary-foreground',
-        'secondary-gradient',
-        'tertiary',
-        'tertiary-foreground',
-        'tertiary-gradient',
-        'muted',
-        'muted-foreground',
+        'color-primary',
+        'color-primary-foreground',
+        'color-primary-gradient',
+        'color-secondary',
+        'color-secondary-foreground',
+        'color-secondary-gradient',
+        'color-tertiary',
+        'color-tertiary-foreground',
+        'color-tertiary-gradient',
+        'color-muted',
+        'color-muted-foreground',
       ]
     >
     footnote: Schema.Attribute.String
@@ -135,7 +152,7 @@ export interface SectionsFaq extends Struct.ComponentSchema {
     displayName: 'Faq'
   }
   attributes: {
-    accordions: Schema.Attribute.Component<'shared.accordions', true>
+    faqs: Schema.Attribute.Component<'shared.faq-item', true> & Schema.Attribute.Required
     isVisible: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>
     subTitle: Schema.Attribute.String
     title: Schema.Attribute.String & Schema.Attribute.Required
@@ -197,8 +214,7 @@ export interface SectionsHero extends Struct.ComponentSchema {
     displayName: 'Hero'
   }
   attributes: {
-    bgColor: Schema.Attribute.String &
-      Schema.Attribute.CustomField<'plugin::color-picker.color'>
+    bgColor: Schema.Attribute.String & Schema.Attribute.CustomField<'plugin::color-picker.color'>
     image: Schema.Attribute.Component<'shared.basic-image', false>
     isVisible: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>
     links: Schema.Attribute.Component<'shared.link', true>
@@ -258,6 +274,20 @@ export interface SectionsNewsletter extends Struct.ComponentSchema {
   }
 }
 
+export interface SectionsPricing extends Struct.ComponentSchema {
+  collectionName: 'components_sections_pricings'
+  info: {
+    description: ''
+    displayName: 'Pricing'
+    icon: 'dollar-sign'
+  }
+  attributes: {
+    plans: Schema.Attribute.Component<'elements.plan', true>
+    subTitle: Schema.Attribute.String
+    title: Schema.Attribute.String
+  }
+}
+
 export interface SectionsStatisticsGrid extends Struct.ComponentSchema {
   collectionName: 'components_sections_statistics_grids'
   info: {
@@ -278,8 +308,7 @@ export interface SectionsTabbedBanner extends Struct.ComponentSchema {
   }
   attributes: {
     subTitle: Schema.Attribute.String
-    tabs: Schema.Attribute.Component<'shared.card-item', true> &
-      Schema.Attribute.Required
+    tabs: Schema.Attribute.Component<'shared.card-item', true> & Schema.Attribute.Required
     title: Schema.Attribute.String & Schema.Attribute.Required
   }
 }
@@ -332,8 +361,7 @@ export interface SharedBasicImage extends Struct.ComponentSchema {
     alt: Schema.Attribute.String
     fallbackSrc: Schema.Attribute.String
     height: Schema.Attribute.Integer
-    media: Schema.Attribute.Media<'images' | 'videos'> &
-      Schema.Attribute.Required
+    media: Schema.Attribute.Media<'images' | 'videos'> & Schema.Attribute.Required
     opacity: Schema.Attribute.Decimal &
       Schema.Attribute.SetMinMax<
         {
@@ -371,6 +399,17 @@ export interface SharedCardItem extends Struct.ComponentSchema {
     link: Schema.Attribute.Component<'shared.link', false>
     subTitle: Schema.Attribute.String & Schema.Attribute.Required
     title: Schema.Attribute.String & Schema.Attribute.Required
+  }
+}
+
+export interface SharedFaqItem extends Struct.ComponentSchema {
+  collectionName: 'components_shared_faq_items'
+  info: {
+    displayName: 'FaqItem'
+  }
+  attributes: {
+    answer: Schema.Attribute.String & Schema.Attribute.Required
+    question: Schema.Attribute.String & Schema.Attribute.Required
   }
 }
 
@@ -449,8 +488,7 @@ export interface SharedMetaSocial extends Struct.ComponentSchema {
         maxLength: 65
       }>
     image: Schema.Attribute.Media<'images' | 'files' | 'videos'>
-    socialNetwork: Schema.Attribute.Enumeration<['Facebook', 'Twitter']> &
-      Schema.Attribute.Required
+    socialNetwork: Schema.Attribute.Enumeration<['Facebook', 'Twitter']> & Schema.Attribute.Required
     title: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
@@ -504,7 +542,8 @@ export interface SharedSeoTwitter extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
-      'example.example': ExampleExample
+      'elements.feature': ElementsFeature
+      'elements.plan': ElementsPlan
       'layout.navbar': LayoutNavbar
       'sections.animated-logo-row': SectionsAnimatedLogoRow
       'sections.benefits-cta-grid': SectionsBenefitsCtaGrid
@@ -520,6 +559,7 @@ declare module '@strapi/strapi' {
       'sections.horizontal-images': SectionsHorizontalImages
       'sections.image-with-cta-button': SectionsImageWithCtaButton
       'sections.newsletter': SectionsNewsletter
+      'sections.pricing': SectionsPricing
       'sections.statistics-grid': SectionsStatisticsGrid
       'sections.tabbed-banner': SectionsTabbedBanner
       'sections.welcome-hero': SectionsWelcomeHero
@@ -527,6 +567,7 @@ declare module '@strapi/strapi' {
       'shared.basic-image': SharedBasicImage
       'shared.button': SharedButton
       'shared.card-item': SharedCardItem
+      'shared.faq-item': SharedFaqItem
       'shared.feature-grid-item': SharedFeatureGridItem
       'shared.footer-item': SharedFooterItem
       'shared.grid-column': SharedGridColumn

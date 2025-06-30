@@ -36,17 +36,17 @@
       "type": "enumeration",
       "enum": [
         "none",
-        "primary",
-        "primary-foreground",
-        "primary-gradient",
-        "secondary",
-        "secondary-foreground",
-        "secondary-gradient",
-        "tertiary",
-        "tertiary-foreground",
-        "tertiary-gradient",
-        "muted",
-        "muted-foreground"
+        "color-primary",
+        "color-primary-foreground",
+        "color-primary-gradient",
+        "color-secondary",
+        "color-secondary-foreground",
+        "color-secondary-gradient",
+        "color-tertiary",
+        "color-tertiary-foreground",
+        "color-tertiary-gradient",
+        "color-muted",
+        "color-muted-foreground"
       ]
     }
   }

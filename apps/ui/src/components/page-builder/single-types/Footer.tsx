@@ -106,10 +106,7 @@ async function fetchData(locale: string) {
       { omitAuthorization: true }
     )
   } catch (e: any) {
-    console.error(
-      `Data for "api::footer.footer" content type wasn't fetched: `,
-      e?.message
-    )
+    console.error(`Data for "api::footer.footer" content type wasn't fetched: `, e?.message)
     return undefined
   }
 }
@@ -123,8 +120,6 @@ export async function Footer({ locale }: { readonly locale: AppLocale }) {
   }
 
   const { sections, links, copyRight } = component
-
-  console.log('Footer component:', component)
 
   return (
     <div className="relative isolate">
@@ -155,10 +150,7 @@ export async function Footer({ locale }: { readonly locale: AppLocale }) {
               <div className="mt-2 sm:mt-0">
                 {component.copyRight && (
                   <span>
-                    {component.copyRight.replace(
-                      '{YEAR}',
-                      new Date().getFullYear().toString()
-                    )}
+                    {component.copyRight.replace('{YEAR}', new Date().getFullYear().toString())}
                   </span>
                 )}
               </div>

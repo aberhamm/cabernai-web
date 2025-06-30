@@ -9,10 +9,7 @@ import { ClientCldImage } from './ClientCldImage'
 export function TabbedBanner({
   component,
 }: {
-  readonly component: Schema.Attribute.ComponentValue<
-    'sections.tabbed-banner',
-    false
-  >
+  readonly component: Schema.Attribute.ComponentValue<'sections.tabbed-banner', false>
 }) {
   const { tabs, subTitle, title } = component
   const [activeTab, setActiveTab] = useState(0)
@@ -22,12 +19,7 @@ export function TabbedBanner({
     <>
       <Head>
         {tabs?.map((tab, index) => (
-          <link
-            key={index}
-            rel="preload"
-            href={tab.image?.media.url}
-            as="image"
-          />
+          <link key={index} rel="preload" href={tab.image?.media.url} as="image" />
         ))}
       </Head>
       <div className="relative isolate">
@@ -52,7 +44,7 @@ export function TabbedBanner({
                       className={`block cursor-pointer whitespace-nowrap rounded-3xl border-0 px-4 py-2 text-base font-medium leading-6 ${
                         activeTab === index
                           ? 'bg-primary text-primary-foreground'
-                          : 'bg-transparent text-flint-gray hover:bg-primary hover:text-primary-foreground'
+                          : 'bg-transparent text-muted hover:bg-primary hover:text-primary-foreground'
                       }`}
                       onClick={() => setActiveTab(index)}
                     >

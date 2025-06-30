@@ -4,12 +4,10 @@ module.exports = {
   semi: false,
   singleQuote: true,
   tabWidth: 2,
+  printWidth: 100,
   trailingComma: 'es5',
   useTabs: false,
-  plugins: [
-    'prettier-plugin-packagejson',
-    '@ianvs/prettier-plugin-sort-imports',
-  ],
+  plugins: ['prettier-plugin-packagejson', '@ianvs/prettier-plugin-sort-imports'],
   importOrder: [
     '<BUILTIN_MODULES>',
     '',

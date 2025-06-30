@@ -17,6 +17,7 @@ import { Hero } from './components/Hero'
 import { HorizontalImages } from './components/HorizontalImagesSlider'
 import { ImageWithCTAButton } from './components/ImageWithCTAButton'
 import { Newsletter } from './components/Newsletter'
+import { Pricing } from './components/Pricing'
 import { StatisticsGrid } from './components/StatisticsGrid'
 import { TabbedBanner } from './components/TabbedBanner'
 import { WelcomeHero } from './components/WelcomeHero'
@@ -43,6 +44,7 @@ const printableComps: {
   'sections.feature-cta-grid': FeatureCTAGrid,
   'sections.benefits-cta-grid': BenefitsCTAGrid,
   'sections.tabbed-banner': TabbedBanner,
+  'sections.pricing': Pricing,
   // Add more components here
 }
 

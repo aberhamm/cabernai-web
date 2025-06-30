@@ -57,7 +57,8 @@
         "sections.statistics-grid",
         "sections.feature-cta-grid",
         "sections.benefits-cta-grid",
-        "sections.tabbed-banner"
+        "sections.tabbed-banner",
+        "sections.pricing"
       ],
       "pluginOptions": {
         "i18n": {

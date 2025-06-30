@@ -24,10 +24,7 @@ async function fetchData(locale: string) {
       { omitAuthorization: true }
     )
   } catch (e: any) {
-    console.error(
-      `Data for "api::navbar.navbar" content type wasn't fetched: `,
-      e?.message
-    )
+    console.error(`Data for "api::navbar.navbar" content type wasn't fetched: `, e?.message)
     return undefined
   }
 }
@@ -37,15 +34,11 @@ export async function PageBuilderNavbar({
   pageSpecificNavbar,
 }: {
   readonly locale: AppLocale
-  readonly pageSpecificNavbar?: Schema.Attribute.ComponentValue<
-    'layout.navbar',
-    false
-  > | null
+  readonly pageSpecificNavbar?: Schema.Attribute.ComponentValue<'layout.navbar', false> | null
 }) {
   removeThisWhenYouNeedMe('PageBuilderNavbar')
 
   const response = await fetchData(locale)
-  // console.log({ response })
   const component = response?.data
 
   const navbar = pageSpecificNavbar ?? component
@@ -83,10 +76,7 @@ export async function PageBuilderNavbar({
             gridColumnStart: 'logo',
           }}
         >
-          <a
-            className="flex items-center underline"
-            href="https://www.tidio.com/"
-          >
+          <a className="flex items-center underline" href="https://www.tidio.com/">
             <svg
               className="h-9 w-24 cursor-pointer"
               fill="none"
@@ -155,10 +145,7 @@ export async function PageBuilderNavbar({
           </div>
           <div className="mb-1 w-full overflow-hidden py-3 text-2xl text-white min-[1200px]:relative min-[1200px]:mb-0 min-[1200px]:w-[unset] min-[1200px]:p-[unset]">
             <div className="flex items-center min-[1200px]:pb-3 min-[1200px]:pl-0 min-[1200px]:pr-0 min-[1200px]:pt-3">
-              <a
-                className="w-full"
-                href="https://www.tidio.com/industry/ecommerce/"
-              >
+              <a className="w-full" href="https://www.tidio.com/industry/ecommerce/">
                 Ecommerce
               </a>
             </div>

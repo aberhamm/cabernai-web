@@ -5,123 +5,120 @@
 @layer base {
   :root {
     /* Brand Colors */
-    --cabernet-red: #7b2c2fff;
-    --cabernet-red-light: #985555;
-    --cabernet-red-dark: #5a1e20;
-    --cabernet-red-vibrant: #a53b3f;
-    --muted-gold: #c9a66bff;
-    --muted-gold-light: #d1aa6c;
-    --muted-gold-dark: #b48a41;
-    --mega-purple: #3c2f41ff;
-    --mega-purple-light: #634d6c;
-    --mega-purple-dark: #332739;
-    --flint-gray: #4a4a48ff;
-    --flint-gray-light: #747471;
-    --flint-gray-dark: #353533;
-    --ivory-white: #fdfdf5ff;
-
     --chocolate-cosmos: #540212ff;
+    --chocolate-cosmos--color-muted: #5a1e20ff;
     --rosewood: #6a0119ff;
     --burgundy: #800020ff;
     --claret: #6d0f2bff;
+    --garnet: #7b2c2fff;
+    --wine: #722f37ff;
+    --auburn: #a53b3fff;
+    --rose-taupe: #985555ff;
+    --english-violet: #634d6cff;
+    --dark-purple: #3c2f41ff;
+    --dark-purple--dark: #332739ff;
     --peach-yellow: #f6dda2ff;
     --dutch-white: #f9e8c0ff;
+    --baby-powder: #fdfdf5ff;
+    --white-smoke: #f5f5f5ff;
+    --ecru: #d1aa6cff;
+    --dark-goldenrod: #b48a41ff;
+    --myrtle-green: #2c7b78ff;
+    --davys-gray: #4a4a48ff;
+    --dim-gray: #747471ff;
+    --jet: #353533ff;
+    --baby-powder: #fdfdf5ff;
+    --eerie-black: #171717ff;
+    --kobicha: #7b512cff;
 
     /* Neutral Colors */
-    --white: var(--ivory-white);
-    --neutral: var(--flint-gray);
-    --black: '#171717';
+    --white: var(--baby-powder);
+    --neutral: var(--davys-gray);
+    --black: var(--eerie-black);
 
-    /* Background and Foreground */
-    --background: var(--ivory-white);
-    --foreground: var(--black);
+    /* Background and Foreground defaults */
+    --color-background: var(--white);
+    --color-background-alt: var(--white-smoke);
+    --color-foreground: var(--black);
 
     /* Cards and Popovers */
-    --card: var(--ivory-white);
-    --card-foreground: var(--flint-gray);
-    --popover: var(--ivory-white);
-    --popover-foreground: var(--flint-gray);
+    --color-card: var(--white);
+    --color-card-foreground: var(--davys-gray);
+    --color-popover: var(--white);
+    --color-popover-foreground: var(--davys-gray);
 
     /* Primary Colors */
-    --primary: var(--cabernet-red);
-    --primary-foreground: var(--ivory-white);
-    --primary-gradient: linear-gradient(
-      to top left,
-      var(--cabernet-red) 0%,
-      var(--cabernet-red-dark) 100%
-    );
+    --color-primary: var(--garnet);
+    --color-primary-light: var(--rose-taupe);
+    --color-primary-dark: var(--chocolate-cosmos--color-muted);
+    --color-primary-foreground: var(--white); /* Main text color */
+    --color-primary-gradient: linear-gradient(to top left, var(--wine) 0%, var(--chocolate-cosmos--color-muted) 100%);
 
     /* Secondary Colors */
-    --secondary: var(--peach-yellow);
-    --secondary-foreground: var(--neutral-900);
-    --secondary-gradient: linear-gradient(
-      to top left,
-      var(--muted-gold) 0%,
-      var(--peach-yellow) 100%
-    );
+    --color-secondary: var(--peach-yellow);
+    --color-secondary-light: var(--dutch-white);
+    --color-secondary-dark: var(--ecru);
+    --color-secondary-foreground: var(--neutral-900); /* Text color for secondary backgrounds */
+    --color-secondary-gradient: linear-gradient(to top left, var(--ecru) 0%, var(--peach-yellow) 100%);
 
     /* Tertiary Colors */
-    --tertiary: var(--mega-purple-light);
-    --tertiary-foreground: var(--neutral-900);
-    --tertiary-gradient: linear-gradient(
-      to top left,
-      var(--mega-purple) 0%,
-      var(--mega-purple-dark) 100%
-    );
+    --color-tertiary: var(--english-violet);
+    --color-tertiary-foreground: var(--white); /* Text color for tertiary backgrounds */
+    --color-tertiary-gradient: linear-gradient(to top left, var(--dark-purple) 0%, var(--dark-purple--dark) 100%);
 
     /* Muted Colors */
-    --muted: var(--flint-gray);
-    --muted-foreground: var(--ivory-white);
+    --color-muted: var(--davys-gray);
+    --color-muted-foreground: var(--white);
 
     /* Accent Colors */
-    --accent: var(--mega-purple);
-    --accent-foreground: var(--ivory-white);
+    --color-accent: var(--dark-purple);
+    --color-accent-foreground: var(--white);
 
     /* Destructive (Alert) Colors */
-    --destructive: 0 84.2% 60.2%; /* Keep red for contrast */
-    --destructive-foreground: var(--ivory-white);
+    --color-destructive: 0 84.2% 60.2%; /* Keep red for contrast */
+    --color-destructive-foreground: var(--white);
 
     /* Borders, Input, and Ring Highlights */
-    --border: var(--mega-purple);
-    --input: var(--flint-gray);
-    --ring: var(--cabernet-red);
+    --color-border: var(--dark-purple);
+    --color-input: var(--davys-gray);
+    --color-ring: var(--garnet);
 
     /* Radius */
     --radius: 1rem;
 
     /* Attention/Warning */
-    --warning: 33 100% 50%; /* Amber tone for warnings */
-    --warning-foreground: var(--ivory-white);
+    --color-warning: 33 100% 50%; /* Amber tone for warnings */
+    --color-warning-foreground: var(--white);
   }
 
   /* Dark Mode */
   .dark {
-    --background: var(--mega-purple);
-    --foreground: var(--ivory-white);
+    --color-background: var(--dark-purple);
+    --color-foreground: var(--white);
 
-    --card: var(--mega-purple);
-    --card-foreground: var(--ivory-white);
-    --popover: var(--mega-purple);
-    --popover-foreground: var(--ivory-white);
+    --color-card: var(--dark-purple);
+    --color-card-foreground: var(--white);
+    --color-popover: var(--dark-purple);
+    --color-popover-foreground: var(--white);
 
-    --primary: var(--cabernet-red);
-    --primary-foreground: var(--ivory-white);
+    --color-primary: var(--garnet);
+    --color-primary-foreground: var(--white);
 
-    --secondary: var(--muted-gold);
-    --secondary-foreground: var(--flint-gray);
+    --color-secondary: var(--ecru);
+    --color-secondary-foreground: var(--davys-gray);
 
-    --muted: var(--flint-gray);
-    --muted-foreground: var(--muted-gold);
+    --color-muted: var(--davys-gray);
+    --color-muted-foreground: var(--ecru);
 
-    --accent: var(--muted-gold);
-    --accent-foreground: var(--ivory-white);
+    --color-accent: var(--ecru);
+    --color-accent-foreground: var(--white);
 
-    --destructive: 0 62.8% 30.6%; /* Darker red for dark mode */
-    --destructive-foreground: var(--ivory-white);
+    --color-destructive: 0 62.8% 30.6%; /* Darker red for dark mode */
+    --color-destructive-foreground: var(--white);
 
-    --border: var(--muted-gold);
-    --input: var(--flint-gray);
-    --ring: var(--cabernet-red);
+    --color-border: var(--ecru);
+    --color-input: var(--davys-gray);
+    --color-ring: var(--garnet);
   }
 }
 
@@ -164,139 +161,5 @@
 }
 
 .bg-gradient-slider {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgba(255, 255, 255, 0) 31%,
-    rgba(255, 255, 255, 0) 69.5%,
-    rgba(255, 255, 255, 0.8) 100%
-  ) !important;
-}
-
-@media (max-width: calc(603px)) {
-  #svg-1 {
-    display: none !important;
-  }
-}
-
-@media (max-width: calc(1023px)) {
-  #nav-1 {
-    display: none !important;
-    left: 0px !important;
-    padding-top: 24px !important;
-    padding-right: 24px !important;
-    padding-bottom: 40px !important;
-    padding-left: 24px !important;
-    position: absolute !important;
-    top: 100% !important;
-    width: 100% !important;
-  }
-
-  #a-1 {
-    width: 100% !important;
-  }
-
-  #a-2 {
-    width: 100% !important;
-  }
-}
-
-@media (min-width: 768px) {
-  #div-1 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-2 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-3 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-4 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-5 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-6 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-7 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-8 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-9 {
-    grid-column-start: span 3 !important;
-  }
-
-  #div-10 {
-    grid-column-start: span 1 !important;
-  }
-
-  #div-11 {
-    grid-column-start: span 1 !important;
-  }
-
-  #div-12 {
-    grid-column-start: span 1 !important;
-  }
-
-  #div-13 {
-    grid-column-start: span 1 !important;
-  }
-
-  #div-14 {
-    grid-column-start: span 1 !important;
-  }
-
-  #div-15 {
-    grid-column-start: span 1 !important;
-  }
-}
-
-@media (min-width: 1024px) {
-  #div-1 {
-    grid-column-start: span 2 !important;
-  }
-
-  #div-2 {
-    grid-column-start: span 2 !important;
-  }
-
-  #div-3 {
-    grid-column-start: span 2 !important;
-  }
-
-  #div-4 {
-    grid-column-start: span 2 !important;
-  }
-
-  #div-5 {
-    grid-column-start: span 2 !important;
-  }
-
-  #div-6 {
-    grid-column-start: span 2 !important;
-  }
-
-  #div-7 {
-    grid-column-start: span 2 !important;
-  }
-
-  #div-8 {
-    grid-column-start: span 2 !important;
-  }
-
-  #div-9 {
-    grid-column-start: span 2 !important;
-  }
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 31%, rgba(255, 255, 255, 0) 69.5%, rgba(255, 255, 255, 0.8) 100%) !important;
 }
