@@ -34,9 +34,13 @@ export const env = createEnv({
   client: {
     // Required in production, optional during development/CI
     NEXT_PUBLIC_APP_PUBLIC_URL:
-      process.env.NODE_ENV === 'production' ? z.string().url() : z.string().url().optional(),
+      process.env.NODE_ENV === 'production' && !process.env.CI
+        ? z.string().url()
+        : z.string().url().optional(),
     NEXT_PUBLIC_STRAPI_URL:
-      process.env.NODE_ENV === 'production' ? z.string().url() : z.string().url().optional(),
+      process.env.NODE_ENV === 'production' && !process.env.CI
+        ? z.string().url()
+        : z.string().url().optional(),
     NEXT_PUBLIC_PREVENT_UNUSED_FUNCTIONS_ERROR_LOGS: optionalZodBoolean,
     NEXT_PUBLIC_NODE_ENV: z.string().optional(),
     NEXT_PUBLIC_REVALIDATE: z.number().or(z.literal(false)).optional(),

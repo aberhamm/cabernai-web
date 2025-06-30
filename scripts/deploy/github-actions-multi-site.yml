@@ -35,14 +35,19 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Lint code
-        run: yarn lint
+        run: NODE_ENV=development yarn lint
 
       - name: Type check
         run: |
-          cd apps/ui && yarn typecheck
-          cd ../strapi && yarn generate:types
+          cd apps/ui && NODE_ENV=development yarn typecheck
+          cd ../strapi && NODE_ENV=development yarn generate:types
 
       - name: Build applications
+        env:
+          # Production environment variables for build
+          NEXT_PUBLIC_APP_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_APP_PUBLIC_URL }}
+          NEXT_PUBLIC_STRAPI_URL: ${{ secrets.NEXT_PUBLIC_STRAPI_URL }}
+          NODE_ENV: production
         run: yarn build
 
   deploy:
