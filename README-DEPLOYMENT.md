@@ -122,7 +122,7 @@ Run the setup script:
 
 ```bash
 # Copy the setup script to your droplet
-curl -o setup-droplet.sh https://raw.githubusercontent.com/your-repo/cabernai-web/main/scripts/deploy/setup-droplet.sh
+curl -o setup-droplet.sh https://raw.githubusercontent.com/aberhamm/cabernai-web/refs/heads/main/scripts/deploy/setup-droplet.sh
 chmod +x setup-droplet.sh
 
 # Run the setup (as root)
@@ -254,7 +254,7 @@ Instead of taking over the entire server:
 
 ```bash
 # On your droplet (as root)
-curl -o setup-existing-droplet.sh https://raw.githubusercontent.com/your-repo/cabernai-web/main/scripts/deploy/setup-existing-droplet.sh
+curl -o setup-existing-droplet.sh https://raw.githubusercontent.com/aberhamm/cabernai-web/refs/heads/main/scripts/deploy/setup-existing-droplet.sh
 chmod +x setup-existing-droplet.sh
 sudo ./setup-existing-droplet.sh
 ```
