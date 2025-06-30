@@ -186,61 +186,178 @@ jobs:
           "
 
       - name: Deploy application (Multi-Site)
+        timeout-minutes: 45  # Set timeout for entire deployment
         run: |
+          echo "🚀 Starting multi-site deployment..."
+          echo "⏱️  Deployment timeout: 45 minutes"
+          echo "📊 Deployment started at: $(date)"
+
           ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
             cd /opt/${{ env.PROJECT_NAME }}
+
+            # Show initial system status
+            echo '📊 System status before deployment:'
+            df -h /opt
+            free -h
+            docker system df || true
 
             # Make scripts executable
             chmod +x scripts/deploy/deploy-multi-site.sh
 
-            # Run MULTI-SITE deployment
+            # Run MULTI-SITE deployment with verbose logging
+            echo '🚀 Starting deployment script...'
             ./scripts/deploy/deploy-multi-site.sh production
           "
 
+          echo "✅ Deployment script completed at: $(date)"
+
       - name: Verify deployment
+        timeout-minutes: 10  # Set timeout for verification
         run: |
-          # Wait for services to start
-          sleep 60
+          echo "🔍 Starting deployment verification..."
+          echo "⏱️  Verification timeout: 10 minutes"
+          echo "📊 Verification started at: $(date)"
 
-          # Check if services are responding
-          if curl -f -s https://${{ vars.DOMAIN_NAME }}/health; then
-            echo '✅ UI is responding'
-          else
-            echo '❌ UI is not responding'
-            exit 1
-          fi
+          # Progressive verification with better logging
+          echo "⏳ Waiting for services to fully initialize..."
+          for i in {1..12}; do
+            echo "🔍 Verification attempt $i/12 (waiting ${i}0 seconds total)..."
+            sleep 10
 
-          if curl -f -s https://${{ vars.DOMAIN_NAME }}/api/health; then
-            echo '✅ API is responding'
-          else
-            echo '❌ API is not responding'
-            exit 1
-          fi
+            # Quick check if containers are running
+            ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+              echo '📊 Container status:'
+              cd /opt/${{ env.PROJECT_NAME }}
+              docker-compose -f docker-compose.multi-site.yml ps
+            "
 
-          # Verify local ports are bound (multi-site specific)
+            # Test local endpoints first (faster)
+            echo "🔍 Testing local endpoints..."
+            if ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+              curl -f -s --max-time 5 http://127.0.0.1:3000/ > /dev/null &&
+              curl -f -s --max-time 5 http://127.0.0.1:1337/ > /dev/null
+            "; then
+              echo "✅ Local endpoints responding, testing public endpoints..."
+              break
+            elif [[ $i -eq 12 ]]; then
+              echo "❌ Local endpoints not responding after 2 minutes"
+              ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+                cd /opt/${{ env.PROJECT_NAME }}
+                echo '📋 Container logs:'
+                docker-compose -f docker-compose.multi-site.yml logs --tail=30
+              "
+              exit 1
+            else
+              echo "⏳ Services still initializing..."
+            fi
+          done
+
+          # Test public endpoints
+          echo "🌐 Testing public endpoints..."
+
+          # Test UI through domain
+          for attempt in {1..5}; do
+            if curl -f -s --max-time 10 https://${{ vars.DOMAIN_NAME }}/ > /dev/null; then
+              echo "✅ UI is responding via https://${{ vars.DOMAIN_NAME }}/"
+              break
+            elif [[ $attempt -eq 5 ]]; then
+              echo "❌ UI is not responding via public domain"
+              exit 1
+            else
+              echo "⏳ UI not ready via public domain, attempt $attempt/5..."
+              sleep 15
+            fi
+          done
+
+          # Test API through domain
+          for attempt in {1..5}; do
+            if curl -f -s --max-time 10 https://${{ vars.DOMAIN_NAME }}/api/ > /dev/null; then
+              echo "✅ API is responding via https://${{ vars.DOMAIN_NAME }}/api/"
+              break
+            elif [[ $attempt -eq 5 ]]; then
+              echo "❌ API is not responding via public domain"
+              exit 1
+            else
+              echo "⏳ API not ready via public domain, attempt $attempt/5..."
+              sleep 15
+            fi
+          done
+
+          # Final verification of local ports
+          echo "🔍 Final verification of local ports..."
           ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
-            if curl -f -s http://127.0.0.1:3000/ > /dev/null; then
+            if curl -f -s --max-time 5 http://127.0.0.1:3000/ > /dev/null; then
               echo '✅ UI running on localhost:3000'
             else
               echo '❌ UI not accessible on localhost:3000'
               exit 1
             fi
 
-            if curl -f -s http://127.0.0.1:1337/ > /dev/null; then
+            if curl -f -s --max-time 5 http://127.0.0.1:1337/ > /dev/null; then
               echo '✅ Strapi running on localhost:1337'
             else
               echo '❌ Strapi not accessible on localhost:1337'
               exit 1
             fi
+
+            echo '📊 Final system status:'
+            df -h /opt
+            docker system df
           "
+
+          echo "✅ Deployment verification completed at: $(date)"
 
       - name: Notify deployment success
         if: success()
         run: echo "🚀 Multi-Site Deployment successful!"
 
+      - name: Debug deployment failure
+        if: failure()
+        run: |
+          echo "❌ Multi-Site Deployment failed!"
+          echo "📊 Collecting debug information..."
+
+          # Collect system information
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            echo '=== SYSTEM STATUS ==='
+            date
+            uptime
+            df -h
+            free -h
+
+            echo '=== DOCKER STATUS ==='
+            docker --version
+            docker-compose --version
+            docker system df
+            docker images | head -10
+
+            echo '=== CONTAINER STATUS ==='
+            cd /opt/${{ env.PROJECT_NAME }} || exit 1
+            docker-compose -f docker-compose.multi-site.yml ps
+
+            echo '=== CONTAINER LOGS (last 50 lines each) ==='
+            docker-compose -f docker-compose.multi-site.yml logs --tail=50 ui || true
+            docker-compose -f docker-compose.multi-site.yml logs --tail=50 strapi || true
+
+            echo '=== NGINX STATUS ==='
+            systemctl status nginx || true
+            nginx -t || true
+            ls -la /etc/nginx/sites-enabled/ || true
+
+            echo '=== NETWORK STATUS ==='
+            netstat -tulpn | grep -E ':(80|443|3000|1337)' || true
+
+            echo '=== RECENT SYSTEM LOGS ==='
+            journalctl --since '10 minutes ago' --no-pager | tail -50 || true
+          " || echo "Failed to collect debug information"
+
       - name: Notify deployment failure
         if: failure()
         run: |
           echo "❌ Multi-Site Deployment failed!"
-          echo "Check that you have run setup-existing-droplet.sh first"
-          echo "and that your existing nginx configuration is compatible"
+          echo "📋 Common issues to check:"
+          echo "1. Run setup-existing-droplet.sh first for multi-site setup"
+          echo "2. Ensure nginx is properly configured for multi-site"
+          echo "3. Check that ports 3000 and 1337 are available"
+          echo "4. Verify sufficient disk space and memory"
+          echo "5. Check the debug information above for specific errors"

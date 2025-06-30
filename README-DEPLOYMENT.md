@@ -566,6 +566,7 @@ For multi-site GitHub Actions automation:
    ```
 
    **This workflow includes:**
+
    - ✅ Multi-site environment verification
    - ✅ Checks for existing nginx setup
    - ✅ Uses `deploy-multi-site.sh` script
@@ -1160,3 +1161,130 @@ If you have an existing deployment with multiple env files:
 3. Remove old package-level env files (no longer needed for production)
 
 This change makes the deployment process **significantly simpler** while maintaining full functionality!
+
+# 🔧 Deployment Troubleshooting
+
+## Deployment Timeouts
+
+If your deployment is taking too long (over 30-45 minutes), here's what to check:
+
+### **Debug Logging Added**
+
+The deployment scripts now include comprehensive debug logging:
+
+- ⏱️ **Timestamps** on all log messages
+- 📊 **System resource monitoring** (disk, memory, Docker usage)
+- 🔍 **Progress updates** every 30 seconds during builds
+- ⚠️ **Timeout controls** with automatic fallbacks
+- 📋 **Container logs** when failures occur
+- 🌐 **Network status** and port checking
+
+### **Timeout Settings**
+
+| Operation       | Timeout    | Description                   |
+| --------------- | ---------- | ----------------------------- |
+| Docker Build    | 30 minutes | Building UI and Strapi images |
+| Service Startup | 5 minutes  | Starting containers           |
+| Health Checks   | 3 minutes  | Testing service availability  |
+| GitHub Actions  | 45 minutes | Total deployment time         |
+| Verification    | 10 minutes | Post-deployment testing       |
+
+### **Common Timeout Causes**
+
+1. **Insufficient Resources:**
+
+   ```bash
+   # Check available resources
+   df -h /opt
+   free -h
+   docker system df
+   ```
+
+2. **Network Issues:**
+
+   ```bash
+   # Test connectivity
+   curl -I https://registry-1.docker.io/
+   ```
+
+3. **Docker Build Cache:**
+
+   ```bash
+   # Clear build cache if needed
+   docker builder prune -f
+   docker system prune -f
+   ```
+
+4. **Concurrent Builds:**
+   - Parallel builds may fail on low-memory systems
+   - Script automatically falls back to sequential builds
+
+### **Monitoring During Deployment**
+
+Watch deployment progress in real-time:
+
+```bash
+# Follow deployment logs
+ssh deploy@your-server "
+  cd /opt/cabernai-web
+  docker-compose -f docker-compose.multi-site.yml logs -f
+"
+
+# Monitor system resources
+ssh deploy@your-server "
+  watch 'df -h /opt && echo && free -h && echo && docker system df'
+"
+```
+
+### **If Deployment Fails**
+
+The GitHub Actions workflow now automatically collects debug information:
+
+- System status and resource usage
+- Docker and container status
+- Application logs (last 50 lines)
+- Nginx configuration and status
+- Network port usage
+- Recent system logs
+
+This information appears in the GitHub Actions logs under "Debug deployment failure".
+
+### **Manual Recovery**
+
+If deployment gets stuck:
+
+```bash
+# Connect to server
+ssh deploy@your-server
+
+# Check what's running
+cd /opt/cabernai-web
+docker-compose -f docker-compose.multi-site.yml ps
+
+# Stop everything
+docker-compose -f docker-compose.multi-site.yml down --timeout 30
+
+# Clean up if needed
+docker system prune -f
+
+# Restart deployment
+./scripts/deploy/deploy-multi-site.sh production
+```
+
+### **Performance Optimization**
+
+For faster deployments:
+
+1. **Use Docker Build Cache:**
+
+   - Remove `--no-cache` flag for subsequent deploys
+   - Only use `--no-cache` for clean deployments
+
+2. **Increase Server Resources:**
+
+   - Minimum: 2 GB RAM, 20 GB disk
+   - Recommended: 4 GB RAM, 40 GB disk
+
+3. **Monitor Build Progress:**
+   - Scripts now show progress every 30 seconds
+   - Resource usage displayed every 2 minutes
