@@ -59,7 +59,6 @@ RUN apk update && apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 # First install dependencies (as they change less often)
-COPY .gitignore .gitignore
 COPY --from=pruned /app/out/json/ .
 COPY --from=pruned /app/out/yarn.lock ./yarn.lock
 
