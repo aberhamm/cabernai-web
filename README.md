@@ -30,7 +30,7 @@ This is a ready-to-go starter template for Strapi projects. It combines the powe
 - **Code quality**: Out-of-the-box ESLint, Prettier, and TypeScript configurations in shareable packages
 - **Husky**: Pre-commit hooks for linting, formatting and commit message validation
 - **Commitizen**: Commitizen for conventional commits and their generation
-- **DigitalOcean ready**: Ready to deploy to DigitalOcean with automated scripts
+- **DigitalOcean ready**: Ready to deploy to DigitalOcean with automated scripts and troubleshooting tools
 - ... and much more is waiting for you to discover! Check [UI README.md](apps/ui/README.md) and [Strapi README.md](apps/strapi/README.md) for more details.
 
 ## 📦 What's inside?
@@ -130,6 +130,7 @@ Husky is installed by default and configured to run following tasks:
 ### Deployment
 
 - `./scripts/deploy/` - **DigitalOcean deployment scripts** for automated production deployment. See [README-DEPLOYMENT.md](README-DEPLOYMENT.md) for complete guide.
+- `./scripts/deploy/fix-github-actions.sh` - **Troubleshooting script** to fix common GitHub Actions deployment issues.
 
 ## 💙 Feedback
 

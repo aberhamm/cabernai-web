@@ -115,6 +115,11 @@ setup_user() {
     usermod -aG docker $DEPLOY_USER
     usermod -aG sudo $DEPLOY_USER
 
+    # Configure passwordless sudo for deploy user
+    echo_info "Configuring passwordless sudo for deploy user..."
+    echo "$DEPLOY_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$DEPLOY_USER
+    chmod 0440 /etc/sudoers.d/$DEPLOY_USER
+
     # Set up SSH key for deploy user (you'll need to add your public key)
     mkdir -p /home/$DEPLOY_USER/.ssh
     chmod 700 /home/$DEPLOY_USER/.ssh
@@ -124,6 +129,8 @@ setup_user() {
 
     chown -R $DEPLOY_USER:$DEPLOY_USER /home/$DEPLOY_USER/.ssh
     chmod 600 /home/$DEPLOY_USER/.ssh/authorized_keys
+
+    echo_info "✓ Deploy user configured with passwordless sudo"
 }
 
 setup_node() {
@@ -300,6 +307,8 @@ main() {
     echo_warn "3. Copy .env.production to /opt/$PROJECT_NAME/.env and configure it"
     echo_warn "4. Run deployment: ./scripts/deploy/deploy.sh production"
     echo_warn "5. Set up SSL: certbot --nginx -d your-domain.com"
+    echo ""
+    echo_info "✅ Deploy user has passwordless sudo configured for GitHub Actions"
 }
 
 main "$@"

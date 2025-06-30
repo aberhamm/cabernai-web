@@ -175,6 +175,11 @@ setup_deploy_user() {
     usermod -aG docker $DEPLOY_USER
     usermod -aG sudo $DEPLOY_USER
 
+    # Configure passwordless sudo for deploy user
+    echo_info "Configuring passwordless sudo for deploy user..."
+    echo "$DEPLOY_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$DEPLOY_USER
+    chmod 0440 /etc/sudoers.d/$DEPLOY_USER
+
     # Set up SSH directory
     mkdir -p /home/$DEPLOY_USER/.ssh
     chmod 700 /home/$DEPLOY_USER/.ssh
@@ -185,6 +190,7 @@ setup_deploy_user() {
     chmod 600 /home/$DEPLOY_USER/.ssh/authorized_keys
     chown $DEPLOY_USER:$DEPLOY_USER /home/$DEPLOY_USER/.ssh/authorized_keys
 
+    echo_info "✓ Deploy user configured with passwordless sudo"
     echo_warn "Don't forget to add your SSH public key to /home/$DEPLOY_USER/.ssh/authorized_keys"
 }
 
@@ -376,6 +382,7 @@ main() {
     echo_warn "4. Run deployment: ./scripts/deploy/deploy-multi-site.sh production"
     echo_warn "5. Set up SSL certificates for your domains"
     echo ""
+    echo_info "✅ Deploy user has passwordless sudo configured for GitHub Actions"
     echo_info "The system is now ready for Cabernai Web deployment alongside your existing sites!"
 }
 
