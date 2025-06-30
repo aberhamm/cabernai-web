@@ -135,12 +135,16 @@ deploy_to_server() {
     sudo mkdir -p /opt/$PROJECT_NAME
     cd /opt/$PROJECT_NAME
 
-    # Check if .env file exists
+        # Check if root .env file exists (using env_file directive)
     if [[ ! -f .env ]]; then
-        echo_error ".env file not found!"
-        echo "Please copy .env.example to .env and configure it"
+        echo_error "Root .env file not found!"
+        echo ""
+        echo "✨ With the new env_file directive, you only need ONE .env file!"
+        echo "Please run './scripts/deploy/env-generator.sh' to create it"
         exit 1
     fi
+
+    echo_info "✅ Found .env file - using env_file directive for clean multi-site deployment"
 
     # Check for existing services and conflicts
     check_existing_services
@@ -183,10 +187,24 @@ deploy_to_server() {
 deploy_from_local() {
     echo_info "Deploying from local machine to $SSH_HOST..."
 
+        # Check if root .env file exists locally (using env_file directive)
+    if [[ ! -f .env ]]; then
+        echo_error "Root .env file not found locally!"
+        echo ""
+        echo "✨ With the new env_file directive, you only need ONE .env file!"
+        echo "Please run './scripts/deploy/env-generator.sh' to create it"
+        exit 1
+    fi
+
+    echo_info "✅ Found .env file locally - using env_file directive for clean deployment"
+
     # Copy files to server
     echo_info "Copying project files..."
     rsync -avz --exclude node_modules --exclude .git \
         ./ $DEPLOY_USER@$SSH_HOST:/opt/$PROJECT_NAME/
+
+    echo_info "✓ Copied all files including:"
+    echo_info "  - .env (automatically loaded into all containers via env_file directive)"
 
     # Copy the multi-site docker compose file
     scp docker-compose.multi-site.yml $DEPLOY_USER@$SSH_HOST:/opt/$PROJECT_NAME/

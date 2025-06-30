@@ -43,7 +43,9 @@ _[After this preparation is done, delete this section]_
 
 ### Environment variables
 
-Copy & rename `.env.local.example` to `.env.local` and fill or update in the values.
+**For Production Deployment:** Use the unified environment approach via `scripts/deploy/env-generator.sh` from the project root. This creates a single comprehensive `.env` file that automatically loads into both Strapi and UI containers. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for complete deployment guide.
+
+**For Local Development:** Copy & rename `.env.local.example` to `.env.local` in this directory and fill or update the values.
 
 ### Run locally in dev mode (with hot-reloading)
 
@@ -69,7 +71,10 @@ To build and run NextJS in Docker container use [Dockerfile](Dockerfile) prepare
 docker build -t ui:latest -f apps/ui/Dockerfile .
 
 # run container using image
-docker run -it --rm --name ui -p 3000:3000 --env-file apps/ui/.env ui:latest
+docker run -it --rm --name ui -p 3000:3000 --env-file apps/ui/.env.local ui:latest
+
+# For production deployment, the root .env file is used instead:
+# docker run -it --rm --name ui -p 3000:3000 --env-file .env ui:latest
 ```
 
 To change port, set `PORT` env variable in `.env` file and in `docker run` command (`-p` flag means port mapping between host:container).
@@ -92,7 +97,20 @@ In this starter template, we use ISR with time-based revalidation by default. Re
 
 [More information about ISR](https://nextjs.org/docs/app/building-your-application/data-fetching/incremental-static-regeneration)
 
-## 🚢 Deploy to Heroku
+## 🚢 Deploy to Production
+
+**Recommended: DigitalOcean Deployment**
+
+Use the automated deployment scripts for DigitalOcean with Supabase database. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for the complete guide with:
+
+- Automated environment variable generation
+- Docker-based deployment with nginx reverse proxy
+- SSL certificate setup
+- GitHub Actions CI/CD integration
+
+The production deployment uses `standalone` output mode for optimal Docker container performance.
+
+**Legacy: Heroku Deployment**
 
 Use buildpacks and setup scripts from [this @notum-cz repository](https://github.com/notum-cz/heroku-scripts). Working `output` mode for app built and served from Heroku is default - `undefined`. App contains all files/dependencies and is started using `next start`.
 
@@ -233,7 +251,9 @@ import { Link, useRouter, redirect } from "next/navigation"
 
 ### Environment variables
 
-Define them in `.env.local.example`, `.env.local` and `src/env.mjs` file where [@t3-oss/env-nextjs](https://github.com/t3-oss/t3-env) validation package is used. This package is used to validate and type-check environment variables.
+**For Local Development:** Define them in `.env.local.example`, `.env.local` and `src/env.mjs` file where [@t3-oss/env-nextjs](https://github.com/t3-oss/t3-env) validation package is used. This package is used to validate and type-check environment variables.
+
+**For Production Deployment:** The unified environment approach automatically provides all necessary variables to the UI container via Docker Compose's `env_file` directive. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for details.
 
 Usage:
 

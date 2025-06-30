@@ -30,7 +30,7 @@ This is a ready-to-go starter template for Strapi projects. It combines the powe
 - **Code quality**: Out-of-the-box ESLint, Prettier, and TypeScript configurations in shareable packages
 - **Husky**: Pre-commit hooks for linting, formatting and commit message validation
 - **Commitizen**: Commitizen for conventional commits and their generation
-- **Heroku ready**: Ready to deploy to Heroku in a few steps
+- **DigitalOcean ready**: Ready to deploy to DigitalOcean with automated scripts
 - ... and much more is waiting for you to discover! Check [UI README.md](apps/ui/README.md) and [Strapi README.md](apps/strapi/README.md) for more details.
 
 ## 📦 What's inside?
@@ -54,7 +54,8 @@ This is a ready-to-go starter template for Strapi projects. It combines the powe
 - In root `package.json` change `name` and `description` according to new project name. Optionally change names in apps and packages too. Keep `@repo` prefix if you don't prefer different scope/company.
 - Modify `README.md` files of apps to be less general (eg. update projects names, customize tech stack). Project-specific READMEs should not contain general leftovers from the template.
 - Follow "How to use this project template?" section in `apps/` READMEs to set up each app.
-- If not deploying to Heroku, remove `Procfile`(s) from repository.
+- See [README-DEPLOYMENT.md](README-DEPLOYMENT.md) for complete DigitalOcean deployment guide.
+- If not using Heroku legacy support, remove `Procfile`(s) from repository.
 
 _[After this preparation is done, delete this section from README]_
 
@@ -125,6 +126,10 @@ Husky is installed by default and configured to run following tasks:
 ### Heroku
 
 - `./scripts/heroku/heroku-postbuild.sh` - Script for Heroku deployment to decide which app to build. It can be removed if not deploying to Heroku.
+
+### Deployment
+
+- `./scripts/deploy/` - **DigitalOcean deployment scripts** for automated production deployment. See [README-DEPLOYMENT.md](README-DEPLOYMENT.md) for complete guide.
 
 ## 💙 Feedback
 

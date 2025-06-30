@@ -31,13 +31,16 @@ This is a [Stapi v5](https://strapi.io/) project bootstrapped with TypeScript us
 
 - Remove packages you don't need from `package.json` and reinstall dependencies.
 - In `docker-compose.yml` change top-level name "dev-templates" (optionally network name too) according to project name to overcome name clashes in dev's computers.
-- For Heroku deployment you have to create S3 bucket and set up ENV variables (Heroku removes uploaded files after dyno restart).
+- For production deployment, it's recommended to use external file storage (Cloudinary or AWS S3) as configured in the deployment guide.
+- For legacy Heroku deployment you have to create S3 bucket and set up ENV variables (Heroku removes uploaded files after dyno restart).
 
 _[After this preparation is done, delete this section]_
 
 ### Environment variables
 
-Copy & rename `.env.example` to `.env` and fill or update the values (most of the values are already set to default values, but you probably want to tweak them for your needs).
+**For Production Deployment:** Use the unified environment approach via `scripts/deploy/env-generator.sh` from the project root. This creates a single comprehensive `.env` file that automatically loads into both Strapi and UI containers. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for complete deployment guide.
+
+**For Local Development:** Copy & rename `.env.example` to `.env` in this directory and fill or update the values (most values are already set to defaults, but you may want to tweak them for your needs).
 
 ### Run locally in dev mode (with hot-reloading)
 
@@ -94,6 +97,9 @@ docker build -t strapi:latest -f apps/strapi/Dockerfile --build-arg APP_URL=http
 
 # run container using image
 docker run -it --rm --name strapi -p 1337:1337 --env-file apps/strapi/.env strapi:latest
+
+# For production deployment, the root .env file is used instead:
+# docker run -it --rm --name strapi -p 1337:1337 --env-file .env strapi:latest
 ```
 
 To change port, set `PORT` env variable in `.env` file and in `docker run` command (`-p` flag means port mapping between host:container).
@@ -109,11 +115,25 @@ docker compose up -d db
 # run Strapi in docker and connect to same network. In docker-compose.yml there is a "db_network" network already defined, so you don't need to create it manually again, but just reference it in this run command
 docker run -it --rm --name strapi -p 1337:1337 --env-file apps/strapi/.env --network=dev-templates_db_network strapi:latest
 
+# For production deployment, the root .env file is used instead:
+# docker run -it --rm --name strapi -p 1337:1337 --env-file .env --network=dev-templates_db_network strapi:latest
+
 # set DATABASE_HOST or DATABASE_URL for Strapi in .env file - host should be set to "db" (name of the Postgres service in docker-compose.yml) or to IP of the host machine instead of "0.0.0.0"
 DATABASE_HOST=db
 ```
 
-## 🚢 Deploy to Heroku
+## 🚢 Deploy to Production
+
+**Recommended: DigitalOcean Deployment**
+
+Use the automated deployment scripts for DigitalOcean with Supabase database. See [README-DEPLOYMENT.md](../../README-DEPLOYMENT.md) for the complete guide with:
+
+- Automated environment variable generation
+- Docker-based deployment with nginx reverse proxy
+- SSL certificate setup
+- GitHub Actions CI/CD integration
+
+**Legacy: Heroku Deployment**
 
 Use buildpacks and setup scripts from [this @notum-cz repository](https://github.com/notum-cz/heroku-scripts). `DATABASE_URL` connection string is provided by Heroku Postgres addon automatically.
 
@@ -127,7 +147,9 @@ User-permissions, seo and config-sync plugins are enabled by default. Sentry plu
 
 #### AWS S3 caveats
 
-In Heroku deployments you always should use S3 (or different external) storage instead of default local upload directory. Heroku resets dyno periodically (at least once a day or after every re-deploy) and so all uploaded files are removed.
+**For production deployments** (DigitalOcean, Heroku, etc.), always use external storage (Cloudinary/S3) instead of the default local upload directory. Cloud platforms may reset storage periodically, removing uploaded files. The deployment guide includes Cloudinary configuration which is simpler than S3 setup.
+
+In Heroku deployments specifically, you always should use S3 (or different external) storage instead of default local upload directory. Heroku resets dyno periodically (at least once a day or after every re-deploy) and so all uploaded files are removed.
 
 Steps:
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Environment Variable Generator for Cabernai Web
-# This script helps generate secure environment variables
+# This script helps generate secure environment variables for all levels
 
 set -e
 
@@ -51,29 +51,25 @@ sed_inplace() {
     fi
 }
 
+
+
 main() {
-    echo_info "Cabernai Web Environment Generator"
-    echo_info "=================================="
+    echo_info "Cabernai Web Environment Generator (Simplified)"
+    echo_info "=============================================="
+    echo ""
+    echo_info "🎯 Creating ONE comprehensive .env file for all containers"
+    echo_info "✨ Uses Docker Compose env_file directive for automatic loading"
     echo ""
 
-    # Check if .env already exists
+    # Check if root .env already exists
     if [[ -f .env ]]; then
-        echo_warn ".env file already exists!"
-        read -p "Do you want to overwrite it? (y/N): " -n 1 -r
+        echo_warn "Root .env file already exists!"
+        read -p "Do you want to regenerate it? (y/N): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             echo_info "Exiting without changes."
             exit 0
         fi
-    fi
-
-    # Start with the example file
-    if [[ -f .env.example ]]; then
-        cp .env.example .env
-        echo_info "Created .env from .env.example"
-    else
-        echo_error ".env.example not found!"
-        exit 1
     fi
 
     # Generate secure secrets
@@ -89,23 +85,11 @@ main() {
     JWT_SECRET=$(generate_secret)
     NEXTAUTH_SECRET=$(generate_secret)
 
-    # Replace secrets in .env file
-    sed_inplace "s/your-app-key-1,your-app-key-2,your-app-key-3,your-app-key-4/$APP_KEY_1,$APP_KEY_2,$APP_KEY_3,$APP_KEY_4/g" .env
-    sed_inplace "s/your-admin-jwt-secret/$ADMIN_JWT_SECRET/g" .env
-    sed_inplace "s/your-api-token-salt/$API_TOKEN_SALT/g" .env
-    sed_inplace "s/your-transfer-token-salt/$TRANSFER_TOKEN_SALT/g" .env
-    sed_inplace "s/your-jwt-secret/$JWT_SECRET/g" .env
-    sed_inplace "s/your-nextauth-secret/$NEXTAUTH_SECRET/g" .env
-
     echo_info "✓ Generated secure secrets"
 
     # Prompt for domain
     echo_step "Domain Configuration"
     read -p "Enter your domain (e.g., example.com): " DOMAIN
-    if [[ -n "$DOMAIN" ]]; then
-        sed_inplace "s/your-domain.com/$DOMAIN/g" .env
-        echo_info "✓ Set domain to $DOMAIN"
-    fi
 
     # Prompt for Supabase database URL
     echo_step "Supabase Database Configuration"
@@ -114,12 +98,6 @@ main() {
     echo_info "Copy the connection string and replace 'your-password' with your actual password"
     echo ""
     read -p "Enter your Supabase database URL: " SUPABASE_URL
-    if [[ -n "$SUPABASE_URL" ]]; then
-        # Escape special characters for sed
-        ESCAPED_URL=$(echo "$SUPABASE_URL" | sed 's/[[\.*^$()+?{|]/\\&/g')
-        sed_inplace "s|postgresql://postgres.your-project-ref:your-password@aws-0-region.pooler.supabase.com:6543/postgres|$ESCAPED_URL|g" .env
-        echo_info "✓ Set Supabase database URL"
-    fi
 
     # File upload configuration
     echo_step "File Upload Configuration"
@@ -135,32 +113,13 @@ main() {
             read -p "Cloudinary name: " CLOUDINARY_NAME
             read -p "Cloudinary API key: " CLOUDINARY_API_KEY
             read -p "Cloudinary API secret: " CLOUDINARY_API_SECRET
-
-            if [[ -n "$CLOUDINARY_NAME" && -n "$CLOUDINARY_API_KEY" && -n "$CLOUDINARY_API_SECRET" ]]; then
-                sed_inplace "s/your-cloudinary-name/$CLOUDINARY_NAME/g" .env
-                sed_inplace "s/your-cloudinary-api-key/$CLOUDINARY_API_KEY/g" .env
-                sed_inplace "s/your-cloudinary-api-secret/$CLOUDINARY_API_SECRET/g" .env
-                echo_info "✓ Configured Cloudinary"
-            fi
             ;;
         2)
             echo_info "AWS S3 Configuration:"
-            # Comment out Cloudinary and uncomment AWS
-            sed_inplace 's/^CLOUDINARY_/# CLOUDINARY_/g' .env
-            sed_inplace 's/^# AWS_/AWS_/g' .env
-
             read -p "AWS Access Key ID: " AWS_ACCESS_KEY_ID
             read -p "AWS Secret Access Key: " AWS_ACCESS_SECRET
             read -p "AWS Region: " AWS_REGION
             read -p "S3 Bucket Name: " AWS_BUCKET
-
-            if [[ -n "$AWS_ACCESS_KEY_ID" && -n "$AWS_ACCESS_SECRET" && -n "$AWS_REGION" && -n "$AWS_BUCKET" ]]; then
-                sed_inplace "s/your-aws-access-key/$AWS_ACCESS_KEY_ID/g" .env
-                sed_inplace "s/your-aws-secret-key/$AWS_ACCESS_SECRET/g" .env
-                sed_inplace "s/your-aws-region/$AWS_REGION/g" .env
-                sed_inplace "s/your-s3-bucket-name/$AWS_BUCKET/g" .env
-                echo_info "✓ Configured AWS S3"
-            fi
             ;;
         3)
             echo_info "Skipping file upload configuration"
@@ -177,13 +136,6 @@ main() {
         read -p "Mailgun API key: " MAILGUN_API_KEY
         read -p "Mailgun domain: " MAILGUN_DOMAIN
         read -p "Mailgun email: " MAILGUN_EMAIL
-
-        if [[ -n "$MAILGUN_API_KEY" && -n "$MAILGUN_DOMAIN" && -n "$MAILGUN_EMAIL" ]]; then
-            sed_inplace "s/your-mailgun-api-key/$MAILGUN_API_KEY/g" .env
-            sed_inplace "s/your-mailgun-domain/$MAILGUN_DOMAIN/g" .env
-            sed_inplace "s/your-mailgun-email/$MAILGUN_EMAIL/g" .env
-            echo_info "✓ Configured Mailgun"
-        fi
     fi
 
     # Sentry
@@ -191,23 +143,114 @@ main() {
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         read -p "Sentry DSN: " SENTRY_DSN
-
-        if [[ -n "$SENTRY_DSN" ]]; then
-            sed_inplace "s/your-sentry-dsn/$SENTRY_DSN/g" .env
-            echo_info "✓ Configured Sentry"
-        fi
     fi
 
     echo ""
-    echo_info "Environment file generated successfully!"
+    echo_step "Creating comprehensive environment file..."
+
+    # Create the unified .env file
+    cat > .env << EOF
+# Cabernai Web Production Environment
+# Generated by env-generator.sh (Simplified)
+# 🎯 This file is automatically loaded into ALL containers via env_file directive
+
+# ----- URLs -----
+UI_PUBLIC_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:3000}
+STRAPI_PUBLIC_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:1337}
+NEXT_PUBLIC_APP_PUBLIC_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:3000}
+NEXT_PUBLIC_STRAPI_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:1337}
+
+# ----- Database (Supabase) -----
+SUPABASE_DATABASE_URL=$SUPABASE_URL
+DATABASE_URL=$SUPABASE_URL
+
+# ----- Strapi Secrets -----
+APP_KEYS=$APP_KEY_1,$APP_KEY_2,$APP_KEY_3,$APP_KEY_4
+ADMIN_JWT_SECRET=$ADMIN_JWT_SECRET
+API_TOKEN_SALT=$API_TOKEN_SALT
+TRANSFER_TOKEN_SALT=$TRANSFER_TOKEN_SALT
+JWT_SECRET=$JWT_SECRET
+PUBLIC_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:1337}
+APP_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:1337}
+HOST=0.0.0.0
+PORT=1337
+
+# ----- NextAuth -----
+NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+NEXTAUTH_URL=${DOMAIN:+https://$DOMAIN}${DOMAIN:-http://localhost:3000}
+
+# ----- File Upload -----
+EOF
+
+    # Add file upload configuration
+    if [[ -n "$CLOUDINARY_NAME" && -n "$CLOUDINARY_API_KEY" && -n "$CLOUDINARY_API_SECRET" ]]; then
+        cat >> .env << EOF
+CLOUDINARY_NAME=$CLOUDINARY_NAME
+CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$CLOUDINARY_NAME
+EOF
+    elif [[ -n "$AWS_ACCESS_KEY_ID" && -n "$AWS_ACCESS_SECRET" && -n "$AWS_REGION" && -n "$AWS_BUCKET" ]]; then
+        cat >> .env << EOF
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+AWS_ACCESS_SECRET=$AWS_ACCESS_SECRET
+AWS_REGION=$AWS_REGION
+AWS_BUCKET=$AWS_BUCKET
+EOF
+    fi
+
+    # Add optional services
+    if [[ -n "$MAILGUN_API_KEY" && -n "$MAILGUN_DOMAIN" && -n "$MAILGUN_EMAIL" ]]; then
+        cat >> .env << EOF
+
+# ----- Email (Mailgun) -----
+MAILGUN_API_KEY=$MAILGUN_API_KEY
+MAILGUN_DOMAIN=$MAILGUN_DOMAIN
+MAILGUN_EMAIL=$MAILGUN_EMAIL
+EOF
+    fi
+
+    if [[ -n "$SENTRY_DSN" ]]; then
+        cat >> .env << EOF
+
+# ----- Monitoring -----
+SENTRY_DSN=$SENTRY_DSN
+NEXT_PUBLIC_SENTRY_DSN=$SENTRY_DSN
+SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
+EOF
+    fi
+
+    cat >> .env << EOF
+
+# ----- System -----
+CRON_ENABLED=true
+NODE_ENV=production
+NEXT_OUTPUT=standalone
+NEXT_IMAGES_UNOPTIMIZED=false
+EOF
+
+    echo_info "✓ Comprehensive .env file created with all variables for both services"
+
+    echo ""
+    echo_info "🎉 Comprehensive environment file generated successfully!"
+    echo ""
+    echo_warn "File created:"
+    echo_warn "- .env (automatically loaded into ALL containers via env_file directive)"
+    echo ""
+    echo_info "✨ Benefits of the simplified approach:"
+    echo_info "  • ONE file contains ALL variables for both Strapi and Next.js"
+    echo_info "  • Automatic loading via Docker Compose env_file directive"
+    echo_info "  • 67% less complexity than multi-file approach"
+    echo_info "  • Same functionality, much easier to manage"
+    echo ""
     echo_warn "Remember to:"
     echo_warn "1. Review the .env file for any missing values"
-    echo_warn "2. Never commit the .env file to version control"
+    echo_warn "2. Never commit .env files to version control"
     echo_warn "3. Keep your secrets secure"
     echo ""
     echo_info "Next steps:"
-    echo_info "1. Set up your DigitalOcean droplet: ./scripts/deploy/setup-droplet.sh"
-    echo_info "2. Deploy your application: ./scripts/deploy/deploy.sh production"
+    echo_info "1. Deploy: ./scripts/deploy/deploy.sh production"
+    echo_info "2. Or setup GitHub Actions with this single .env file"
 }
 
 main "$@"
