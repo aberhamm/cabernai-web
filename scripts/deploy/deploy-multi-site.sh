@@ -76,16 +76,34 @@ monitor_progress() {
 
     local start_time=$(date +%s)
     local last_update=0
+    local loop_count=0
+    local max_loops=$((timeout / 5 + 10))  # Maximum iterations to prevent infinite loops
 
     echo_info "⏳ $description (PID: $pid, Timeout: ${timeout}s)"
+    echo_debug "🔒 Loop safeguard: max ${max_loops} iterations"
 
     while kill -0 $pid 2>/dev/null; do
+        # Increment loop counter and check for runaway loops
+        loop_count=$((loop_count + 1))
+        if [[ $loop_count -gt $max_loops ]]; then
+            echo_error "🚨 SAFETY: Loop exceeded maximum iterations ($max_loops). Terminating."
+            kill $pid 2>/dev/null || true
+            return 1
+        fi
+
         local current_time=$(date +%s)
         local elapsed=$((current_time - start_time))
 
+        # Sanity check: if elapsed time calculation fails, abort
+        if [[ ! $elapsed =~ ^[0-9]+$ ]] || [[ $elapsed -lt 0 ]]; then
+            echo_error "🚨 SAFETY: Invalid elapsed time calculation. Aborting."
+            kill $pid 2>/dev/null || true
+            return 1
+        fi
+
         # Update every 30 seconds
         if [[ $((elapsed - last_update)) -ge 30 ]]; then
-            echo_debug "⏱️  Still running... ${elapsed}s elapsed ($(($elapsed / 60))m)"
+            echo_debug "⏱️  Still running... ${elapsed}s elapsed ($(($elapsed / 60))m) [Loop: $loop_count/$max_loops]"
             last_update=$elapsed
 
             # Show system resources every 2 minutes
@@ -109,10 +127,10 @@ monitor_progress() {
     # Check exit status
     if wait $pid; then
         local final_elapsed=$(($(date +%s) - start_time))
-        echo_info "✅ $description completed in ${final_elapsed}s ($(($final_elapsed / 60))m)"
+        echo_info "✅ $description completed in ${final_elapsed}s ($(($final_elapsed / 60))m) [Loops: $loop_count]"
         return 0
     else
-        echo_error "❌ $description failed"
+        echo_error "❌ $description failed after $loop_count loops"
         return 1
     fi
 }
@@ -350,27 +368,42 @@ deploy_to_server() {
     echo_step "Waiting for services to be ready..."
     echo_debug "Services may take 2-5 minutes to fully initialize..."
 
-    # Progressive health checking instead of blind wait
-    for i in {1..10}; do
-        echo_debug "Health check attempt $i/10..."
-        sleep 15
+        # Progressive health checking instead of blind wait
+    local max_attempts=10
+    local attempt_timeout=30  # 30 seconds per attempt
 
-        # Check if containers are still running
-        if docker-compose -f $DOCKER_COMPOSE_FILE ps | grep -q "Up"; then
+    for i in $(seq 1 $max_attempts); do
+        echo_debug "Health check attempt $i/$max_attempts..."
+
+        # Use timeout for sleep to prevent hanging
+        timeout $attempt_timeout sleep 15 || {
+            echo_error "🚨 SAFETY: Sleep command timed out. System may be unresponsive."
+            break
+        }
+
+        # Check if containers are still running with timeout
+        if timeout 10 docker-compose -f $DOCKER_COMPOSE_FILE ps | grep -q "Up"; then
             echo_debug "✓ Containers are running"
         else
             echo_warn "Some containers may have stopped. Checking logs..."
-            docker-compose -f $DOCKER_COMPOSE_FILE logs --tail=20
+            timeout 30 docker-compose -f $DOCKER_COMPOSE_FILE logs --tail=20 || echo_warn "Log check timed out"
         fi
 
-        # Try basic connectivity
-        if curl -f -s http://127.0.0.1:3000/ > /dev/null 2>&1; then
+        # Try basic connectivity with timeout
+        if timeout 10 curl -f -s http://127.0.0.1:3000/ > /dev/null 2>&1; then
             echo_info "✓ UI is responding - services are ready!"
             break
-        elif [[ $i -eq 10 ]]; then
-            echo_warn "Services may still be initializing. Proceeding with health checks..."
+        elif [[ $i -eq $max_attempts ]]; then
+            echo_warn "Services may still be initializing after $max_attempts attempts. Proceeding with health checks..."
         else
-            echo_debug "UI not ready yet, waiting..."
+            echo_debug "UI not ready yet, waiting... (attempt $i/$max_attempts)"
+        fi
+
+        # Safety check: if we've been trying for too long, abort
+        local total_elapsed=$((i * 15))
+        if [[ $total_elapsed -gt 300 ]]; then  # 5 minutes
+            echo_error "🚨 SAFETY: Health check loop exceeded 5 minutes. Aborting."
+            break
         fi
     done
 
@@ -445,35 +478,59 @@ check_services() {
     # Test local endpoints with detailed logging
     echo_debug "Testing local endpoints..."
 
-    # Test UI (local) with retries
+    # Test UI (local) with retries and safety checks
     echo_debug "Testing UI on http://127.0.0.1:3000..."
-    for attempt in {1..5}; do
-        if curl -f -s --max-time 10 http://127.0.0.1:3000/ > /dev/null; then
+    local ui_max_attempts=5
+    local ui_retry_delay=10
+
+    for attempt in $(seq 1 $ui_max_attempts); do
+        # Safety check: validate attempt number
+        if [[ ! $attempt =~ ^[1-5]$ ]]; then
+            echo_error "🚨 SAFETY: Invalid attempt number: $attempt. Breaking loop."
+            break
+        fi
+
+        if timeout 15 curl -f -s --max-time 10 http://127.0.0.1:3000/ > /dev/null; then
             echo_info "✓ UI is responding locally (attempt $attempt)"
             break
-        elif [[ $attempt -eq 5 ]]; then
-            echo_warn "✗ UI is not responding locally after 5 attempts"
+        elif [[ $attempt -eq $ui_max_attempts ]]; then
+            echo_warn "✗ UI is not responding locally after $ui_max_attempts attempts"
             echo_debug "Checking UI container logs..."
-            docker-compose -f $DOCKER_COMPOSE_FILE logs ui --tail=20
+            timeout 30 docker-compose -f $DOCKER_COMPOSE_FILE logs ui --tail=20 || echo_warn "UI log check timed out"
         else
-            echo_debug "UI not ready, attempt $attempt/5, retrying in 10s..."
-            sleep 10
+            echo_debug "UI not ready, attempt $attempt/$ui_max_attempts, retrying in ${ui_retry_delay}s..."
+            timeout $((ui_retry_delay + 5)) sleep $ui_retry_delay || {
+                echo_error "🚨 SAFETY: Sleep timed out during UI retry. System may be unresponsive."
+                break
+            }
         fi
     done
 
-    # Test Strapi (local) with retries
+    # Test Strapi (local) with retries and safety checks
     echo_debug "Testing Strapi API on http://127.0.0.1:1337..."
-    for attempt in {1..5}; do
-        if curl -f -s --max-time 10 http://127.0.0.1:1337/ > /dev/null 2>&1; then
+    local strapi_max_attempts=5
+    local strapi_retry_delay=15
+
+    for attempt in $(seq 1 $strapi_max_attempts); do
+        # Safety check: validate attempt number
+        if [[ ! $attempt =~ ^[1-5]$ ]]; then
+            echo_error "🚨 SAFETY: Invalid attempt number: $attempt. Breaking loop."
+            break
+        fi
+
+        if timeout 20 curl -f -s --max-time 10 http://127.0.0.1:1337/ > /dev/null 2>&1; then
             echo_info "✓ Strapi API is responding locally (attempt $attempt)"
             break
-        elif [[ $attempt -eq 5 ]]; then
-            echo_warn "✗ Strapi API may not be ready yet (this is normal during first startup)"
+        elif [[ $attempt -eq $strapi_max_attempts ]]; then
+            echo_warn "✗ Strapi API may not be ready yet after $strapi_max_attempts attempts (this is normal during first startup)"
             echo_debug "Checking Strapi container logs..."
-            docker-compose -f $DOCKER_COMPOSE_FILE logs strapi --tail=20
+            timeout 30 docker-compose -f $DOCKER_COMPOSE_FILE logs strapi --tail=20 || echo_warn "Strapi log check timed out"
         else
-            echo_debug "Strapi not ready, attempt $attempt/5, retrying in 15s..."
-            sleep 15
+            echo_debug "Strapi not ready, attempt $attempt/$strapi_max_attempts, retrying in ${strapi_retry_delay}s..."
+            timeout $((strapi_retry_delay + 5)) sleep $strapi_retry_delay || {
+                echo_error "🚨 SAFETY: Sleep timed out during Strapi retry. System may be unresponsive."
+                break
+            }
         fi
     done
 

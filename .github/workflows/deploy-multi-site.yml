@@ -218,68 +218,122 @@ jobs:
           echo "⏱️  Verification timeout: 10 minutes"
           echo "📊 Verification started at: $(date)"
 
-          # Progressive verification with better logging
+                    # Progressive verification with better logging and safety checks
           echo "⏳ Waiting for services to fully initialize..."
-          for i in {1..12}; do
-            echo "🔍 Verification attempt $i/12 (waiting ${i}0 seconds total)..."
-            sleep 10
+          max_attempts=12
+          attempt_timeout=15  # timeout per attempt
+          total_timeout=300   # 5 minutes total
+          start_time=$(date +%s)
 
-            # Quick check if containers are running
-            ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+          for i in $(seq 1 $max_attempts); do
+            current_time=$(date +%s)
+            elapsed=$((current_time - start_time))
+
+            # Safety check: abort if total time exceeded
+            if [[ $elapsed -gt $total_timeout ]]; then
+              echo "🚨 SAFETY: Total verification time exceeded ${total_timeout}s. Aborting."
+              exit 1
+            fi
+
+            # Safety check: validate iteration number
+            if [[ ! $i =~ ^[0-9]+$ ]] || [[ $i -lt 1 ]] || [[ $i -gt $max_attempts ]]; then
+              echo "🚨 SAFETY: Invalid iteration number: $i. Aborting."
+              exit 1
+            fi
+
+            echo "🔍 Verification attempt $i/$max_attempts (${elapsed}s elapsed, max ${total_timeout}s)..."
+
+            # Use timeout for sleep to prevent hanging
+            timeout $attempt_timeout sleep 10 || {
+              echo "🚨 SAFETY: Sleep command timed out. System may be unresponsive."
+              exit 1
+            }
+
+            # Quick check if containers are running with timeout
+            echo "📊 Checking container status..."
+            if ! timeout 30 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
               echo '📊 Container status:'
               cd /opt/${{ env.PROJECT_NAME }}
-              docker-compose -f docker-compose.multi-site.yml ps
-            "
+              timeout 20 docker-compose -f docker-compose.multi-site.yml ps
+            "; then
+              echo "⚠️ Container status check timed out or failed"
+            fi
 
-            # Test local endpoints first (faster)
+            # Test local endpoints first (faster) with timeout
             echo "🔍 Testing local endpoints..."
-            if ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
-              curl -f -s --max-time 5 http://127.0.0.1:3000/ > /dev/null &&
-              curl -f -s --max-time 5 http://127.0.0.1:1337/ > /dev/null
+            if timeout 30 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+              timeout 10 curl -f -s --max-time 5 http://127.0.0.1:3000/ > /dev/null &&
+              timeout 10 curl -f -s --max-time 5 http://127.0.0.1:1337/ > /dev/null
             "; then
               echo "✅ Local endpoints responding, testing public endpoints..."
               break
-            elif [[ $i -eq 12 ]]; then
-              echo "❌ Local endpoints not responding after 2 minutes"
-              ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            elif [[ $i -eq $max_attempts ]]; then
+              echo "❌ Local endpoints not responding after $max_attempts attempts (${elapsed}s total)"
+              timeout 60 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
                 cd /opt/${{ env.PROJECT_NAME }}
                 echo '📋 Container logs:'
-                docker-compose -f docker-compose.multi-site.yml logs --tail=30
-              "
+                timeout 45 docker-compose -f docker-compose.multi-site.yml logs --tail=30 || echo 'Log collection timed out'
+              " || echo "Debug info collection failed"
               exit 1
             else
-              echo "⏳ Services still initializing..."
+              echo "⏳ Services still initializing... (attempt $i/$max_attempts)"
             fi
           done
 
           # Test public endpoints
           echo "🌐 Testing public endpoints..."
 
-          # Test UI through domain
-          for attempt in {1..5}; do
-            if curl -f -s --max-time 10 https://${{ vars.DOMAIN_NAME }}/ > /dev/null; then
-              echo "✅ UI is responding via https://${{ vars.DOMAIN_NAME }}/"
+          # Test UI through domain with safety checks
+          ui_max_attempts=5
+          ui_retry_delay=15
+          ui_timeout=20
+
+          for attempt in $(seq 1 $ui_max_attempts); do
+            # Safety check: validate attempt number
+            if [[ ! $attempt =~ ^[1-5]$ ]]; then
+              echo "🚨 SAFETY: Invalid UI attempt number: $attempt. Aborting."
+              exit 1
+            fi
+
+            if timeout $ui_timeout curl -f -s --max-time 10 https://${{ vars.DOMAIN_NAME }}/ > /dev/null; then
+              echo "✅ UI is responding via https://${{ vars.DOMAIN_NAME }}/ (attempt $attempt)"
               break
-            elif [[ $attempt -eq 5 ]]; then
-              echo "❌ UI is not responding via public domain"
+            elif [[ $attempt -eq $ui_max_attempts ]]; then
+              echo "❌ UI is not responding via public domain after $ui_max_attempts attempts"
               exit 1
             else
-              echo "⏳ UI not ready via public domain, attempt $attempt/5..."
-              sleep 15
+              echo "⏳ UI not ready via public domain, attempt $attempt/$ui_max_attempts..."
+              timeout $((ui_retry_delay + 5)) sleep $ui_retry_delay || {
+                echo "🚨 SAFETY: UI retry sleep timed out. System may be unresponsive."
+                exit 1
+              }
             fi
           done
 
-          # Test API through domain
-          for attempt in {1..5}; do
-            if curl -f -s --max-time 10 https://${{ vars.DOMAIN_NAME }}/api/ > /dev/null; then
-              echo "✅ API is responding via https://${{ vars.DOMAIN_NAME }}/api/"
+          # Test API through domain with safety checks
+          api_max_attempts=5
+          api_retry_delay=15
+          api_timeout=20
+
+          for attempt in $(seq 1 $api_max_attempts); do
+            # Safety check: validate attempt number
+            if [[ ! $attempt =~ ^[1-5]$ ]]; then
+              echo "🚨 SAFETY: Invalid API attempt number: $attempt. Aborting."
+              exit 1
+            fi
+
+            if timeout $api_timeout curl -f -s --max-time 10 https://${{ vars.DOMAIN_NAME }}/api/ > /dev/null; then
+              echo "✅ API is responding via https://${{ vars.DOMAIN_NAME }}/api/ (attempt $attempt)"
               break
-            elif [[ $attempt -eq 5 ]]; then
-              echo "❌ API is not responding via public domain"
+            elif [[ $attempt -eq $api_max_attempts ]]; then
+              echo "❌ API is not responding via public domain after $api_max_attempts attempts"
               exit 1
             else
-              echo "⏳ API not ready via public domain, attempt $attempt/5..."
-              sleep 15
+              echo "⏳ API not ready via public domain, attempt $attempt/$api_max_attempts..."
+              timeout $((api_retry_delay + 5)) sleep $api_retry_delay || {
+                echo "🚨 SAFETY: API retry sleep timed out. System may be unresponsive."
+                exit 1
+              }
             fi
           done
 

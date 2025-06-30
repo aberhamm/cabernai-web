@@ -226,15 +226,35 @@ main() {
 
     check_root_directory
 
-    # Prompt user for what to fix
-    echo "What would you like to fix?"
-    echo "1. File permissions only"
-    echo "2. Environment setup only"
-    echo "3. Sharp module only (macOS ARM64)"
-    echo "4. Clean and reinstall everything"
-    echo "5. Fix all issues (recommended)"
-    echo ""
-    read -p "Enter your choice (1-5): " choice
+    # Safety check: prevent infinite loops in user input
+    local max_input_attempts=3
+    local attempt=0
+    local choice=""
+
+    while [[ $attempt -lt $max_input_attempts ]]; do
+        attempt=$((attempt + 1))
+
+        echo "What would you like to fix?"
+        echo "1. File permissions only"
+        echo "2. Environment setup only"
+        echo "3. Sharp module only (macOS ARM64)"
+        echo "4. Clean and reinstall everything"
+        echo "5. Fix all issues (recommended)"
+        echo ""
+
+        # Use timeout for read to prevent hanging
+        if timeout 60 bash -c 'read -p "Enter your choice (1-5): " choice; echo $choice' > /tmp/choice_input 2>/dev/null; then
+            choice=$(cat /tmp/choice_input 2>/dev/null)
+            rm -f /tmp/choice_input
+            break
+        else
+            echo_warn "Input timed out or failed. Attempt $attempt/$max_input_attempts"
+            if [[ $attempt -eq $max_input_attempts ]]; then
+                echo_error "🚨 SAFETY: Max input attempts reached. Defaulting to option 5 (fix all issues)."
+                choice="5"
+            fi
+        fi
+    done
 
     case $choice in
         1)

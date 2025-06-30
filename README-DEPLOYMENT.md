@@ -1288,3 +1288,95 @@ For faster deployments:
 3. **Monitor Build Progress:**
    - Scripts now show progress every 30 seconds
    - Resource usage displayed every 2 minutes
+
+## 🔒 Infinite Loop Prevention
+
+To prevent deployment hangs and infinite loops, comprehensive safeguards have been implemented:
+
+### **Loop Safeguards Added**
+
+| Script/Workflow        | Loop Type             | Safeguards                                                          |
+| ---------------------- | --------------------- | ------------------------------------------------------------------- |
+| `deploy-multi-site.sh` | Process monitoring    | Max iterations, timeout validation, elapsed time checks             |
+| `deploy-multi-site.sh` | Health check loops    | Bounded iterations (1-10), timeout per attempt, total time limit    |
+| `deploy-multi-site.sh` | Service retry loops   | Max attempts (1-5), timeout per operation, input validation         |
+| GitHub Actions         | Verification loops    | Bounded iterations (1-12), total timeout (300s), attempt validation |
+| GitHub Actions         | Public endpoint tests | Max attempts (1-5), timeout per curl, sleep timeout                 |
+| `fix-dev-issues.sh`    | User input            | Max input attempts (3), timeout per read (60s)                      |
+
+### **Safety Mechanisms**
+
+1. **Maximum Iteration Limits:**
+
+   ```bash
+   # All loops have explicit bounds
+   for i in $(seq 1 $max_attempts); do
+     # Safety check: validate iteration number
+     if [[ ! $i =~ ^[1-5]$ ]]; then
+       echo "🚨 SAFETY: Invalid iteration. Breaking loop."
+       break
+     fi
+   ```
+
+2. **Timeout Controls:**
+
+   ```bash
+   # Every operation has a timeout
+   timeout 30 some_command || {
+     echo "🚨 SAFETY: Command timed out. Aborting."
+     exit 1
+   }
+   ```
+
+3. **Time-based Limits:**
+
+   ```bash
+   # Total elapsed time tracking
+   if [[ $elapsed -gt $total_timeout ]]; then
+     echo "🚨 SAFETY: Total time exceeded. Aborting."
+     exit 1
+   fi
+   ```
+
+4. **Process Validation:**
+   ```bash
+   # Validate processes are still running
+   while kill -0 $pid 2>/dev/null; do
+     loop_count=$((loop_count + 1))
+     if [[ $loop_count -gt $max_loops ]]; then
+       echo "🚨 SAFETY: Max loops exceeded."
+       kill $pid 2>/dev/null || true
+       return 1
+     fi
+   ```
+
+### **Timeout Hierarchy**
+
+| Level                | Timeout | Purpose                                 |
+| -------------------- | ------- | --------------------------------------- |
+| **Command Level**    | 5-30s   | Individual operations (curl, docker ps) |
+| **Operation Level**  | 1-5 min | Service checks, container operations    |
+| **Process Level**    | 30 min  | Docker builds, major operations         |
+| **Total Deployment** | 45 min  | Entire GitHub Actions workflow          |
+
+### **Emergency Stops**
+
+All loops include emergency stop conditions:
+
+- **System Unresponsive:** If basic commands (sleep, curl) timeout
+- **Invalid State:** If iteration counters become invalid
+- **Resource Exhaustion:** If system resources are critically low
+- **Time Exceeded:** If any timeout is reached
+
+### **Monitoring and Alerts**
+
+Safety violations are clearly logged:
+
+```bash
+🚨 SAFETY: Loop exceeded maximum iterations (360). Terminating.
+🚨 SAFETY: Invalid elapsed time calculation. Aborting.
+🚨 SAFETY: Sleep command timed out. System may be unresponsive.
+🚨 SAFETY: Total verification time exceeded 300s. Aborting.
+```
+
+These safeguards ensure that deployments will never hang indefinitely and will provide clear error messages when safety limits are reached.
