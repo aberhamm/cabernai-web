@@ -37,8 +37,9 @@ jobs:
         run: |
           echo "🔧 Fixing Sharp module for Linux CI environment..."
           # Force reinstall Sharp with correct platform binary
-          yarn workspace @repo/ui remove sharp
-          yarn workspace @repo/ui add sharp
+          rm -rf node_modules/@img/sharp* || true
+          rm -rf node_modules/sharp || true
+          yarn install --include=optional
           echo "✅ Sharp module reinstalled for Linux platform"
 
       - name: Lint code
