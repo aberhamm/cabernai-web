@@ -11,6 +11,8 @@ jobs:
     name: Build all apps
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    environment:
+      name: production
     steps:
       - name: Check out code
         uses: actions/checkout@v4
