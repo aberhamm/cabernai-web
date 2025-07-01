@@ -81,7 +81,7 @@ RUN \
     echo "📦 Workspace info:" && echo "APP=${APP}, WORKSPACE=${WORKSPACE}" && \
     echo "🚀 Running turbo build..." && \
     NODE_OPTIONS="--max-old-space-size=2048 " \
-    turbo run build --filter=${WORKSPACE} --concurrency=1 --verbosity=2 && \
+    turbo run build --filter=${WORKSPACE} --no-deps --concurrency=1 --verbosity=2 && \
     echo "✅ Build completed successfully!" || (echo "❌ Build failed!" && exit 1)
 
 # -------------------------- stage runner ---------------------------------
