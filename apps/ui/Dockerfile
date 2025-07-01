@@ -61,14 +61,6 @@ RUN \
     export npm_config_jobs=1 && \
     yarn install --prefer-offline --frozen-lockfile --ignore-scripts --network-timeout 300000
 
-# Install Sharp for Next.js image optimization with single thread
-RUN \
-    --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-    yarn config set network-concurrency 1 && \
-    export JOBS=1 && \
-    export npm_config_jobs=1 && \
-    yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile --network-timeout 300000
-
 # Build the project and its dependencies
 COPY --from=pruned /app/out/full/ .
 COPY turbo.json turbo.json
