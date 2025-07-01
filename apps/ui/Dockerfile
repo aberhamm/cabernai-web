@@ -65,6 +65,9 @@ RUN \
 COPY --from=pruned /app/out/full/ .
 COPY turbo.json turbo.json
 
+# Set PATH to include node_modules/.bin for CLI access
+ENV PATH /app/apps/${APP}/node_modules/.bin:$PATH
+
 # Set build environment with memory optimizations
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -79,6 +82,9 @@ RUN \
     echo "📊 Available memory:" && free -h && \
     echo "📁 Current directory contents:" && ls -la && \
     echo "📦 Workspace info:" && echo "APP=${APP}, WORKSPACE=${WORKSPACE}" && \
+    echo "🔍 Verifying CLI tools..." && \
+    echo "PATH=$PATH" && \
+    which next && echo "✅ Next.js CLI found" || echo "❌ Next.js CLI not found" && \
     echo "🚀 Running turbo build..." && \
     NODE_OPTIONS="--max-old-space-size=2048 " \
     turbo run build --filter=${WORKSPACE} --only --concurrency=1 --verbosity=2 && \
