@@ -22,8 +22,7 @@ ARG WORKSPACE
 # Set working directory
 WORKDIR /app
 
-# Install turbo globally with specific version for consistency
-RUN yarn global add turbo@^2.0.9
+# No need to install turbo globally - will use npx
 
 # Copy only necessary files for pruning
 COPY package.json yarn.lock turbo.json ./
@@ -32,7 +31,7 @@ COPY apps/ui/package.json apps/ui/
 COPY apps/strapi/package.json apps/strapi/
 
 # see https://turbo.build/repo/docs/reference/command-line-reference#turbo-prune---scopetarget
-RUN turbo prune ${WORKSPACE} --docker
+RUN npx turbo prune ${WORKSPACE} --docker
 
 # -------------------------- stage installer ---------------------------------
 FROM base AS installer
@@ -49,8 +48,7 @@ WORKDIR /app
 COPY --from=pruned /app/out/json/ .
 COPY --from=pruned /app/out/yarn.lock ./yarn.lock
 
-# Install turbo globally
-RUN yarn global add turbo@^2.0.9
+# No need to install turbo globally - will use npx
 
 # Install dependencies with resource constraints optimization
 RUN \
@@ -65,8 +63,7 @@ RUN \
 COPY --from=pruned /app/out/full/ .
 COPY turbo.json turbo.json
 
-# Set PATH to include node_modules/.bin for CLI access
-ENV PATH /app/apps/${APP}/node_modules/.bin:$PATH
+# PATH not needed with npx - it handles CLI access automatically
 
 # Set build environment with memory optimizations
 ENV NODE_ENV=production
@@ -83,11 +80,11 @@ RUN \
     echo "📁 Current directory contents:" && ls -la && \
     echo "📦 Workspace info:" && echo "APP=${APP}, WORKSPACE=${WORKSPACE}" && \
     echo "🔍 Verifying CLI tools..." && \
-    echo "PATH=$PATH" && \
-    which next && echo "✅ Next.js CLI found" || echo "❌ Next.js CLI not found" && \
+    echo "NPX available: $(which npx)" && \
+    npx next --version && echo "✅ Next.js CLI accessible via npx" || echo "❌ Next.js CLI not accessible" && \
     echo "🚀 Running turbo build..." && \
     NODE_OPTIONS="--max-old-space-size=2048 " \
-    turbo run build --filter=${WORKSPACE} --only --concurrency=1 --verbosity=2 && \
+    npx turbo run build --filter=${WORKSPACE} --only --concurrency=1 --verbosity=2 && \
     echo "✅ Build completed successfully!" || (echo "❌ Build failed!" && exit 1)
 
 # -------------------------- stage runner ---------------------------------

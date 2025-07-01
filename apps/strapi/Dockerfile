@@ -23,8 +23,7 @@ ARG WORKSPACE
 # Set working directory
 WORKDIR /app
 
-# Install turbo globally with specific version for consistency
-RUN yarn global add turbo@^2.0.9
+# No need to install turbo globally - will use npx
 
 # Copy only necessary files for pruning
 COPY package.json yarn.lock turbo.json ./
@@ -33,7 +32,7 @@ COPY apps/ui/package.json apps/ui/
 COPY apps/strapi/package.json apps/strapi/
 
 # see https://turbo.build/repo/docs/reference/command-line-reference#turbo-prune---scopetarget
-RUN turbo prune ${WORKSPACE} --docker
+RUN npx turbo prune ${WORKSPACE} --docker
 
 # -------------------------- stage installer ---------------------------------
 FROM base AS installer
@@ -66,8 +65,8 @@ RUN apk update && apk add --no-cache \
 COPY --from=pruned /app/out/json/ .
 COPY --from=pruned /app/out/yarn.lock ./yarn.lock
 
-# Install global dependencies
-RUN yarn global add node-gyp turbo@^2.0.9
+# Install global dependencies (only node-gyp needed for native modules)
+RUN yarn global add node-gyp
 
 # Install dependencies with resource constraints optimization
 RUN \
@@ -86,7 +85,7 @@ RUN \
     export npm_config_jobs=1 && \
     yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile --network-timeout 300000
 
-ENV PATH /app/apps/${APP}/node_modules/.bin:$PATH
+# PATH not needed for build with npx - it handles CLI access automatically
 
 # Build the project and its dependencies
 COPY --from=pruned /app/out/full/ .
@@ -101,7 +100,7 @@ ENV STRAPI_HIDE_STARTUP_MESSAGE=true
 RUN \
     --mount=type=cache,id=turbo-cache,target=/app/.turbo,sharing=locked \
     NODE_OPTIONS="--max-old-space-size=2048 " \
-    turbo run build --filter=${WORKSPACE} --concurrency=1
+    npx turbo run build --filter=${WORKSPACE} --concurrency=1
 
 # -------------------------- stage runner ---------------------------------
 FROM base AS runner

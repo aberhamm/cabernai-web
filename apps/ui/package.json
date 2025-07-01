@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "GENERATE_SOURCEMAP=false next build",
-    "dev": "next dev",
+    "build": "GENERATE_SOURCEMAP=false npx next build",
+    "dev": "npx next dev",
     "postinstall": "node -e \"try { require('sharp') } catch (e) { console.log('Sharp not found, skipping...') }\"",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
-    "preview": "next build && next start",
-    "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "lint": "npx next lint",
+    "lint:fix": "npx next lint --fix",
+    "preview": "npx next build && npx next start",
+    "start": "npx next start",
+    "typecheck": "npx tsc --noEmit"
   },
   "browserslist": [
     ">0.3%",
