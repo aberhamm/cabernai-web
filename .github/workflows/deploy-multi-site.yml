@@ -591,7 +591,9 @@ jobs:
               exit 1
             else
               echo "⏳ Services still initializing... (attempt $i/$max_attempts)"
-              echo "   UI: $([[ \"$ui_ok\" == \"true\" ]] && echo \"✅\" || echo \"❌\") | Strapi: $([[ \"$strapi_ok\" == \"true\" ]] && echo \"✅\" || echo \"❌\")"
+              ui_status="❌"; [[ "$ui_ok" == "true" ]] && ui_status="✅"
+              strapi_status="❌"; [[ "$strapi_ok" == "true" ]] && strapi_status="✅"
+              echo "   UI: $ui_status | Strapi: $strapi_status"
             fi
           done
 
