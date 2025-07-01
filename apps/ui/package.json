@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "GENERATE_SOURCEMAP=false next build",
     "dev": "next dev",
     "postinstall": "node -e \"try { require('sharp') } catch (e) { console.log('Sharp not found, skipping...') }\"",
     "lint": "next lint",

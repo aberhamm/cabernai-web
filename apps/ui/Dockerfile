@@ -69,12 +69,20 @@ COPY turbo.json turbo.json
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_SHARP=0
+ENV NEXT_OUTPUT=standalone
+ENV NEXT_IMAGES_UNOPTIMIZED=false
 
 # Build with turbo cache and memory constraints
 RUN \
     --mount=type=cache,id=turbo-cache,target=/app/.turbo,sharing=locked \
+    echo "🔧 Starting UI build with 2GB memory..." && \
+    echo "📊 Available memory:" && free -h && \
+    echo "📁 Current directory contents:" && ls -la && \
+    echo "📦 Workspace info:" && echo "APP=${APP}, WORKSPACE=${WORKSPACE}" && \
+    echo "🚀 Running turbo build..." && \
     NODE_OPTIONS="--max-old-space-size=2048 " \
-    turbo run build --filter=${WORKSPACE} --concurrency=1
+    turbo run build --filter=${WORKSPACE} --concurrency=1 --verbose && \
+    echo "✅ Build completed successfully!" || (echo "❌ Build failed!" && exit 1)
 
 # -------------------------- stage runner ---------------------------------
 FROM base AS runner
