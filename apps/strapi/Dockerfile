@@ -65,16 +65,18 @@ COPY --from=pruned /app/out/yarn.lock ./yarn.lock
 # Install global dependencies
 RUN yarn global add node-gyp turbo@^2.0.9
 
-# Install dependencies with better caching and production optimizations
+# Install dependencies with resource constraints optimization
 RUN \
     --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
     --mount=type=cache,id=node-modules,target=/app/node_modules,sharing=locked \
-    yarn install --prefer-offline --frozen-lockfile --ignore-scripts --production --network-timeout 100000
+    yarn config set network-concurrency 1 && \
+    yarn install --prefer-offline --frozen-lockfile --ignore-scripts --production --network-timeout 300000
 
-# Install Sharp for Strapi image processing
+# Install Sharp for Strapi image processing with single thread
 RUN \
     --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-    yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile --network-timeout 100000
+    yarn config set network-concurrency 1 && \
+    yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile --network-timeout 300000
 
 ENV PATH /app/apps/${APP}/node_modules/.bin:$PATH
 

@@ -48,16 +48,18 @@ COPY --from=pruned /app/out/yarn.lock ./yarn.lock
 # Install turbo globally
 RUN yarn global add turbo@^2.0.9
 
-# Install dependencies with better caching
+# Install dependencies with resource constraints optimization
 RUN \
     --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
     --mount=type=cache,id=node-modules,target=/app/node_modules,sharing=locked \
-    yarn install --prefer-offline --frozen-lockfile --ignore-scripts --network-timeout 100000
+    yarn config set network-concurrency 1 && \
+    yarn install --prefer-offline --frozen-lockfile --ignore-scripts --network-timeout 300000
 
-# Install Sharp for Next.js image optimization
+# Install Sharp for Next.js image optimization with single thread
 RUN \
     --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-    yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile --network-timeout 100000
+    yarn config set network-concurrency 1 && \
+    yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile --network-timeout 300000
 
 # Build the project and its dependencies
 COPY --from=pruned /app/out/full/ .
