@@ -792,8 +792,8 @@ jobs:
             # Safety check: validate attempt number
             if [[ ! $attempt =~ ^[1-5]$ ]]; then
               echo "🚨 SAFETY: Invalid API attempt number: $attempt. Aborting."
-              exit 1
-            fi
+            exit 1
+          fi
 
             if timeout $api_timeout curl -f -s --max-time 10 https://${{ vars.DOMAIN_NAME }}/api/ > /dev/null; then
               echo "✅ API is responding via https://${{ vars.DOMAIN_NAME }}/api/ (attempt $attempt)"

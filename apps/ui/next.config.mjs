@@ -1,6 +1,3 @@
-import { withSentryConfig } from "@sentry/nextjs"
-import plugin from "next-intl/plugin"
-
 import { env } from "./src/env.mjs"
 
 // Conditionally import plaiceholder to avoid Sharp issues during linting
@@ -14,7 +11,7 @@ if (process.env.NEXT_SHARP !== '0') {
   }
 }
 
-const withNextIntl = plugin("./src/lib/i18n.ts")
+// withNextIntl will be conditionally loaded below
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -66,13 +63,28 @@ const nextConfig = {
 }
 
 const withConfig = (() => {
-  let config = withNextIntl(withPlaiceholder(nextConfig))
+  let config = nextConfig
+
+  // Apply plaiceholder wrapper
+  config = withPlaiceholder(config)
+
+  // Apply next-intl wrapper conditionally
+  try {
+    const plugin = require("next-intl/plugin")
+    const withNextIntl = plugin("./src/lib/i18n.ts")
+    config = withNextIntl(config)
+  } catch (error) {
+    console.log('⚠️ next-intl configuration failed - package not available:', error.message)
+  }
 
   // Only enable Sentry if all required variables are present
   const hasSentryConfig = env.SENTRY_ORG && env.SENTRY_PROJECT && env.SENTRY_AUTH_TOKEN && env.NEXT_PUBLIC_SENTRY_DSN
 
   if (hasSentryConfig) {
-    config = withSentryConfig(config, {
+    try {
+      // Dynamic import to avoid loading Sentry when not needed
+      const { withSentryConfig } = require("@sentry/nextjs")
+      config = withSentryConfig(config, {
       // For all available options, see:
       // https://github.com/getsentry/sentry-webpack-plugin#options
 
@@ -101,6 +113,9 @@ const withConfig = (() => {
       // Automatically tree-shake Sentry logger statements to reduce bundle size
       disableLogger: true,
     })
+    } catch (error) {
+      console.log('⚠️ Sentry configuration failed - package not available:', error.message)
+    }
   } else {
     console.log('⚠️ Sentry configuration skipped - missing required environment variables')
   }

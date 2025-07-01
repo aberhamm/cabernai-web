@@ -24,10 +24,10 @@ WORKDIR /app
 
 # No need to install turbo globally - will use npx
 
-# Copy only necessary files for pruning
+# Copy files needed for pruning (including source code)
 COPY package.json yarn.lock turbo.json ./
 COPY packages packages
-COPY apps/ui/package.json apps/ui/
+COPY apps/ui apps/ui
 COPY apps/strapi/package.json apps/strapi/
 
 # see https://turbo.build/repo/docs/reference/command-line-reference#turbo-prune---scopetarget
@@ -59,7 +59,7 @@ RUN \
     export npm_config_jobs=1 && \
     yarn install --prefer-offline --frozen-lockfile --ignore-scripts --network-timeout 300000
 
-# Build the project and its dependencies
+# Copy source files AFTER dependency installation to avoid conflicts
 COPY --from=pruned /app/out/full/ .
 COPY turbo.json turbo.json
 
@@ -75,14 +75,7 @@ ENV NEXT_IMAGES_UNOPTIMIZED=false
 # Build with turbo cache and memory constraints
 RUN \
     --mount=type=cache,id=turbo-cache,target=/app/.turbo,sharing=locked \
-    echo "🔧 Starting UI build with 2GB memory..." && \
-    echo "📊 Available memory:" && free -h && \
-    echo "📁 Current directory contents:" && ls -la && \
-    echo "📦 Workspace info:" && echo "APP=${APP}, WORKSPACE=${WORKSPACE}" && \
-    echo "🔍 Verifying CLI tools..." && \
-    echo "NPX available: $(which npx)" && \
-    npx next --version && echo "✅ Next.js CLI accessible via npx" || echo "❌ Next.js CLI not accessible" && \
-    echo "🚀 Running turbo build..." && \
+    echo "🚀 Starting UI build..." && \
     NODE_OPTIONS="--max-old-space-size=2048 " \
     npx turbo run build --filter=${WORKSPACE} --only --concurrency=1 --verbosity=2 && \
     echo "✅ Build completed successfully!" || (echo "❌ Build failed!" && exit 1)
