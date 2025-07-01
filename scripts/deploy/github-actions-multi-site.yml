@@ -242,8 +242,12 @@ jobs:
             echo '🐳 Starting Docker build and deployment...'
             echo 'This may take some time, especially on the first run...'
             DOCKER_BUILDKIT=1 docker-compose -f docker-compose.multi-site.yml build --parallel --build-arg BUILDKIT_INLINE_CACHE=1
-            docker-compose -f docker-compose.multi-site.yml up -d --remove-orphans --force-recreate
-            docker-compose -f docker-compose.multi-site.yml logs --tail=50
+            echo '🚀 Deploying services. This command will wait until services are healthy.'
+            docker-compose -f docker-compose.multi-site.yml up -d --remove-orphans --force-recreate --wait
+            echo '✅ All services are healthy!'
+
+            echo '📊 Displaying container logs...'
+            docker-compose -f docker-compose.multi-site.yml logs --tail=100
 
             # Prune old docker images/containers
             echo '🧹 Pruning old Docker assets...'
