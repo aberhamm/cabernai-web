@@ -40,7 +40,7 @@ ARG APP
 ARG WORKSPACE
 
 # Set Node.js memory limits and optimization flags for build process
-ENV NODE_OPTIONS="--max-old-space-size=1536 "
+ENV NODE_OPTIONS="--max-old-space-size=2048 "
 ENV GENERATE_SOURCEMAP=false
 
 WORKDIR /app
@@ -68,11 +68,12 @@ COPY turbo.json turbo.json
 # Set build environment with memory optimizations
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_SHARP=0
 
 # Build with turbo cache and memory constraints
 RUN \
     --mount=type=cache,id=turbo-cache,target=/app/.turbo,sharing=locked \
-    NODE_OPTIONS="--max-old-space-size=1536 " \
+    NODE_OPTIONS="--max-old-space-size=2048 " \
     turbo run build --filter=${WORKSPACE} --concurrency=1
 
 # -------------------------- stage runner ---------------------------------
