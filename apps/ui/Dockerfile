@@ -53,12 +53,16 @@ RUN \
     --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
     --mount=type=cache,id=node-modules,target=/app/node_modules,sharing=locked \
     yarn config set network-concurrency 1 && \
+    npm config set jobs 1 && \
+    export JOBS=1 && \
     yarn install --prefer-offline --frozen-lockfile --ignore-scripts --network-timeout 300000
 
 # Install Sharp for Next.js image optimization with single thread
 RUN \
     --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
     yarn config set network-concurrency 1 && \
+    npm config set jobs 1 && \
+    export JOBS=1 && \
     yarn workspace ${WORKSPACE} add sharp --ignore-engines --prefer-offline --frozen-lockfile --network-timeout 300000
 
 # Build the project and its dependencies
