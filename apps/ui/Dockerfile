@@ -39,6 +39,10 @@ FROM base AS installer
 ARG APP
 ARG WORKSPACE
 
+# Set Node.js memory limits and optimization flags for build process
+ENV NODE_OPTIONS="--max-old-space-size=1536 --optimize-for-size"
+ENV GENERATE_SOURCEMAP=false
+
 WORKDIR /app
 
 # First install dependencies (as they change less often)
@@ -69,14 +73,15 @@ RUN \
 COPY --from=pruned /app/out/full/ .
 COPY turbo.json turbo.json
 
-# Set build environment
+# Set build environment with memory optimizations
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build with turbo cache
+# Build with turbo cache and memory constraints
 RUN \
     --mount=type=cache,id=turbo-cache,target=/app/.turbo,sharing=locked \
-    turbo run build --filter=${WORKSPACE}
+    NODE_OPTIONS="--max-old-space-size=1536 --optimize-for-size" \
+    turbo run build --filter=${WORKSPACE} --concurrency=1
 
 # -------------------------- stage runner ---------------------------------
 FROM base AS runner

@@ -41,6 +41,10 @@ ARG APP
 ARG WORKSPACE
 ENV NODE_ENV=production
 
+# Set Node.js memory limits and optimization flags for build process
+ENV NODE_OPTIONS="--max-old-space-size=2048 --optimize-for-size"
+ENV GENERATE_SOURCEMAP=false
+
 WORKDIR /app
 
 # Install system dependencies for Strapi in a single layer
@@ -88,13 +92,16 @@ ENV PATH /app/apps/${APP}/node_modules/.bin:$PATH
 COPY --from=pruned /app/out/full/ .
 COPY turbo.json turbo.json
 
-# Set build environment
+# Set build environment with memory optimizations
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV STRAPI_DISABLE_UPDATE_NOTIFICATION=true
+ENV STRAPI_HIDE_STARTUP_MESSAGE=true
 
-# Build with turbo cache
+# Build with turbo cache and memory constraints
 RUN \
     --mount=type=cache,id=turbo-cache,target=/app/.turbo,sharing=locked \
-    turbo run build --filter=${WORKSPACE}
+    NODE_OPTIONS="--max-old-space-size=2048 --optimize-for-size" \
+    turbo run build --filter=${WORKSPACE} --concurrency=1
 
 # -------------------------- stage runner ---------------------------------
 FROM base AS runner
