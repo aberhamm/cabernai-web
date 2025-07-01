@@ -221,6 +221,9 @@ jobs:
           # Monitoring - Sentry (DSN duplicated for Next.js compatibility)
           SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           NEXT_PUBLIC_SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          SENTRY_ORG=${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
 
           # System
@@ -276,28 +279,92 @@ jobs:
             echo '📊 Initial container status:'
             docker ps -a
 
-            # Wait for services and show logs in real-time
+            # Wait for services and show logs in real-time with enhanced monitoring
             echo '⏳ Waiting for services to be healthy...'
             timeout 300s bash -c '
-              while true; do
+              attempt=1
+              max_attempts=30
+
+              while [ $attempt -le $max_attempts ]; do
+                echo "🔍 Health check attempt $attempt/$max_attempts..."
+
+                # Check for exited containers first
                 if docker-compose -f docker-compose.multi-site.yml ps | grep -q "Exit"; then
                   echo "❌ Container(s) exited unexpectedly!"
+                  echo "📊 Container status:"
                   docker-compose -f docker-compose.multi-site.yml ps
-                  echo "📋 Container logs:"
-                  docker-compose -f docker-compose.multi-site.yml logs
+                  echo "📋 Container logs (last 50 lines):"
+                  docker-compose -f docker-compose.multi-site.yml logs --tail=50 --timestamps
+                  echo "📊 System resources:"
+                  free -h && df -h /opt
                   exit 1
                 fi
 
-                RUNNING_COUNT=$(docker-compose -f docker-compose.multi-site.yml ps --services --filter "status=running" | wc -l)
-                if [ "$RUNNING_COUNT" -eq 2 ]; then
-                  echo "✅ All services are running!"
+                # Count running containers more reliably
+                RUNNING_COUNT=$(docker-compose -f docker-compose.multi-site.yml ps -q | wc -l)
+                HEALTHY_COUNT=0
+
+                # Check each service individually
+                if docker-compose -f docker-compose.multi-site.yml ps ui | grep -q "Up"; then
+                  HEALTHY_COUNT=$((HEALTHY_COUNT + 1))
+                  echo "✅ UI service is running"
+                else
+                  echo "⏳ UI service not ready yet"
+                fi
+
+                if docker-compose -f docker-compose.multi-site.yml ps strapi | grep -q "Up"; then
+                  HEALTHY_COUNT=$((HEALTHY_COUNT + 1))
+                  echo "✅ Strapi service is running"
+                else
+                  echo "⏳ Strapi service not ready yet"
+                fi
+
+                if [ "$HEALTHY_COUNT" -eq 2 ]; then
+                  echo "✅ All services are running! ($HEALTHY_COUNT/2)"
+
+                  # Quick connectivity test
+                  echo "🔍 Testing basic connectivity..."
+                  if timeout 10 curl -f -s http://127.0.0.1:3000/ > /dev/null 2>&1; then
+                    echo "✅ UI responding on port 3000"
+                  else
+                    echo "⏳ UI not responding yet on port 3000"
+                  fi
+
+                  if timeout 10 curl -f -s http://127.0.0.1:1337/ > /dev/null 2>&1; then
+                    echo "✅ Strapi responding on port 1337"
+                  else
+                    echo "⏳ Strapi not responding yet on port 1337"
+                  fi
+
                   break
                 fi
 
-                echo "⏳ Waiting for services... ($RUNNING_COUNT/2 running)"
-                docker-compose -f docker-compose.multi-site.yml ps
+                echo "⏳ Waiting for services... ($HEALTHY_COUNT/2 healthy)"
+
+                # Show container status every few attempts
+                if [ $((attempt % 3)) -eq 0 ]; then
+                  echo "📊 Current container status:"
+                  docker-compose -f docker-compose.multi-site.yml ps
+                fi
+
+                # Show recent logs every 5 attempts
+                if [ $((attempt % 5)) -eq 0 ]; then
+                  echo "📋 Recent logs (last 10 lines):"
+                  docker-compose -f docker-compose.multi-site.yml logs --tail=10 --timestamps
+                fi
+
+                attempt=$((attempt + 1))
                 sleep 10
               done
+
+              if [ $attempt -gt $max_attempts ]; then
+                echo "❌ Services failed to become healthy within timeout"
+                echo "📊 Final container status:"
+                docker-compose -f docker-compose.multi-site.yml ps
+                echo "📋 Final logs:"
+                docker-compose -f docker-compose.multi-site.yml logs --tail=50 --timestamps
+                exit 1
+              fi
             '
 
             # Show final status and logs
@@ -382,7 +449,7 @@ jobs:
           echo "⏱️  Verification timeout: 10 minutes"
           echo "📊 Verification started at: $(date)"
 
-                    # Progressive verification with better logging and safety checks
+          # Progressive verification with better logging and safety checks
           echo "⏳ Waiting for services to fully initialize..."
           max_attempts=12
           attempt_timeout=15  # timeout per attempt
@@ -413,36 +480,126 @@ jobs:
               exit 1
             }
 
-            # Quick check if containers are running with timeout
+            # Enhanced container status check with better error handling
             echo "📊 Checking container status..."
-            if ! timeout 30 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
-              echo '📊 Container status:'
+            container_status_output=""
+            if container_status_output=$(timeout 30 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
               cd /opt/${{ env.PROJECT_NAME }}
-              timeout 20 docker-compose -f docker-compose.multi-site.yml ps
-            "; then
-              echo "⚠️ Container status check timed out or failed"
+              echo '📊 Container status:'
+              docker-compose -f docker-compose.multi-site.yml ps
+              echo '📊 All containers (including stopped):'
+              docker ps -a --filter 'label=com.docker.compose.project=cabernai-web' --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+              echo '📊 Docker system status:'
+              docker system df
+              echo '📊 Network status:'
+              docker network ls | grep cabernai || echo 'No cabernai network found'
+            " 2>&1); then
+              echo "$container_status_output"
+
+              # Check if any containers are running
+              if echo "$container_status_output" | grep -q "Up"; then
+                echo "✅ Found running containers"
+              else
+                echo "⚠️ No running containers found"
+                # Show container logs for debugging
+                echo "📋 Checking why containers aren't running..."
+                timeout 60 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+                  cd /opt/${{ env.PROJECT_NAME }}
+                  echo '📋 Recent container logs:'
+                  docker-compose -f docker-compose.multi-site.yml logs --tail=20 --timestamps || echo 'No logs available'
+                  echo '📋 Container inspect for stopped containers:'
+                  docker ps -a --filter 'label=com.docker.compose.project=cabernai-web' --format '{{.Names}}' | head -5 | while read container; do
+                    if [ -n \"\$container\" ]; then
+                      echo \"--- \$container ---\"
+                      docker inspect \"\$container\" --format '{{.State.Status}}: {{.State.Error}}' 2>/dev/null || echo 'Inspect failed'
+                    fi
+                  done
+                " || echo "Container debugging failed"
+              fi
+            else
+              echo "⚠️ Container status check failed or timed out"
+              echo "Error output: $container_status_output"
             fi
 
-            # Test local endpoints first (faster) with timeout
+            # Test local endpoints with better error handling
             echo "🔍 Testing local endpoints..."
-            if timeout 30 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
-              timeout 10 curl -f -s --max-time 5 http://127.0.0.1:3000/ > /dev/null &&
-              timeout 10 curl -f -s --max-time 5 http://127.0.0.1:1337/ > /dev/null
+            local_endpoints_ok=false
+
+            # Test UI endpoint
+            if timeout 15 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+              timeout 8 curl -f -s --max-time 5 http://127.0.0.1:3000/ > /dev/null 2>&1
             "; then
-              echo "✅ Local endpoints responding, testing public endpoints..."
+              echo "✅ UI endpoint (3000) responding"
+              ui_ok=true
+            else
+              echo "❌ UI endpoint (3000) not responding"
+              ui_ok=false
+            fi
+
+            # Test Strapi endpoint
+            if timeout 15 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+              timeout 8 curl -f -s --max-time 5 http://127.0.0.1:1337/ > /dev/null 2>&1
+            "; then
+              echo "✅ Strapi endpoint (1337) responding"
+              strapi_ok=true
+            else
+              echo "❌ Strapi endpoint (1337) not responding"
+              strapi_ok=false
+            fi
+
+            # Check if both endpoints are working
+            if [[ "$ui_ok" == "true" && "$strapi_ok" == "true" ]]; then
+              echo "✅ Both local endpoints responding, testing public endpoints..."
+              local_endpoints_ok=true
               break
             elif [[ $i -eq $max_attempts ]]; then
               echo "❌ Local endpoints not responding after $max_attempts attempts (${elapsed}s total)"
-              timeout 60 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+              echo "🔍 Final debugging attempt..."
+
+              # Enhanced debugging for failed deployment
+              timeout 120 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
                 cd /opt/${{ env.PROJECT_NAME }}
-                echo '📋 Container logs:'
-                timeout 45 docker-compose -f docker-compose.multi-site.yml logs --tail=30 || echo 'Log collection timed out'
-              " || echo "Debug info collection failed"
+
+                echo '=== FINAL DEBUG INFO ==='
+                echo '📊 System resources:'
+                free -h && df -h /opt
+
+                echo '📊 Docker status:'
+                docker --version && docker-compose --version
+                docker system df
+
+                echo '📊 All containers:'
+                docker ps -a
+
+                echo '📊 Compose project containers:'
+                docker-compose -f docker-compose.multi-site.yml ps -a
+
+                echo '📊 Network status:'
+                netstat -tulpn | grep -E ':(3000|1337)' || echo 'Ports 3000/1337 not bound'
+
+                echo '📋 Recent logs (last 30 lines per service):'
+                docker-compose -f docker-compose.multi-site.yml logs --tail=30 --timestamps ui 2>/dev/null || echo 'No UI logs'
+                echo '---'
+                docker-compose -f docker-compose.multi-site.yml logs --tail=30 --timestamps strapi 2>/dev/null || echo 'No Strapi logs'
+
+                echo '📊 Docker events (last 50):'
+                docker events --since '10m' --until '0s' 2>/dev/null | tail -50 || echo 'No recent events'
+
+                echo '=== END DEBUG INFO ==='
+              " || echo "Final debug collection failed"
+
               exit 1
             else
               echo "⏳ Services still initializing... (attempt $i/$max_attempts)"
+              echo "   UI: $([[ \"$ui_ok\" == \"true\" ]] && echo \"✅\" || echo \"❌\") | Strapi: $([[ \"$strapi_ok\" == \"true\" ]] && echo \"✅\" || echo \"❌\")"
             fi
           done
+
+          # Only proceed to public endpoint testing if local endpoints are working
+          if [[ "$local_endpoints_ok" != "true" ]]; then
+            echo "❌ Skipping public endpoint tests - local endpoints not working"
+            exit 1
+          fi
 
           # Test public endpoints
           echo "🌐 Testing public endpoints..."

@@ -104,7 +104,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install only runtime dependencies
-RUN apk add --no-cache vips-dev dumb-init
+RUN apk add --no-cache vips-dev dumb-init curl
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 strapi

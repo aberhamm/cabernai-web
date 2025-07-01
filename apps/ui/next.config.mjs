@@ -68,46 +68,43 @@ const nextConfig = {
 const withConfig = (() => {
   let config = withNextIntl(withPlaiceholder(nextConfig))
 
-  config = withSentryConfig(config, {
-    // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options
+  // Only enable Sentry if all required variables are present
+  const hasSentryConfig = env.SENTRY_ORG && env.SENTRY_PROJECT && env.SENTRY_AUTH_TOKEN && env.NEXT_PUBLIC_SENTRY_DSN
 
-    // Pass org, project and auth token to be able to upload source maps
-    org: env.SENTRY_ORG,
-    project: env.SENTRY_PROJECT,
-    authToken: env.SENTRY_AUTH_TOKEN,
+  if (hasSentryConfig) {
+    config = withSentryConfig(config, {
+      // For all available options, see:
+      // https://github.com/getsentry/sentry-webpack-plugin#options
 
-    // Only print logs for uploading source maps in CI
-    silent: !process.env.CI,
+      // Pass org, project and auth token to be able to upload source maps
+      org: env.SENTRY_ORG,
+      project: env.SENTRY_PROJECT,
+      authToken: env.SENTRY_AUTH_TOKEN,
 
-    // For all available options, see:
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+      // Only print logs for uploading source maps in CI
+      silent: !process.env.CI,
 
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
-    widenClientFileUpload: true,
+      // For all available options, see:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-    // Automatically annotate React components to show their full name in breadcrumbs and session replay
-    reactComponentAnnotation: {
-      enabled: true,
-    },
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
 
-    // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-    // This can increase your server load as well as your hosting bill.
-    // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-    // side errors will fail.
-    // tunnelRoute: "/monitoring",
+      // Automatically annotate React components to show their full name in breadcrumbs and session replay
+      reactComponentAnnotation: {
+        enabled: true,
+      },
 
-    // Hides source maps from generated client bundles
-    hideSourceMaps: true,
+      // Hides source maps from generated client bundles
+      hideSourceMaps: true,
 
-    // sourcemaps: {
-    //   // To disable sourcemap plugin, set this to true
-    //   disable: true
-    // }
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
+    })
+  } else {
+    console.log('⚠️ Sentry configuration skipped - missing required environment variables')
+  }
 
-    // Automatically tree-shake Sentry logger statements to reduce bundle size
-    disableLogger: true,
-  })
   return config
 })()
 

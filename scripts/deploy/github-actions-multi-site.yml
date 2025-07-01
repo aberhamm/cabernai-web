@@ -208,6 +208,9 @@ jobs:
           # Monitoring - Sentry (DSN duplicated for Next.js compatibility)
           SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           NEXT_PUBLIC_SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          SENTRY_ORG=${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1
 
           # System
