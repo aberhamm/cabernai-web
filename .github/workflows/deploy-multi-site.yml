@@ -16,13 +16,20 @@ on:
 env:
   PROJECT_NAME: cabernai-web
   DEPLOY_USER: deploy
+  REGISTRY: ghcr.io
+  IMAGE_NAME_UI: ${{ github.repository }}-ui
+  IMAGE_NAME_STRAPI: ${{ github.repository }}-strapi
 
 jobs:
-  test:
-    name: Test & Build
+  build:
+    name: Build Docker Images
     runs-on: ubuntu-latest
-    environment:
-      name: production
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-ui: ${{ steps.image.outputs.image-ui }}
+      image-strapi: ${{ steps.image.outputs.image-strapi }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -60,24 +67,77 @@ jobs:
           echo "⚠️ Skipping Strapi type generation in CI due to Sharp dependency conflicts"
           echo "✅ Strapi types will be generated during deployment on the server where Sharp is properly installed"
 
-      - name: Build applications
-        env:
-          # Production environment variables for build - derived from domain
-          NEXT_PUBLIC_APP_PUBLIC_URL: https://${{ vars.DOMAIN_NAME }}
-          NEXT_PUBLIC_STRAPI_URL: https://${{ vars.DOMAIN_NAME }}
-          NODE_ENV: production
-          # Skip Sharp module during build to avoid platform compatibility issues
-          NEXT_SHARP: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for UI
+        id: meta-ui
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_UI }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Extract metadata for Strapi
+        id: meta-strapi
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_STRAPI }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push UI image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/ui/Dockerfile
+          push: true
+          tags: ${{ steps.meta-ui.outputs.tags }}
+          labels: ${{ steps.meta-ui.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            APP=ui
+            WORKSPACE=@repo/ui
+            BUILDKIT_INLINE_CACHE=1
+
+      - name: Build and push Strapi image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/strapi/Dockerfile
+          push: true
+          tags: ${{ steps.meta-strapi.outputs.tags }}
+          labels: ${{ steps.meta-strapi.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            APP=strapi
+            WORKSPACE=@repo/strapi
+            BUILDKIT_INLINE_CACHE=1
+
+      - name: Output image names
+        id: image
         run: |
-          echo "🔍 Debug: DOMAIN_NAME = '${{ vars.DOMAIN_NAME }}'"
-          echo "🔍 Debug: NEXT_PUBLIC_APP_PUBLIC_URL = '$NEXT_PUBLIC_APP_PUBLIC_URL'"
-          echo "🔍 Debug: NEXT_PUBLIC_STRAPI_URL = '$NEXT_PUBLIC_STRAPI_URL'"
-          echo "🔍 Debug: NEXT_SHARP = '$NEXT_SHARP'"
-          yarn build
+          echo "image-ui=${{ env.REGISTRY }}/${{ env.IMAGE_NAME_UI }}:latest" >> $GITHUB_OUTPUT
+          echo "image-strapi=${{ env.REGISTRY }}/${{ env.IMAGE_NAME_STRAPI }}:latest" >> $GITHUB_OUTPUT
 
   deploy:
     name: Deploy to Production (Multi-Site)
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     environment:
@@ -167,7 +227,98 @@ jobs:
             --exclude .next \
             --exclude .cache \
             --exclude .tmp \
+            --exclude apps/ui/Dockerfile \
+            --exclude apps/strapi/Dockerfile \
             ./ ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }}:/opt/${{ env.PROJECT_NAME }}/
+
+      - name: Create optimized Docker Compose for deployment
+        run: |
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            cd /opt/${{ env.PROJECT_NAME }}
+
+            # Create deployment-specific docker-compose.yml that uses pre-built images
+            cat > docker-compose.deploy.yml << 'EOF'
+          version: '3.8'
+
+          services:
+            ui:
+              image: ${{ needs.build.outputs.image-ui }}
+              restart: unless-stopped
+              environment:
+                - NODE_ENV=production
+                - NEXT_TELEMETRY_DISABLED=1
+              env_file:
+                - .env
+              ports:
+                - "127.0.0.1:3000:3000"
+              healthcheck:
+                test: ["CMD-SHELL", "curl -f http://localhost:3000 || node -e \"require('http').get('http://localhost:3000', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\" || exit 1"]
+                interval: 30s
+                timeout: 10s
+                retries: 5
+                start_period: 60s
+              depends_on:
+                strapi:
+                  condition: service_healthy
+              networks:
+                - cabernai_network
+                - default
+              labels:
+                - traefik.enable=false
+
+            strapi:
+              image: ${{ needs.build.outputs.image-strapi }}
+              restart: unless-stopped
+              environment:
+                - NODE_ENV=production
+                - HOST=0.0.0.0
+                - PORT=1337
+              env_file:
+                - .env
+              ports:
+                - "127.0.0.1:1337:1337"
+              volumes:
+                - strapi_uploads:/app/apps/strapi/public/uploads
+              healthcheck:
+                test: ["CMD-SHELL", "curl -f http://localhost:1337/admin || node -e \"require('http').get('http://localhost:1337/admin', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\" || exit 1"]
+                interval: 30s
+                timeout: 10s
+                retries: 5
+                start_period: 60s
+              networks:
+                - cabernai_network
+                - default
+              labels:
+                - traefik.enable=false
+
+            watchtower:
+              image: containrrr/watchtower
+              restart: unless-stopped
+              command: --interval 3600 --cleanup --scope cabernai-web
+              environment:
+                - WATCHTOWER_CLEANUP=true
+                - WATCHTOWER_POLL_INTERVAL=3600
+                - WATCHTOWER_INCLUDE_STOPPED=true
+                - WATCHTOWER_REVIVE_STOPPED=false
+                - WATCHTOWER_NO_STARTUP_MESSAGE=true
+              volumes:
+                - /var/run/docker.sock:/var/run/docker.sock
+              networks:
+                - cabernai_network
+              labels:
+                - com.centurylinklabs.watchtower.scope=cabernai-web
+
+          networks:
+            cabernai_network:
+              external: true
+
+          volumes:
+            strapi_uploads:
+              name: cabernai_strapi_uploads
+          EOF
+
+            echo '✅ Created deployment-specific docker-compose.yml with pre-built images'
+          "
 
       - name: Create environment file
         run: |
@@ -192,6 +343,7 @@ jobs:
           DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}
           DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
           DATABASE_SSL=${{ secrets.DATABASE_SSL }}
+          DATABASE_SSL_REJECT_UNAUTHORIZED=false
 
           # Strapi secrets
           APP_KEYS=${{ secrets.APP_KEYS }}
@@ -240,11 +392,18 @@ jobs:
             echo '✅ Created single .env file - automatically loaded into ALL containers!'
           "
 
-      - name: Deploy application (Multi-Site)
-        timeout-minutes: 30 # Reduced timeout due to optimizations
+      - name: Log in to Container Registry on server
         run: |
-          echo "🚀 Starting optimized multi-site deployment..."
-          echo "⏱️  Deployment timeout: 30 minutes (reduced from 45 due to build optimizations)"
+          ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
+            echo '${{ secrets.GITHUB_TOKEN }}' | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            echo '✅ Logged in to container registry on server'
+          "
+
+      - name: Deploy application (Multi-Site with pre-built images)
+        timeout-minutes: 15 # Significantly reduced timeout since we're not building
+        run: |
+          echo "🚀 Starting optimized multi-site deployment with pre-built images..."
+          echo "⏱️  Deployment timeout: 15 minutes (reduced - no building required)"
           echo "📊 Deployment started at: $(date)"
 
           ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
@@ -254,133 +413,123 @@ jobs:
             echo '=== SYSTEM STATUS ==='
             free -h && df -h && nproc
 
-            # Build and deploy with Docker Compose
-            echo '🐳 Starting Docker build and deployment...'
-            echo 'This may take some time, especially on the first run...'
+            # Pull the latest images first
+            echo '📥 Pulling pre-built images from registry...'
+            docker pull ${{ needs.build.outputs.image-ui }}
+            docker pull ${{ needs.build.outputs.image-strapi }}
 
             # Ensure clean state
             echo '🧹 Cleaning up any existing containers...'
-            docker-compose -f docker-compose.multi-site.yml down --remove-orphans || true
+            docker-compose -f docker-compose.deploy.yml down --remove-orphans || true
 
             # Show Docker system info
-            echo '📊 Docker system status before build:'
+            echo '📊 Docker system status:'
             docker system df
-            docker system info
 
-            # Build with detailed output
-            echo '🏗️ Building images...'
-            DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f docker-compose.multi-site.yml build --parallel --build-arg BUILDKIT_INLINE_CACHE=1 --progress=plain
-
-            # Start services with detailed logging
-            echo '🚀 Starting services...'
-            docker-compose -f docker-compose.multi-site.yml up -d --remove-orphans --force-recreate
+            # Start services with pre-built images
+            echo '🚀 Starting services with pre-built images...'
+            docker-compose -f docker-compose.deploy.yml up -d --remove-orphans --force-recreate
 
             # Show immediate status
             echo '📊 Initial container status:'
             docker ps -a
 
-            # Wait for services and show logs in real-time with enhanced monitoring
+            # Wait for services with enhanced monitoring
             echo '⏳ Waiting for services to be healthy...'
-            timeout 300s bash -c '
+            timeout 240s bash -c '
               attempt=1
-              max_attempts=30
+              max_attempts=24
 
-              while [ $attempt -le $max_attempts ]; do
-                echo "🔍 Health check attempt $attempt/$max_attempts..."
+              while [ \$attempt -le \$max_attempts ]; do
+                echo \"🔍 Health check attempt \$attempt/\$max_attempts...\"
 
                 # Check for exited containers first
-                if docker-compose -f docker-compose.multi-site.yml ps | grep -q "Exit"; then
-                  echo "❌ Container(s) exited unexpectedly!"
-                  echo "📊 Container status:"
-                  docker-compose -f docker-compose.multi-site.yml ps
-                  echo "📋 Container logs (last 50 lines):"
-                  docker-compose -f docker-compose.multi-site.yml logs --tail=50 --timestamps
-                  echo "📊 System resources:"
+                if docker-compose -f docker-compose.deploy.yml ps | grep -q \"Exit\"; then
+                  echo \"❌ Container(s) exited unexpectedly!\"
+                  echo \"📊 Container status:\"
+                  docker-compose -f docker-compose.deploy.yml ps
+                  echo \"📋 Container logs (last 30 lines):\"
+                  docker-compose -f docker-compose.deploy.yml logs --tail=30 --timestamps
+                  echo \"📊 System resources:\"
                   free -h && df -h /opt
                   exit 1
                 fi
 
-                # Count running containers more reliably
-                RUNNING_COUNT=$(docker-compose -f docker-compose.multi-site.yml ps -q | wc -l)
+                # Count running containers
                 HEALTHY_COUNT=0
 
                 # Check each service individually
-                if docker-compose -f docker-compose.multi-site.yml ps ui | grep -q "Up"; then
-                  HEALTHY_COUNT=$((HEALTHY_COUNT + 1))
-                  echo "✅ UI service is running"
+                if docker-compose -f docker-compose.deploy.yml ps ui | grep -q \"Up\"; then
+                  HEALTHY_COUNT=\$((HEALTHY_COUNT + 1))
+                  echo \"✅ UI service is running\"
                 else
-                  echo "⏳ UI service not ready yet"
+                  echo \"⏳ UI service not ready yet\"
                 fi
 
-                if docker-compose -f docker-compose.multi-site.yml ps strapi | grep -q "Up"; then
-                  HEALTHY_COUNT=$((HEALTHY_COUNT + 1))
-                  echo "✅ Strapi service is running"
+                if docker-compose -f docker-compose.deploy.yml ps strapi | grep -q \"Up\"; then
+                  HEALTHY_COUNT=\$((HEALTHY_COUNT + 1))
+                  echo \"✅ Strapi service is running\"
                 else
-                  echo "⏳ Strapi service not ready yet"
+                  echo \"⏳ Strapi service not ready yet\"
                 fi
 
-                if [ "$HEALTHY_COUNT" -eq 2 ]; then
-                  echo "✅ All services are running! ($HEALTHY_COUNT/2)"
+                if [ \"\$HEALTHY_COUNT\" -eq 2 ]; then
+                  echo \"✅ All services are running! (\$HEALTHY_COUNT/2)\"
 
                   # Quick connectivity test
-                  echo "🔍 Testing basic connectivity..."
+                  echo \"🔍 Testing basic connectivity...\"
                   if timeout 10 curl -f -s http://127.0.0.1:3000/ > /dev/null 2>&1; then
-                    echo "✅ UI responding on port 3000"
+                    echo \"✅ UI responding on port 3000\"
                   else
-                    echo "⏳ UI not responding yet on port 3000"
+                    echo \"⏳ UI not responding yet on port 3000\"
                   fi
 
                   if timeout 10 curl -f -s http://127.0.0.1:1337/ > /dev/null 2>&1; then
-                    echo "✅ Strapi responding on port 1337"
+                    echo \"✅ Strapi responding on port 1337\"
                   else
-                    echo "⏳ Strapi not responding yet on port 1337"
+                    echo \"⏳ Strapi not responding yet on port 1337\"
                   fi
 
                   break
                 fi
 
-                echo "⏳ Waiting for services... ($HEALTHY_COUNT/2 healthy)"
+                echo \"⏳ Waiting for services... (\$HEALTHY_COUNT/2 healthy)\"
 
                 # Show container status every few attempts
-                if [ $((attempt % 3)) -eq 0 ]; then
-                  echo "📊 Current container status:"
-                  docker-compose -f docker-compose.multi-site.yml ps
+                if [ \$((attempt % 3)) -eq 0 ]; then
+                  echo \"📊 Current container status:\"
+                  docker-compose -f docker-compose.deploy.yml ps
                 fi
 
                 # Show recent logs every 5 attempts
-                if [ $((attempt % 5)) -eq 0 ]; then
-                  echo "📋 Recent logs (last 10 lines):"
-                  docker-compose -f docker-compose.multi-site.yml logs --tail=10 --timestamps
+                if [ \$((attempt % 5)) -eq 0 ]; then
+                  echo \"📋 Recent logs (last 10 lines):\"
+                  docker-compose -f docker-compose.deploy.yml logs --tail=10 --timestamps
                 fi
 
-                attempt=$((attempt + 1))
+                attempt=\$((attempt + 1))
                 sleep 10
               done
 
-              if [ $attempt -gt $max_attempts ]; then
-                echo "❌ Services failed to become healthy within timeout"
-                echo "📊 Final container status:"
-                docker-compose -f docker-compose.multi-site.yml ps
-                echo "📋 Final logs:"
-                docker-compose -f docker-compose.multi-site.yml logs --tail=50 --timestamps
+              if [ \$attempt -gt \$max_attempts ]; then
+                echo \"❌ Services failed to become healthy within timeout\"
+                echo \"📊 Final container status:\"
+                docker-compose -f docker-compose.deploy.yml ps
+                echo \"📋 Final logs:\"
+                docker-compose -f docker-compose.deploy.yml logs --tail=50 --timestamps
                 exit 1
               fi
             '
 
             # Show final status and logs
             echo '📊 Final container status:'
-            docker-compose -f docker-compose.multi-site.yml ps
+            docker-compose -f docker-compose.deploy.yml ps
             echo '📋 Container logs:'
-            docker-compose -f docker-compose.multi-site.yml logs --no-color --tail=200
-
-            # Verify network connectivity
-            echo '🔍 Testing container networking:'
-            docker network ls
-            docker network inspect cabernai_network || true
+            docker-compose -f docker-compose.deploy.yml logs --no-color --tail=100
 
             # Show resource usage
             echo '📊 Resource usage:'
-            docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"
+            docker stats --no-stream --format \"table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\"
 
             # Prune old docker images/containers
             echo '🧹 Pruning old Docker assets...'
@@ -397,6 +546,7 @@ jobs:
             sudo nginx -t
             echo '✅ Nginx configuration test successful!'
             echo '🔄 Reloading Nginx...'
+            sudo systemctl reload nginx
             sudo systemctl reload nginx
 
             echo '✅ Nginx reloaded successfully!'
@@ -486,7 +636,7 @@ jobs:
             if container_status_output=$(timeout 30 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
               cd /opt/${{ env.PROJECT_NAME }}
               echo '📊 Container status:'
-              docker-compose -f docker-compose.multi-site.yml ps
+              docker-compose -f docker-compose.deploy.yml ps
               echo '📊 All containers (including stopped):'
               docker ps -a --filter 'label=com.docker.compose.project=cabernai-web' --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
               echo '📊 Docker system status:'
@@ -506,7 +656,7 @@ jobs:
                 timeout 60 ssh ${{ env.DEPLOY_USER }}@${{ secrets.DROPLET_HOST }} "
                   cd /opt/${{ env.PROJECT_NAME }}
                   echo '📋 Recent container logs:'
-                  docker-compose -f docker-compose.multi-site.yml logs --tail=20 --timestamps || echo 'No logs available'
+                  docker-compose -f docker-compose.deploy.yml logs --tail=20 --timestamps || echo 'No logs available'
                   echo '📋 Container inspect for stopped containers:'
                   docker ps -a --filter 'label=com.docker.compose.project=cabernai-web' --format '{{.Names}}' | head -5 | while read container; do
                     if [ -n \"\$container\" ]; then
@@ -572,15 +722,15 @@ jobs:
                 docker ps -a
 
                 echo '📊 Compose project containers:'
-                docker-compose -f docker-compose.multi-site.yml ps -a
+                docker-compose -f docker-compose.deploy.yml ps -a
 
                 echo '📊 Network status:'
                 netstat -tulpn | grep -E ':(3000|1337)' || echo 'Ports 3000/1337 not bound'
 
                 echo '📋 Recent logs (last 30 lines per service):'
-                docker-compose -f docker-compose.multi-site.yml logs --tail=30 --timestamps ui 2>/dev/null || echo 'No UI logs'
+                docker-compose -f docker-compose.deploy.yml logs --tail=30 --timestamps ui 2>/dev/null || echo 'No UI logs'
                 echo '---'
-                docker-compose -f docker-compose.multi-site.yml logs --tail=30 --timestamps strapi 2>/dev/null || echo 'No Strapi logs'
+                docker-compose -f docker-compose.deploy.yml logs --tail=30 --timestamps strapi 2>/dev/null || echo 'No Strapi logs'
 
                 echo '📊 Docker events (last 50):'
                 docker events --since '10m' --until '0s' 2>/dev/null | tail -50 || echo 'No recent events'
@@ -735,11 +885,11 @@ jobs:
 
             echo '=== CONTAINER STATUS ==='
             cd /opt/${{ env.PROJECT_NAME }} || exit 1
-            timeout 30 docker-compose -f docker-compose.multi-site.yml ps || echo 'container status check timed out'
+            timeout 30 docker-compose -f docker-compose.deploy.yml ps || echo 'container status check timed out'
 
             echo '=== CONTAINER LOGS (last 50 lines each) ==='
-            timeout 60 docker-compose -f docker-compose.multi-site.yml logs --tail=50 ui || echo 'UI logs collection timed out'
-            timeout 60 docker-compose -f docker-compose.multi-site.yml logs --tail=50 strapi || echo 'Strapi logs collection timed out'
+            timeout 60 docker-compose -f docker-compose.deploy.yml logs --tail=50 ui || echo 'UI logs collection timed out'
+            timeout 60 docker-compose -f docker-compose.deploy.yml logs --tail=50 strapi || echo 'Strapi logs collection timed out'
 
             echo '=== NGINX STATUS ==='
             timeout 15 systemctl status nginx || echo 'nginx status check timed out'
