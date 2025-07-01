@@ -254,13 +254,66 @@ jobs:
             # Build and deploy with Docker Compose
             echo '🐳 Starting Docker build and deployment...'
             echo 'This may take some time, especially on the first run...'
-            DOCKER_BUILDKIT=1 docker-compose -f docker-compose.multi-site.yml build --parallel --build-arg BUILDKIT_INLINE_CACHE=1
-            echo '🚀 Deploying services. This command will wait until services are healthy.'
-            docker-compose -f docker-compose.multi-site.yml up -d --remove-orphans --force-recreate --wait
-            echo '✅ All services are healthy!'
 
-            echo '📊 Displaying container logs...'
-            docker-compose -f docker-compose.multi-site.yml logs --tail=100
+            # Ensure clean state
+            echo '🧹 Cleaning up any existing containers...'
+            docker-compose -f docker-compose.multi-site.yml down --remove-orphans || true
+
+            # Show Docker system info
+            echo '📊 Docker system status before build:'
+            docker system df
+            docker system info
+
+            # Build with detailed output
+            echo '🏗️ Building images...'
+            DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f docker-compose.multi-site.yml build --parallel --build-arg BUILDKIT_INLINE_CACHE=1 --progress=plain
+
+            # Start services with detailed logging
+            echo '🚀 Starting services...'
+            docker-compose -f docker-compose.multi-site.yml up -d --remove-orphans --force-recreate
+
+            # Show immediate status
+            echo '📊 Initial container status:'
+            docker ps -a
+
+            # Wait for services and show logs in real-time
+            echo '⏳ Waiting for services to be healthy...'
+            timeout 300s bash -c '
+              while true; do
+                if docker-compose -f docker-compose.multi-site.yml ps | grep -q "Exit"; then
+                  echo "❌ Container(s) exited unexpectedly!"
+                  docker-compose -f docker-compose.multi-site.yml ps
+                  echo "📋 Container logs:"
+                  docker-compose -f docker-compose.multi-site.yml logs
+                  exit 1
+                fi
+
+                RUNNING_COUNT=$(docker-compose -f docker-compose.multi-site.yml ps --services --filter "status=running" | wc -l)
+                if [ "$RUNNING_COUNT" -eq 2 ]; then
+                  echo "✅ All services are running!"
+                  break
+                fi
+
+                echo "⏳ Waiting for services... ($RUNNING_COUNT/2 running)"
+                docker-compose -f docker-compose.multi-site.yml ps
+                sleep 10
+              done
+            '
+
+            # Show final status and logs
+            echo '📊 Final container status:'
+            docker-compose -f docker-compose.multi-site.yml ps
+            echo '📋 Container logs:'
+            docker-compose -f docker-compose.multi-site.yml logs --no-color --tail=200
+
+            # Verify network connectivity
+            echo '🔍 Testing container networking:'
+            docker network ls
+            docker network inspect cabernai_network || true
+
+            # Show resource usage
+            echo '📊 Resource usage:'
+            docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}"
 
             # Prune old docker images/containers
             echo '🧹 Pruning old Docker assets...'
