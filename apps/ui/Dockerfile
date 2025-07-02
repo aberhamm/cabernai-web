@@ -51,13 +51,16 @@ COPY --from=pruned /app/out/yarn.lock ./yarn.lock
 # No need to install turbo globally - will use npx
 
 # Install dependencies with resource constraints optimization
+# First install all dependencies at root level
 RUN \
     --mount=type=cache,id=yarn-cache,target=/usr/local/share/.cache/yarn/v6,sharing=locked \
-    --mount=type=cache,id=node-modules,target=/app/node_modules,sharing=locked \
     yarn config set network-concurrency 1 && \
     export JOBS=1 && \
     export npm_config_jobs=1 && \
-    yarn install --prefer-offline --frozen-lockfile --ignore-scripts --network-timeout 300000
+    yarn install --prefer-offline --network-timeout 300000 && \
+    echo "🔍 Verifying @t3-oss/env-nextjs installation..." && \
+    find . -name "*t3-oss*" -type d && \
+    node -e "console.log('✅ Package resolved:', require.resolve('@t3-oss/env-nextjs'))" || echo "❌ Package not found"
 
 # Copy source files AFTER dependency installation to avoid conflicts
 COPY --from=pruned /app/out/full/ .
@@ -71,6 +74,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_SHARP=0
 ENV NEXT_OUTPUT=standalone
 ENV NEXT_IMAGES_UNOPTIMIZED=false
+
+# Add required environment variables for @t3-oss/env-nextjs validation
+ENV NEXT_PUBLIC_APP_PUBLIC_URL=http://localhost:3000
+ENV NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
 
 # Build with turbo cache and memory constraints
 RUN \

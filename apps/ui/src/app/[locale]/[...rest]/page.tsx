@@ -1,13 +1,31 @@
-import { notFound } from 'next/navigation'
-import { setRequestLocale } from 'next-intl/server'
-
-import { PageProps } from '@/types/next'
-
+import { ComponentsRenderer } from '@/components/page-builder/ComponentsRenderer'
 import { routing } from '@/lib/navigation'
 import { getMetadataFromStrapi } from '@/lib/next-helpers'
 import Strapi from '@/lib/strapi'
-import { ErrorBoundary } from '@/components/elementary/ErrorBoundary'
+import { PageProps } from '@/types/next'
+import { setRequestLocale } from 'next-intl/server'
+import { notFound } from 'next/navigation'
 import { ComponentsRenderer } from '@/components/page-builder/ComponentsRenderer'
+import { routing } from '@/lib/navigation'
+import { getMetadataFromStrapi } from '@/lib/next-helpers'
+import Strapi from '@/lib/strapi'
+import { PageProps } from '@/types/next'
+import { setRequestLocale } from 'next-intl/server'
+import { notFound } from 'next/navigation'
+import { ComponentsRenderer } from '@/components/page-builder/ComponentsRenderer'
+import { routing } from '@/lib/navigation'
+import { getMetadataFromStrapi } from '@/lib/next-helpers'
+import Strapi from '@/lib/strapi'
+import { PageProps } from '@/types/next'
+import { setRequestLocale } from 'next-intl/server'
+import { notFound } from 'next/navigation'
+import { ComponentsRenderer } from '@/components/page-builder/ComponentsRenderer'
+import { routing } from '@/lib/navigation'
+import { getMetadataFromStrapi } from '@/lib/next-helpers'
+import Strapi from '@/lib/strapi'
+import { PageProps } from '@/types/next'
+import { setRequestLocale } from 'next-intl/server'
+import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {
   const promises = routing.locales.map((locale) =>
@@ -71,7 +89,7 @@ export default async function StrapiPage({ params }: Props) {
     notFound()
   }
 
-  const pageComponents = page.content.filter((x) => {
+  const pageComponents = page.content.filter((x: any) => {
     return x.__component !== 'layout.navbar' && ('isVisible' in x ? x.isVisible : true)
   })
 
