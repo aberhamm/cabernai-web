@@ -1,5 +1,6 @@
 import type { Core } from '@strapi/strapi'
 
+import { registerPopulatePageMiddleware } from './documentMiddlewares/page'
 import { registerAdminUserSubscriber } from './lifeCycles/adminUser'
 import { registerUserSubscriber } from './lifeCycles/user'
 
@@ -22,5 +23,7 @@ export default {
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
     registerAdminUserSubscriber({ strapi })
     registerUserSubscriber({ strapi })
+
+    registerPopulatePageMiddleware({ strapi })
   },
 }
