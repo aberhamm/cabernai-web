@@ -8,18 +8,19 @@ import { routing } from './lib/navigation'
 // https://next-intl-docs.vercel.app/docs/getting-started/app-router
 const intlMiddleware = createMiddleware(routing)
 
-const publicPages = [
-  '/',
-  '/auth/activate',
-  '/auth/forgot-password',
-  '/auth/reset-password',
-  '/auth/register',
-  '/auth/signin',
-  '/builder',
-  '/builder/.*', // use regex to match all builder pages
-  '/docs',
-  '/digital-ocean',
-]
+// Public pages configuration - currently unused but kept for future implementation
+// const publicPages = [
+//   '/',
+//   '/auth/activate',
+//   '/auth/forgot-password',
+//   '/auth/reset-password',
+//   '/auth/register',
+//   '/auth/signin',
+//   '/builder',
+//   '/builder/.*', // use regex to match all builder pages
+//   '/docs',
+//   '/digital-ocean',
+// ]
 
 const authMiddleware = withAuth(
   // Note that this callback is only invoked if
@@ -47,13 +48,7 @@ export default function middleware(req: NextRequest) {
     return NextResponse.redirect(`https://${req.headers.get('host')}${req.nextUrl.pathname}`, 301)
   }
 
-  const publicPathnameRegex = RegExp(
-    `^(/(${routing.locales.join('|')}))?(${publicPages
-      .flatMap((p) => (p === '/' ? ['', '/'] : p))
-      .join('|')})/?$`,
-    'i'
-  )
-  const isPublicPage = true // publicPathnameRegex.test(req.nextUrl.pathname)
+  const isPublicPage = true // For now, all pages are public
 
   if (isPublicPage) {
     return intlMiddleware(req)

@@ -162,7 +162,6 @@ import { cn } from '@/lib/styles'
 import { cn } from '@/lib/styles'
 import { cn } from '@/lib/styles'
 import { cn } from '@/lib/styles'
-
 ;<div className={cn('flex items-center justify-center', className)}>...</div>
 ```
 
@@ -254,11 +253,11 @@ For full navigation functionality in cooperation with `next-intl`, some function
 
 ```tsx
 // ✅ OK
-import { notFound, useSearchParams } from "next/navigation"
-import { Link, useRouter, redirect } from "@/lib/navigation"
+import { notFound, useSearchParams } from 'next/navigation'
+import { Link, useRouter, redirect } from '@/lib/navigation'
 
 // ❌ NOT OK
-import { Link, useRouter, redirect } from "next/navigation"
+import { Link, useRouter, redirect } from 'next/navigation'
 ```
 
 ### Environment variables

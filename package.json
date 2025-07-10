@@ -19,11 +19,14 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npx turbo build --cache-dir=.turbo",
-    "build:fast": "npx turbo build --cache-dir=.turbo --parallel",
-    "build:production": "NODE_ENV=production npx turbo build --cache-dir=.turbo --parallel",
-    "build:strapi": "npx turbo run build --filter=@repo/strapi",
-    "build:ui": "npx turbo run build --filter=@repo/ui",
+    "build": "npx turbo build --cache-dir=.turbo --parallel",
+    "build:fast": "NEXT_SHARP=0 GENERATE_SOURCEMAP=false npx turbo build --cache-dir=.turbo --parallel --concurrency=12",
+    "build:optimized": "NODE_ENV=production NEXT_SHARP=0 GENERATE_SOURCEMAP=false NEXT_TELEMETRY_DISABLED=1 npx turbo build --cache-dir=.turbo --parallel --concurrency=12 --force",
+    "build:production": "NODE_ENV=production NEXT_SHARP=0 GENERATE_SOURCEMAP=false npx turbo build --cache-dir=.turbo --parallel --concurrency=12",
+    "build:strapi": "npx turbo run build --filter=@repo/strapi --cache-dir=.turbo",
+    "build:ui": "npx turbo run build --filter=@repo/ui --cache-dir=.turbo",
+    "clean": "npx turbo clean && rm -rf .turbo && rm -rf node_modules/.cache",
+    "clean:all": "rm -rf node_modules && rm -rf .turbo && rm -rf apps/*/node_modules && rm -rf apps/*/.next && rm -rf apps/*/dist",
     "commit": "git-cz",
     "dev": "npx turbo dev",
     "dev:strapi": "npx turbo run dev --filter=@repo/strapi",
@@ -31,25 +34,27 @@
     "dev:unified": "docker-compose -f docker-compose.dev.yml up --build",
     "docker:build": "DOCKER_BUILDKIT=1 docker-compose -f docker-compose.multi-site.yml build --parallel --compress",
     "docker:build:fast": "DOCKER_BUILDKIT=1 docker-compose -f docker-compose.multi-site.yml build --parallel --compress --pull",
+    "docker:build:optimized": "DOCKER_BUILDKIT=1 BUILDKIT_INLINE_CACHE=1 docker-compose -f docker-compose.multi-site.yml build --parallel --compress --pull --build-arg BUILDKIT_INLINE_CACHE=1",
     "docker:clean": "docker system prune -f && docker builder prune -f",
     "format": "prettier --write --cache --ignore-unknown \"**/*.{js,jsx,ts,tsx,md,css,scss}\"",
     "format:check": "prettier --check --cache --ignore-unknown \"**/*.{js,jsx,ts,tsx,md,css,scss}\"",
     "heroku-postbuild": "bash ./scripts/heroku/heroku-postbuild.sh",
     "preinstall": "npx only-allow yarn",
     "postinstall": "node -e \"try { require('sharp') } catch (e) { console.log('Sharp not found, skipping...') }\"",
-    "lint": "npx turbo lint",
-    "lint:fix": "npx turbo lint -- --fix",
-    "lint:fix:ui": "npx turbo run lint --filter=@repo/ui -- --fix",
+    "lint": "npx turbo lint --cache-dir=.turbo --parallel",
+    "lint:fix": "npx turbo lint:fix --cache-dir=.turbo --parallel",
     "prepare": "husky",
-    "preview": "npx turbo run build && npx turbo run start",
+    "preview": "npx turbo run build:fast && npx turbo run start",
     "quality": "yarn lint:fix && yarn format",
     "quality:check": "yarn lint && yarn format:check",
     "start": "npx turbo run start",
-    "start:strapi": "npx turbo run start --filter=@repo/strapi",
-    "start:ui": "npx turbo run start --filter=@repo/ui",
-    "typecheck": "npx tsc --noEmit"
+    "test": "npx turbo run test --cache-dir=.turbo --parallel",
+    "typecheck": "npx turbo typecheck --cache-dir=.turbo --parallel"
   },
   "prettier": "@repo/prettier-config",
+  "dependencies": {
+    "sharp": "^0.34.2"
+  },
   "devDependencies": {
     "@commitlint/cli": "19.3.0",
     "@commitlint/config-conventional": "19.2.2",
@@ -66,7 +71,7 @@
   },
   "packageManager": "yarn@1.22.22",
   "engines": {
-    "node": "20.x.x",
+    "node": ">=20.x.x",
     "yarn": "1.22.x"
   },
   "comments": {
