@@ -5,7 +5,7 @@ import { setRequestLocale } from 'next-intl/server'
 
 import { LayoutProps } from '@/types/next'
 
-import { fontInter, fontRoboto } from '@/lib/fonts'
+import { fontInter } from '@/lib/fonts'
 import { setupLibraries } from '@/lib/general-helpers'
 import { routing } from '@/lib/navigation'
 import { cn } from '@/lib/styles'

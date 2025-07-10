@@ -1,12 +1,12 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
+import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 
 import { SetPasswordForm } from './_components/SetPasswordForm'
 

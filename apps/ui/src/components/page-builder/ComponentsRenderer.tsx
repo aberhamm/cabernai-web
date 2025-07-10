@@ -1,7 +1,5 @@
 import { Schema, UID } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
-
 import { ErrorBoundary } from '../elementary/ErrorBoundary'
 import { AnimatedLogoRow } from './components/AnimatedLogoRow'
 import { BenefitsCTAGrid } from './components/BenefitsCTAGrid'

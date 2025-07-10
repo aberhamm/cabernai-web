@@ -7,7 +7,6 @@ import { routing } from '@/lib/navigation'
 import { getMetadataFromStrapi } from '@/lib/next-helpers'
 import Strapi from '@/lib/strapi'
 import { ComponentsRenderer } from '@/components/page-builder/ComponentsRenderer'
-import { Footer } from '@/components/page-builder/single-types/Footer'
 
 export async function generateStaticParams() {
   const promises = routing.locales.map((locale) =>

@@ -27,12 +27,12 @@ function CheckIcon({ className, ...props }: React.ComponentPropsWithoutRef<'svg'
   )
 }
 
-export function Plan({
+export const Plan = ({
   component,
 }: {
   readonly component: Schema.Attribute.ComponentValue<'elements.plan', false>
-}) {
-  const { name, monthPrice, yearPrice, description, features, isRecommended } = component
+}) => {
+  const { name, monthPrice, description, features, isRecommended } = component
   const href = '#'
 
   return (

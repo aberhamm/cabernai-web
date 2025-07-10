@@ -1,7 +1,6 @@
 import React from 'react'
 import { Schema } from '@repo/strapi'
 
-import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { Link } from '@/lib/navigation'
 
 export interface LinkStrapiProps {

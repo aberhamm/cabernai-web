@@ -1,9 +1,7 @@
 import React from 'react'
-import Image from 'next/image'
 
 import { AppLocale } from '@/types/general'
 
-import { getAuth } from '@/lib/auth'
 import { Link } from '@/lib/navigation'
 import Strapi from '@/lib/strapi'
 import { cn } from '@/lib/styles'
@@ -15,9 +13,7 @@ export async function Header({ locale }: { readonly locale: AppLocale }) {
   const { logoImage, topBarLinks, primaryNavigationLinks, logoLink, logoIcon, announcements } =
     data?.data ?? {}
 
-  const session = await getAuth()
-
-  const isAuthenticated = session?.user != null
+  // const session = await getAuth() // Currently unused but kept for future auth implementation
 
   const topBarLink = announcements?.[0]
   return (

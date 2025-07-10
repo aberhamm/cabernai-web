@@ -17,7 +17,6 @@ const generatePlaceholder = async (src: string) => {
     // Dynamically import plaiceholder only when needed and available
     const plaiceholderModule = await import('plaiceholder').catch(() => null)
     if (!plaiceholderModule) {
-      console.log('Plaiceholder module not available, skipping blur placeholder generation')
       return { plaiceholderError: true }
     }
 

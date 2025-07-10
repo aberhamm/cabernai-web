@@ -1,13 +1,8 @@
-import React from 'react'
 import { Schema } from '@repo/strapi'
 
 import { cn } from '@/lib/styles'
-import { Container } from '@/components/elementary/Container'
-import InlineSVG from '@/components/page-builder/InlineSVG'
 
-import { BasicImage } from './BasicImage'
 import { ClientCldImage } from './ClientCldImage'
-import { LinkStrapi } from './LinkStrapi'
 
 export const CTABanner = ({
   component,

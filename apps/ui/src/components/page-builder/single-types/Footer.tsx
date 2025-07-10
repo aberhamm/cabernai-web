@@ -1,96 +1,8 @@
-import { Fragment } from 'react'
-
 import { AppLocale } from '@/types/general'
 
-import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import Strapi from '@/lib/strapi'
-import { cn } from '@/lib/styles'
-import { Container } from '@/components/elementary/Container'
 
-import { ImageWithLink } from '../components/ImageWithLink'
 import { LinkStrapi } from '../components/LinkStrapi'
-
-const footerContent = {
-  sections: [
-    {
-      title: 'Company',
-      links: [
-        { href: 'https://www.digitalocean.com/about', label: 'About' },
-        {
-          href: 'https://investors.digitalocean.com/governance/executive-management/default.aspx',
-          label: 'Leadership',
-        },
-      ],
-    },
-    {
-      title: 'Products',
-      links: [
-        { href: 'https://www.digitalocean.com/products', label: 'Overview' },
-        {
-          href: 'https://www.digitalocean.com/products/droplets',
-          label: 'Droplets',
-        },
-        {
-          href: 'https://www.digitalocean.com/products/kubernetes',
-          label: 'Kubernetes',
-        },
-        {
-          href: 'https://www.digitalocean.com/products/functions',
-          label: 'Functions',
-        },
-        {
-          href: 'https://www.digitalocean.com/products/app-platform',
-          label: 'App Platform',
-        },
-      ],
-    },
-    {
-      title: 'Resources',
-      links: [
-        {
-          href: 'https://www.digitalocean.com/community/tutorials',
-          label: 'Community Tutorials',
-        },
-        {
-          href: 'https://www.digitalocean.com/community/questions',
-          label: 'Community Q&A',
-        },
-        { href: 'https://css-tricks.com/', label: 'CSS-Tricks' },
-      ],
-    },
-    {
-      title: 'Solutions',
-      links: [
-        {
-          href: 'https://www.digitalocean.com/solutions/website-hosting',
-          label: 'Website Hosting',
-        },
-        {
-          href: 'https://www.digitalocean.com/solutions/vps-hosting',
-          label: 'VPS Hosting',
-        },
-      ],
-    },
-    {
-      title: 'Contact',
-      links: [
-        { href: 'https://www.digitalocean.com/support', label: 'Support' },
-        {
-          href: 'https://www.digitalocean.com/company/contact/sales?referrer=footer',
-          label: 'Sales',
-        },
-        {
-          href: 'https://www.digitalocean.com/company/contact/abuse',
-          label: 'Report Abuse',
-        },
-        { href: 'https://status.digitalocean.com/', label: 'System Status' },
-        { href: 'https://ideas.digitalocean.com/', label: 'Share your ideas' },
-      ],
-    },
-  ],
-  copyRight: '© 2024 DigitalOcean, LLC.',
-  sitemap: 'Sitemap.',
-}
 
 async function fetchData(locale: string) {
   try {
@@ -119,7 +31,7 @@ export async function Footer({ locale }: { readonly locale: AppLocale }) {
     return null
   }
 
-  const { sections, links, copyRight } = component
+  const { sections } = component
 
   return (
     <div className="relative isolate">
@@ -153,15 +65,6 @@ export async function Footer({ locale }: { readonly locale: AppLocale }) {
                     {component.copyRight.replace('{YEAR}', new Date().getFullYear().toString())}
                   </span>
                 )}
-              </div>
-              <div className="flex flex-wrap justify-center gap-4 md:justify-end">
-                {component.links?.map((link, i) => (
-                  <LinkStrapi
-                    key={String(link.id) + i}
-                    component={link}
-                    className="m-0 hover:underline"
-                  />
-                ))}
               </div>
             </div>
           </div>

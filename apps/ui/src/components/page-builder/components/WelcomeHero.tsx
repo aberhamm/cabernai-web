@@ -3,15 +3,7 @@
 import { Schema } from '@repo/strapi'
 import { CldImage } from 'next-cloudinary'
 
-import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import { cn } from '@/lib/styles'
-import { Container } from '@/components/elementary/Container'
-import { TextGenerateEffect } from '@/components/fx/TextGeneration'
-import Heading from '@/components/typography/Heading'
-import { Paragraph } from '@/components/typography/Paragraph'
-
-import { BasicImage } from './BasicImage'
-import { LinkStrapi } from './LinkStrapi'
 
 export function WelcomeHero({
   component,
@@ -183,7 +175,7 @@ export function WelcomeHero({
                 <div className="flex flex-col items-center gap-2">
                   {title && (
                     <h1 className="text-5xl font-bold leading-[56px] tracking-[-1.5px] md:mx-auto md:my-0 md:min-h-[2lh] md:max-w-screen-md">
-                      <TextGenerateEffect words={title} />
+                      {title}
                     </h1>
                   )}
                   {subTitle && (

@@ -7,7 +7,9 @@ export function Faq({
 }: {
   readonly component: Schema.Attribute.ComponentValue<'sections.faq', false>
 }) {
-  const { title, subTitle, faqs } = component
+  const { faqs, isVisible } = component
+
+  if (!isVisible) return null
 
   return (
     <section
@@ -32,17 +34,15 @@ export function Faq({
             {}
           </h2>
           <p className="mt-4 text-lg tracking-tight text-slate-700">
-            If you can&apos;t find what you&apos;re looking for, email our support team and if you&apos;re lucky
-            someone will get back to you.
+            If you can&apos;t find what you&apos;re looking for, email our support team and if
+            you&apos;re lucky someone will get back to you.
           </p>
         </div>
         <ul className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3">
           {faqs &&
             faqs.map((faq, faqIndex) => (
               <li key={faqIndex}>
-                <h3 className="font-display text-lg leading-7 text-slate-900">
-                  {faq.question}
-                </h3>
+                <h3 className="font-display text-lg leading-7 text-slate-900">{faq.question}</h3>
                 <p className="mt-4 text-sm text-slate-700">{faq.answer}</p>
               </li>
             ))}

@@ -1,21 +1,13 @@
-import React from 'react'
 import { Schema } from '@repo/strapi'
-
-import { Container } from '@/components/elementary/Container'
-import InlineSVG from '@/components/page-builder/InlineSVG'
-
-import { BasicImage } from './BasicImage'
-import { LinkStrapi } from './LinkStrapi'
 
 export const CTABannerCentered = ({
   component,
 }: {
   readonly component: Schema.Attribute.ComponentValue<'sections.cta-banner-centered', false>
 }) => {
-  // Destructure the component attributes
-  const { title, subText, image, link, isVisible, bgColor, footnote } = component
+  const { title, subText, link, isVisible, bgColor, footnote } = component
 
-  if (!isVisible) return null // Render nothing if isVisible is false
+  if (!isVisible) return null
 
   return (
     <section className="relative isolate">
@@ -55,20 +47,6 @@ export const CTABannerCentered = ({
                   </a>
                 )}
               </div>
-
-              {/* Image */}
-              {/* {image?.media?.url && (
-                <div className="-m-4 md:absolute md:bottom-0 md:left-0 md:right-0 md:top-0 md:m-0">
-                  <img
-                    className="h-auto w-full max-w-full object-cover md:absolute md:h-full"
-                    src={image.media.url}
-                    alt={image.alt || ''}
-                    style={{
-                      aspectRatio: 'auto 1088 / 328',
-                    }}
-                  />
-                </div>
-              )} */}
             </div>
             {footnote && <p className="text-center text-xs text-slate-600">{footnote}</p>}
           </div>

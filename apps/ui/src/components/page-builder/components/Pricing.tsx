@@ -1,7 +1,5 @@
-import Link from 'next/link'
 import { Schema } from '@repo/strapi'
 
-import { cn } from '@/lib/styles'
 import { Container } from '@/components/elementary/Container'
 import { Plan } from '@/components/elementary/Plan'
 

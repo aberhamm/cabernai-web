@@ -1,14 +1,10 @@
+import Image from 'next/image'
 import { Schema } from '@repo/strapi'
 
 import { AppLocale } from '@/types/general'
 
-import { getAuth } from '@/lib/auth'
 import { removeThisWhenYouNeedMe } from '@/lib/general-helpers'
 import Strapi from '@/lib/strapi'
-import { LoggedUserMenu } from '@/components/elementary/LoggedUserMenu'
-import { NavbarItem } from '@/components/elementary/NavbarItem'
-
-import { ImageWithLink } from '../components/ImageWithLink'
 
 async function fetchData(locale: string) {
   try {
@@ -47,9 +43,7 @@ export async function PageBuilderNavbar({
     return null
   }
 
-  const links = (navbar.links ?? []).filter((link) => link.href)
-
-  const session = await getAuth()
+  // Data is fetched but currently not used in this static implementation
 
   return (
     <div>
@@ -126,13 +120,12 @@ export async function PageBuilderNavbar({
             <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <div className="flex w-full items-center justify-between min-[1200px]:w-[unset]">
                 <span className="w-full text-2xl text-white">Product</span>
-                <img
+                <Image
                   className="size-6 min-[1200px]:ml-2"
                   src="https://www.tidio.com/images/icons/icon-chevron-down-white.svg"
                   alt=""
-                  style={{
-                    aspectRatio: 'auto 24 / 24',
-                  }}
+                  width={24}
+                  height={24}
                 />
               </div>
             </div>
@@ -158,13 +151,12 @@ export async function PageBuilderNavbar({
             <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <div className="flex w-full items-center justify-between min-[1200px]:w-[unset]">
                 <span className="w-full text-2xl text-white">Resources</span>
-                <img
+                <Image
                   className="size-6 min-[1200px]:ml-2"
                   src="https://www.tidio.com/images/icons/icon-chevron-down-white.svg"
                   alt=""
-                  style={{
-                    aspectRatio: 'auto 24 / 24',
-                  }}
+                  width={24}
+                  height={24}
                 />
               </div>
             </div>
@@ -173,13 +165,12 @@ export async function PageBuilderNavbar({
             <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <div className="flex w-full items-center justify-between min-[1200px]:w-[unset]">
                 <span className="w-full text-2xl text-white">Partners</span>
-                <img
+                <Image
                   className="size-6 min-[1200px]:ml-2"
                   src="https://www.tidio.com/images/icons/icon-chevron-down-white.svg"
                   alt=""
-                  style={{
-                    aspectRatio: 'auto 24 / 24',
-                  }}
+                  width={24}
+                  height={24}
                 />
               </div>
             </div>
@@ -188,13 +179,12 @@ export async function PageBuilderNavbar({
             <div className="flex items-center min-[1200px]:px-0 min-[1200px]:py-3">
               <div className="flex w-full items-center justify-between min-[1200px]:w-[unset]">
                 <span className="w-full text-2xl text-white">Contact</span>
-                <img
+                <Image
                   className="size-6 min-[1200px]:ml-2"
                   src="https://www.tidio.com/images/icons/icon-chevron-down-white.svg"
                   alt=""
-                  style={{
-                    aspectRatio: 'auto 24 / 24',
-                  }}
+                  width={24}
+                  height={24}
                 />
               </div>
             </div>

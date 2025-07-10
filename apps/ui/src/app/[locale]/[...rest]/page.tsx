@@ -6,7 +6,6 @@ import { PageProps } from '@/types/next'
 import { routing } from '@/lib/navigation'
 import { getMetadataFromStrapi } from '@/lib/next-helpers'
 import Strapi from '@/lib/strapi'
-import { ErrorBoundary } from '@/components/elementary/ErrorBoundary'
 import { ComponentsRenderer } from '@/components/page-builder/ComponentsRenderer'
 
 export async function generateStaticParams() {

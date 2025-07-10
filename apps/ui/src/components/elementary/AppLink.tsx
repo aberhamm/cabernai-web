@@ -1,9 +1,9 @@
-import { VariantProps } from 'class-variance-authority'
 import React from 'react'
+import { VariantProps } from 'class-variance-authority'
 
-import { buttonVariants } from '@/components/ui/button'
 import { isAppLink, Link } from '@/lib/navigation'
 import { cn } from '@/lib/styles'
+import { buttonVariants } from '@/components/ui/button'
 
 export interface AppLinkProps
   extends React.AnchorHTMLAttributes<HTMLAnchorElement>,

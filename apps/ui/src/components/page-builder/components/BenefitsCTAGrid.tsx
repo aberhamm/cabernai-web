@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Schema } from '@repo/strapi'
 
 import { cn } from '@/lib/styles'
@@ -47,13 +48,12 @@ export const BenefitsCTAGrid = ({
                       <div className="flex flex-col gap-4">
                         {benefit.image && (
                           <div className="size-20">
-                            <img
+                            <Image
                               className="size-full max-w-full object-contain"
-                              src={benefit.image?.media?.url}
+                              src={benefit.image?.media?.url || ''}
                               alt={benefit.image?.alt || ''}
-                              style={{
-                                aspectRatio: 'auto 80 / 80',
-                              }}
+                              width={80}
+                              height={80}
                             />
                           </div>
                         )}
