@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  # Strapi Application
+  strapi-app:
+    build:
+      context: .
+      dockerfile: ./apps/strapi/Dockerfile
+      target: runner
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_CLIENT: postgres
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_SSL: ${DATABASE_SSL:-true}
+      DATABASE_SSL_REJECT_UNAUTHORIZED: ${DATABASE_SSL_REJECT_UNAUTHORIZED:-true}
+      DATABASE_SCHEMA: ${DATABASE_SCHEMA:-public}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      APP_KEYS: ${APP_KEYS}
+      STRAPI_URL: ${STRAPI_URL}
+      # Add your other Strapi environment variables here
+    volumes:
+      - strapi_uploads:/opt/app/public/uploads
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1337/_health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Next.js UI Application
+  ui-app:
+    build:
+      context: .
+      dockerfile: ./apps/ui/Dockerfile
+      target: runner
+      args:
+        APP_PUBLIC_URL: ${APP_PUBLIC_URL}
+        STRAPI_URL: ${STRAPI_URL}
+        STRAPI_REST_READONLY_API_KEY: ${STRAPI_REST_READONLY_API_KEY}
+        NEXTAUTH_URL: ${NEXTAUTH_URL}
+        NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+        NEXT_OUTPUT: standalone
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_OUTPUT: standalone
+      APP_PUBLIC_URL: ${APP_PUBLIC_URL}
+      STRAPI_URL: ${STRAPI_URL}
+      STRAPI_REST_READONLY_API_KEY: ${STRAPI_REST_READONLY_API_KEY}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      # Add your other UI environment variables here
+    depends_on:
+      strapi-app:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      - nginx_certs:/etc/letsencrypt
+      - nginx_webroot:/var/www/certbot
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - strapi-app
+      - ui-app
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Certbot for SSL certificates
+  certbot:
+    image: certbot/certbot:latest
+    restart: "no"
+    volumes:
+      - nginx_certs:/etc/letsencrypt
+      - nginx_webroot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  strapi_uploads:
+    driver: local
+  nginx_certs:
+    driver: local
+  nginx_webroot:
+    driver: local
+  nginx_logs:
+    driver: local

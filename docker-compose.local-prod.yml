@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Strapi Application (Production Build, Local Testing)
+  strapi-app:
+    build:
+      context: .
+      dockerfile: ./apps/strapi/Dockerfile
+      target: runner
+    ports:
+      - "1337:1337"
+    environment:
+      NODE_ENV: production
+      DATABASE_CLIENT: postgres
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_SSL: ${DATABASE_SSL:-true}
+      DATABASE_SSL_REJECT_UNAUTHORIZED: ${DATABASE_SSL_REJECT_UNAUTHORIZED:-true}
+      DATABASE_SCHEMA: ${DATABASE_SCHEMA:-public}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      APP_KEYS: ${APP_KEYS}
+      STRAPI_URL: ${STRAPI_URL:-http://localhost:1337}
+    volumes:
+      - strapi_uploads:/app/apps/strapi/public/uploads
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1337/_health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Next.js UI Application (Production Build, Local Testing)
+  ui-app:
+    build:
+      context: .
+      dockerfile: ./apps/ui/Dockerfile
+      target: runner
+      args:
+        APP_PUBLIC_URL: ${APP_PUBLIC_URL:-http://localhost:3000}
+        STRAPI_URL: ${STRAPI_URL:-http://localhost:1337}
+        STRAPI_REST_READONLY_API_KEY: ${STRAPI_REST_READONLY_API_KEY}
+        NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+        NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+        NEXT_OUTPUT: standalone
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_OUTPUT: standalone
+      APP_PUBLIC_URL: ${APP_PUBLIC_URL:-http://localhost:3000}
+      STRAPI_URL: ${STRAPI_URL:-http://localhost:1337}
+      STRAPI_REST_READONLY_API_KEY: ${STRAPI_REST_READONLY_API_KEY}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  strapi_uploads:
+    driver: local
